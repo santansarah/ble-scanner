@@ -83,3 +83,12 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+
+/app.properties
+/app/src/main/res/values/secrets.xml
+/.idea
+/ble-scanner.sqbpro
+/app/src/main/java/com/santansarah/blescanner/utils/BLEMfrIds.kt
+/app/src/main/java/com/santansarah/blescanner/utils/Companies.kt
+/app/src/main/java/com/santansarah/blescanner/utils/ServiceIds.kt
