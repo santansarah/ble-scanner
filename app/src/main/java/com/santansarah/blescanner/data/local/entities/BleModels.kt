@@ -25,12 +25,14 @@ data class MicrosoftDevice(
 
 @Entity(tableName = "scanned")
 data class ScannedDevice(
-    val name: String,
-    val address: String,
+    val deviceName: String?,
+    @PrimaryKey val address: String,
     val rssi: Int,
-    val manufacturer: String,
-    val services: List<String>
+    val manufacturer: String?,
+    val services: List<String>? = null,
+    val extra: List<String>? = null
 )
+
 
 
 

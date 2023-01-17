@@ -1,7 +1,6 @@
 package com.santansarah.blescanner.domain
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -12,11 +11,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import androidx.activity.ComponentActivity
+import android.os.ParcelUuid
+import android.util.SparseArray
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import com.santansarah.blescanner.data.local.BleRepository
-import com.santansarah.blescanner.domain.models.ScannedDevice
+import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +25,7 @@ import kotlin.time.Duration.Companion.minutes
 
 
 class BLEManager(
-    private val app: Application,
+    app: Application,
     private val bleRepository: BleRepository,
     private val scope: CoroutineScope
 ) {
@@ -54,52 +53,84 @@ class BLEManager(
             scope.launch {
                 Timber.d("device: $result")
 
-                var device = ScannedDevice(
-                    name = result.device.name ?: "Unknown",
-                    address = result.device.address,
-                    rssi = result.rssi,
-                    manufacturer = null,
-                    services = emptyList(),
-                    extra = emptyList()
-                )
+                var mfName: String? = null
+                var services: List<String>? = null
+                var extra: List<String>? = null
 
-                val mfgData = result.scanRecord?.manufacturerSpecificData
-                mfgData?.let {
-                    var mfId: Int = 0
-                    for (i in 0 until it.size()) {
-                        mfId = it.keyAt(i)
-                    }
-                    device = device.copy(manufacturer = bleRepository
-                        .getCompanyById(mfId)?.name)
+                result.scanRecord?.manufacturerSpecificData?.let { mfData ->
+                    getMfId(mfData)?.let { mfId ->
+                        mfName = getMfName(mfId)
 
-                    if (mfId == 6) {
-                        val bytes = result.scanRecord?.getManufacturerSpecificData(mfId)
-                        bytes?.let {msData ->
-                            val msDeviceType = msData[1].toHex().toInt()
-                            device = device.copy(extra = listOf(
-                                bleRepository.getMicrosoftDeviceById(msDeviceType)?.name
-                            ))
+                        result.scanRecord?.getManufacturerSpecificData(mfId)?.let { mfBytes ->
+                            if (mfId == 6) {
+                                getMsDevice(mfBytes)?.let {msDevice ->
+                                    extra = listOf(msDevice)
+                                }
+                            }
                         }
                     }
-
                 }
 
-                val serviceIdsRecord = result.scanRecord?.serviceUuids
-                val serviceNames = mutableListOf<String?>()
-                serviceIdsRecord?.let {
-                    it.forEach { serviceId ->
-                        val formattedId = serviceId.uuid.toGss()
-                        serviceNames.add(bleRepository.getServiceById(formattedId)?.name)
-                    }
-
-                    device = device.copy(services = serviceNames)
+                result.scanRecord?.serviceUuids?.let {
+                    services = getServices(it)
                 }
+
+                var device = ScannedDevice(
+                    deviceName = result.device.name,
+                    address = result.device.address,
+                    rssi = result.rssi,
+                    manufacturer = mfName,
+                    services = services,
+                    extra = extra
+                )
+
+                bleRepository.insertDevice(device)
 
                 Timber.d(device.toString())
 
             }
 
         }
+
+    }
+
+    fun getMfId(
+        mfData: SparseArray<ByteArray>
+    ): Int? {
+
+        var mfId: Int? = null
+        for (i in 0 until mfData.size()) {
+            mfId = mfData.keyAt(i)
+        }
+        return mfId
+    }
+
+    suspend fun getMfName(
+        mfId: Int
+    ): String? = bleRepository.getCompanyById(mfId)?.name
+
+    suspend fun getMsDevice(
+        byteArray: ByteArray
+    ): String? {
+        val msDeviceType = byteArray[1].toHex().toInt()
+        return bleRepository.getMicrosoftDeviceById(msDeviceType)?.name
+    }
+
+    suspend fun getServices(
+        serviceIdRecord: List<ParcelUuid>
+    ): List<String>? {
+        var serviceNames: MutableList<String>? = null
+
+        serviceIdRecord.forEach { serviceId ->
+            val formattedId = serviceId.uuid.toGss()
+            bleRepository.getServiceById(formattedId)?.name?.let { serviceName ->
+                if (serviceNames == null)
+                    serviceNames = mutableListOf()
+                serviceNames?.add(serviceName)
+            }
+        }
+
+        return serviceNames?.toList()
 
     }
 
@@ -121,27 +152,30 @@ class BLEManager(
     }
 
     private fun checkEnabled() {
-        if (!btAdapter.isEnabled) {
+        /*if (!btAdapter.isEnabled) {
             val btEnableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             btEnableResultLauncher.launch(btEnableIntent)
-        }
+        }*/
     }
 
     @SuppressLint("MissingPermission")
     private fun scanLeDevice() {
-        if (!scanning) { // Stops scanning after a pre-defined scan period.
-            handler.postDelayed({
+        scope.launch {
+            if (!scanning) { // Stops scanning after a pre-defined scan period.
+                handler.postDelayed({
+                    scanning = false
+                    Timber.d("stopped scanning...")
+                    btScanner.stopScan(scanCallback)
+                }, SCAN_PERIOD)
+                scanning = true
+                Timber.d("started scanning...")
+                //bleRepository.deleteScans()
+                btScanner.startScan(null, scanSettings, scanCallback)
+            } else {
                 scanning = false
-                Timber.d("stopped scanning...")
                 btScanner.stopScan(scanCallback)
-            }, SCAN_PERIOD)
-            scanning = true
-            Timber.d("started scanning...")
-            btScanner.startScan(null, scanSettings, scanCallback)
-        } else {
-            scanning = false
-            btScanner.stopScan(scanCallback)
-            Timber.d("stopped scanning...")
+                Timber.d("stopped scanning...")
+            }
         }
     }
 
