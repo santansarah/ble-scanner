@@ -18,6 +18,8 @@ class BleRepository(
 
     suspend fun insertDevice(device: ScannedDevice) = dao.insertDevice(device)
 
-    fun deleteScans() = dao.deleteScans()
+    suspend fun deleteScans() = dao.deleteScans()
+
+    fun getScannedDevices() = dao.getScannedDevices()
 
 }

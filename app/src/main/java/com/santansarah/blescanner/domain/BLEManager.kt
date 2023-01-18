@@ -1,12 +1,14 @@
 package com.santansarah.blescanner.domain
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
@@ -20,18 +22,20 @@ import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import timber.log.Timber
 import kotlin.time.Duration.Companion.minutes
-
 
 class BLEManager(
     app: Application,
     private val bleRepository: BleRepository,
     private val scope: CoroutineScope
-) {
+): KoinComponent {
 
-    private val btManager = app.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    private val btAdapter: BluetoothAdapter = btManager.adapter
+    var isScanning = false
+
+    private val btAdapter: BluetoothAdapter = get()
     private val btScanner = btAdapter.bluetoothLeScanner
 
     private lateinit var btEnableResultLauncher: ActivityResultLauncher<Intent>
@@ -39,11 +43,12 @@ class BLEManager(
     private var scanning = false
     private val handler = Handler(Looper.getMainLooper())
 
-    private val SCAN_PERIOD: Long = 2.minutes.inWholeMilliseconds
+    private val SCAN_PERIOD: Long = 4.minutes.inWholeMilliseconds
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
+
 
     private val scanCallback = object : ScanCallback() {
 
@@ -85,8 +90,6 @@ class BLEManager(
                 )
 
                 bleRepository.insertDevice(device)
-
-                Timber.d(device.toString())
 
             }
 
@@ -137,7 +140,7 @@ class BLEManager(
     init {
         setUpLauncher()
         checkEnabled()
-        scanLeDevice()
+        scan()
     }
 
     private fun setUpLauncher() {
@@ -158,7 +161,7 @@ class BLEManager(
         }*/
     }
 
-    @SuppressLint("MissingPermission")
+    /*@SuppressLint("MissingPermission")
     private fun scanLeDevice() {
         scope.launch {
             if (!scanning) { // Stops scanning after a pre-defined scan period.
@@ -177,8 +180,19 @@ class BLEManager(
                 Timber.d("stopped scanning...")
             }
         }
+    }*/
+
+    @SuppressLint("MissingPermission")
+    fun scan() {
+        isScanning = true
+        btScanner.startScan(null,scanSettings,scanCallback)
     }
 
+    @SuppressLint("MissingPermission")
+    fun stopScan() {
+        isScanning = false
+        btScanner.stopScan(scanCallback)
+    }
 
 }
 

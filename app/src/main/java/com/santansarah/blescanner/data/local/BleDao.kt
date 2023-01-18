@@ -14,22 +14,22 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BleDao {
     @Query("SELECT * FROM companies WHERE code = :companyId")
-    fun getCompanyById(companyId: Int): Company?
+    suspend fun getCompanyById(companyId: Int): Company?
 
     @Query("SELECT * FROM services where uuid = :uuid")
-    fun getServiceByUuid(uuid: String): Service?
+    suspend fun getServiceByUuid(uuid: String): Service?
 
     @Query("SELECT * FROM MicrosoftDevices where id = :id")
-    fun getMicrosoftDevice(id: Int): MicrosoftDevice?
+    suspend fun getMicrosoftDevice(id: Int): MicrosoftDevice?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertDevice(device: ScannedDevice): Long
+    suspend fun insertDevice(device: ScannedDevice): Long
 
     @Query("SELECT * from scanned ORDER BY rssi")
     fun getScannedDevices(): Flow<List<ScannedDevice>>
 
     @Query("DELETE from scanned")
-    fun deleteScans()
+    suspend fun deleteScans()
 
 }
 

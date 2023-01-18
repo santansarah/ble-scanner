@@ -26,6 +26,9 @@ class Converters {
     fun listToJson(value: List<String>?) = Json.encodeToString(value)
 
     @TypeConverter
-    fun jsonToList(value: String) = Json.decodeFromString<List<String>>(value)
+    fun jsonToList(value: String) =
+        if (value.startsWith("["))
+            Json.decodeFromString<List<String>>(value)
+        else null
 
 }

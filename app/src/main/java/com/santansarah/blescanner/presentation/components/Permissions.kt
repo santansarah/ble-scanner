@@ -1,4 +1,4 @@
-package com.santansarah.blescanner.presentation
+package com.santansarah.blescanner.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +15,7 @@ import com.santansarah.blescanner.utils.permissionsList
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeRoute(
-
-) {
+fun ShowPermissions() {
 
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionsList)
 
