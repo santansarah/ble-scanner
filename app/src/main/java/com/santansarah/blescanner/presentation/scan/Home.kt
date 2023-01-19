@@ -37,15 +37,9 @@ fun HomeRoute(
     LazyColumn() {
         items(devices.value) { device ->
 
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(text = device.rssi.toString())
-                Text(text = device.deviceName ?: "")
-                Text(text = device.address)
-                Text(text = device.manufacturer ?: "")
-                Text(text = device.services.toString())
-            }
+            ScannedDevice(device = device)
             
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
         }
     }

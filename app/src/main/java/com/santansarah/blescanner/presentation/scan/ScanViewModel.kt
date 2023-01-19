@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
-import com.santansarah.blescanner.domain.BLEManager
+import com.santansarah.blescanner.presentation.BLEManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

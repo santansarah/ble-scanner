@@ -5,8 +5,7 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.santansarah.blescanner.MainActivity
-import com.santansarah.blescanner.domain.BLEManager
+import com.santansarah.blescanner.presentation.BLEManager
 import com.santansarah.blescanner.presentation.scan.ScanViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

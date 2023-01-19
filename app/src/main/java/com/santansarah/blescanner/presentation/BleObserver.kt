@@ -1,4 +1,4 @@
-package com.santansarah.blescanner.domain
+package com.santansarah.blescanner.presentation
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -6,14 +6,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import org.koin.android.ext.android.get
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 

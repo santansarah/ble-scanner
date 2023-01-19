@@ -1,5 +1,6 @@
 package com.santansarah.blescanner.data.local
 
+import android.location.Address
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -25,8 +26,11 @@ interface BleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDevice(device: ScannedDevice): Long
 
-    @Query("SELECT * from scanned ORDER BY rssi")
+    @Query("SELECT * from scanned")
     fun getScannedDevices(): Flow<List<ScannedDevice>>
+
+    @Query("SELECT * from scanned where address = :address")
+    suspend fun getDeviceByAddress(address: String): ScannedDevice?
 
     @Query("DELETE from scanned")
     suspend fun deleteScans()

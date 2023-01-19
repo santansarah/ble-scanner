@@ -1,7 +1,9 @@
 package com.santansarah.blescanner.data.local.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import org.jetbrains.annotations.NotNull
 
 @Entity(tableName = "companies")
 data class Company(
@@ -23,18 +25,16 @@ data class MicrosoftDevice(
     val name: String
 )
 
-@Entity(tableName = "scanned")
+@Entity(
+    tableName = "scanned",
+    indices = [Index(value = ["address"], unique = true)]
+)
 data class ScannedDevice(
+    @PrimaryKey(autoGenerate = true) val deviceId: Long? = null,
     val deviceName: String?,
-    @PrimaryKey val address: String,
+    val address: String,
     val rssi: Int,
     val manufacturer: String?,
     val services: List<String>? = null,
     val extra: List<String>? = null
 )
-
-
-
-
-
-

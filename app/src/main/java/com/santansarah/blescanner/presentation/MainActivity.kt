@@ -1,6 +1,5 @@
-package com.santansarah.blescanner
+package com.santansarah.blescanner.presentation
 
-import android.bluetooth.BluetoothAdapter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,12 +8,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.santansarah.blescanner.domain.BLEManager
-import com.santansarah.blescanner.domain.BleObserver
+import com.santansarah.blescanner.presentation.BleObserver
 import com.santansarah.blescanner.presentation.scan.HomeRoute
 import com.santansarah.blescanner.ui.theme.BLEScannerTheme
-import org.koin.android.ext.android.get
 
 
 class MainActivity : ComponentActivity() {
@@ -26,15 +24,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BLEScannerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    HomeRoute(
-                        isScanning = bleObserver.bleManager.isScanning
-                    )
-                }
+                BleApp(
+                    isScanning = bleObserver.bleManager.isScanning
+                )
             }
         }
     }

@@ -1,21 +1,13 @@
-package com.santansarah.blescanner.domain
+package com.santansarah.blescanner.presentation
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import android.os.ParcelUuid
 import android.util.SparseArray
-import androidx.activity.result.ActivityResultLauncher
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.utils.toGss
@@ -25,7 +17,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
-import kotlin.time.Duration.Companion.minutes
 
 class BLEManager(
     app: Application,
@@ -38,17 +29,9 @@ class BLEManager(
     private val btAdapter: BluetoothAdapter = get()
     private val btScanner = btAdapter.bluetoothLeScanner
 
-    private lateinit var btEnableResultLauncher: ActivityResultLauncher<Intent>
-
-    private var scanning = false
-    private val handler = Handler(Looper.getMainLooper())
-
-    private val SCAN_PERIOD: Long = 4.minutes.inWholeMilliseconds
-
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
-
 
     private val scanCallback = object : ScanCallback() {
 
@@ -56,7 +39,7 @@ class BLEManager(
         override fun onScanResult(callbackType: Int, result: ScanResult) {
 
             scope.launch {
-                Timber.d("device: $result")
+                //Timber.d("device: $result")
 
                 var mfName: String? = null
                 var services: List<String>? = null
@@ -81,6 +64,7 @@ class BLEManager(
                 }
 
                 var device = ScannedDevice(
+                    deviceId = 0,
                     deviceName = result.device.name,
                     address = result.device.address,
                     rssi = result.rssi,
@@ -89,7 +73,8 @@ class BLEManager(
                     extra = extra
                 )
 
-                bleRepository.insertDevice(device)
+                val recNum = bleRepository.insertDevice(device)
+                Timber.d("$recNum: ${device.toString()}")
 
             }
 
@@ -138,27 +123,10 @@ class BLEManager(
     }
 
     init {
-        setUpLauncher()
-        checkEnabled()
-        scan()
-    }
-
-    private fun setUpLauncher() {
-        /*btEnableResultLauncher = activity.registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                // There are no request codes
-                val data: Intent? = result.data
-            }
-        }*/
-    }
-
-    private fun checkEnabled() {
-        /*if (!btAdapter.isEnabled) {
-            val btEnableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            btEnableResultLauncher.launch(btEnableIntent)
-        }*/
+        scope.launch {
+            bleRepository.deleteScans()
+            scan()
+        }
     }
 
     /*@SuppressLint("MissingPermission")
