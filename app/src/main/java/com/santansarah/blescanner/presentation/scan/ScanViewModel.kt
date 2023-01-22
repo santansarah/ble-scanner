@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 
 class ScanViewModel(
-    bleManager: BLEManager,
+    private val bleManager: BLEManager,
     bleRepository: BleRepository,
     dispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -26,5 +26,9 @@ class ScanViewModel(
             initialValue = emptyList()
         )
 
+
+    fun startScan() {
+        bleManager.scan()
+    }
 
 }

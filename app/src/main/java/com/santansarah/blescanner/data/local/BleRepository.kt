@@ -25,7 +25,8 @@ class BleRepository(
             rssi = device.rssi,
             manufacturer = existingDevice?.manufacturer ?: device.manufacturer,
             services = device.services,
-            extra = device.extra
+            extra = device.extra,
+            lastSeen = device.lastSeen
         )
 
         return dao.insertDevice(deviceToUpsert)

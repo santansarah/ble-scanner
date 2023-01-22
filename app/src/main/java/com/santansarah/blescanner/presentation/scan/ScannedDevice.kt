@@ -14,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,17 +29,18 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.ui.theme.BLEScannerTheme
+import com.santansarah.blescanner.utils.toDate
 
 @Composable
 fun ScannedDevice(
     device: ScannedDevice
 ) {
 
-    Card(
+    OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
+            defaultElevation = 4.dp
         )
     ) {
         Row(
@@ -88,6 +90,10 @@ fun ScannedDevice(
                     text = device.address,
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = "Last seen: ${device.lastSeen.toDate()}",
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }
@@ -105,7 +111,7 @@ fun ScannedDevicePreview() {
     val device = ScannedDevice(
         0, "LED", "24:A9:30:53:5A:97", -45,
         "Microsoft", listOf("Human Readable Device"),
-        listOf("Windows 10 Desktop")
+        listOf("Windows 10 Desktop"), 0L
     )
     BLEScannerTheme {
         Surface() {

@@ -36,5 +36,6 @@ data class ScannedDevice(
     val rssi: Int,
     val manufacturer: String?,
     val services: List<String>? = null,
-    val extra: List<String>? = null
+    val extra: List<String>? = null,
+    val lastSeen: Long
 )

@@ -1,6 +1,12 @@
 package com.santansarah.blescanner.utils
 
+import android.os.SystemClock
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
+import java.util.concurrent.TimeUnit
+
 
 /**
  * Use “%02x” to convert the given byte to its corresponding hex value.
@@ -17,4 +23,11 @@ fun UUID.toGss() =
     this.toString()
         .replaceFirst(Regex("^0+(?!$)"), "")
         .replace("-0000-1000-8000-00805f9b34fb", "")
+
+fun Long.toMillis() =
+    System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(
+        SystemClock.elapsedRealtimeNanos() - this, TimeUnit.NANOSECONDS)
+
+fun Long.toDate() =
+    SimpleDateFormat("MM/dd/yy h:mm:ss ", Locale.US).format(Date(this))
 

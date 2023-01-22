@@ -24,9 +24,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BLEScannerTheme {
-                BleApp(
-                    isScanning = bleObserver.bleManager.isScanning
-                )
+                BleApp()
             }
         }
     }

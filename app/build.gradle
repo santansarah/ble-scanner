@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'kotlin-kapt'
+    id 'de.mannodermaus.android-junit5'
 }
 
 android {
@@ -16,7 +17,10 @@ android {
         versionCode 1
         versionName "1.0"
 
+        // add the AndroidJUnitRunner, then connect JUnit 5 to the runner
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArgument "runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder"
+
         vectorDrawables {
             useSupportLibrary true
         }
@@ -61,11 +65,11 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha04"
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation platform('androidx.compose:compose-bom:2022.10.00')
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    //testImplementation 'junit:junit:4.13.2'
+    //androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    //androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    //androidTestImplementation platform('androidx.compose:compose-bom:2022.10.00')
+    //androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
@@ -80,7 +84,6 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
-    testImplementation "androidx.room:room-testing:$room_version"
 
     def koin_android_version= "3.3.2"
     def koin_android_compose_version= "3.4.1"
@@ -90,5 +93,24 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
     implementation "io.insert-koin:koin-androidx-navigation:$koin_android_version"
     implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
+
+    //testing
+    testImplementation "io.insert-koin:koin-test:$koin_android_version"
+    testImplementation "io.insert-koin:koin-test-junit5:$koin_android_version"
+
+    testImplementation "androidx.room:room-testing:$room_version"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    testImplementation 'io.mockk:mockk:1.13.3'
+
+    androidTestImplementation 'androidx.test:core:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    androidTestImplementation 'de.mannodermaus.junit5:android-test-core:1.3.0'
+    androidTestRuntimeOnly 'de.mannodermaus.junit5:android-test-runner:1.3.0'
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    androidTestImplementation 'io.mockk:mockk-android:1.13.3'
+    androidTestImplementation 'app.cash.turbine:turbine:0.12.1'
 
 }

@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 @Database(
     entities = [Company::class, Service::class,
         MicrosoftDevice::class, ScannedDevice::class],
-    version = 6, exportSchema = false
+    version = 7, exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class BleDatabase : RoomDatabase() {

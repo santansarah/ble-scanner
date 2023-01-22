@@ -12,6 +12,7 @@ import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
+import com.santansarah.blescanner.utils.toMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -39,7 +40,7 @@ class BLEManager(
         override fun onScanResult(callbackType: Int, result: ScanResult) {
 
             scope.launch {
-                //Timber.d("device: $result")
+                Timber.d("device: $result")
 
                 var mfName: String? = null
                 var services: List<String>? = null
@@ -70,7 +71,8 @@ class BLEManager(
                     rssi = result.rssi,
                     manufacturer = mfName,
                     services = services,
-                    extra = extra
+                    extra = extra,
+                    lastSeen = result.timestampNanos.toMillis()
                 )
 
                 val recNum = bleRepository.insertDevice(device)
@@ -125,7 +127,7 @@ class BLEManager(
     init {
         scope.launch {
             bleRepository.deleteScans()
-            scan()
+            //scan()
         }
     }
 
