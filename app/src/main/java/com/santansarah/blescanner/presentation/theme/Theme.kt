@@ -1,4 +1,4 @@
-package com.santansarah.blescanner.ui.theme
+package com.santansarah.blescanner.presentation.theme
 
 import android.app.Activity
 import android.os.Build
@@ -85,7 +85,7 @@ private val DarkColors = darkColorScheme(
 fun BLEScannerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

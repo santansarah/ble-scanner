@@ -1,4 +1,4 @@
-package com.santansarah.blescanner.ui.theme
+package com.santansarah.blescanner.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFFff4800)
@@ -28,11 +28,11 @@ val md_theme_light_outlineVariant = Color(0xFFD1C2CB)
 val md_theme_light_scrim = Color(0xFF000000)
 
 // cards
-val md_theme_light_surface = Color(0xFFe2e9e9)
-val md_theme_light_surfaceVariant = Color(0xFFe2e9e9)
-val md_theme_light_surfaceTint = Color(0xFF03ffe5)
-val md_theme_light_onSurface = Color(0xFF001314)
-val md_theme_light_outline = Color(0xFF3f504e)
+val md_theme_light_surface = Color(0xFFefefd1)
+val md_theme_light_surfaceVariant = Color(0xFFefefd1)
+val md_theme_light_surfaceTint = Color(0xFFefefd1)
+val md_theme_light_onSurface = Color(0xFF0e100f)
+val md_theme_light_outline = Color(0xFF5a6860)
 
 val md_theme_dark_primary = Color(0xFFfff500)
 val md_theme_dark_onPrimary = Color(0xFF0e100f)
@@ -63,7 +63,7 @@ val md_theme_dark_surface = Color(0xFF0e100f)
 val md_theme_dark_surfaceVariant = Color(0xFF0e100f)
 val md_theme_dark_onSurface = Color(0xFFc7c1bd)
 val md_theme_dark_onSurfaceVariant = Color(0xFFc7c1bd)
-val md_theme_dark_outline = Color(0xFFff4800)
+val md_theme_dark_outline = Color(0xFFff8300)
 val md_theme_dark_surfaceTint = Color(0xFFc7c1bd)
 
 
