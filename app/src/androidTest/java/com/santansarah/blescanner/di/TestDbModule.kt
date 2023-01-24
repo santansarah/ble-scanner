@@ -12,8 +12,6 @@ val testDatabaseModule = module {
 
     fun provideDataBase(application: Application): BleDatabase {
         return Room.inMemoryDatabaseBuilder(application, BleDatabase::class.java)
-            .fallbackToDestructiveMigration()
-            .createFromAsset("database/ble.db")
             .build()
     }
 
@@ -21,10 +19,8 @@ val testDatabaseModule = module {
         return dataBase.bleDao()
     }
 
-    fun provideBleRepository(dao: BleDao): BleRepository = BleRepository(dao)
-
-    single { provideDataBase(get()) }
-    single { provideDao(get()) }
-    single { BleRepository(get()) }
+    factory { provideDataBase(get()) }
+    factory { provideDao(get()) }
+    factory { BleRepository(get()) }
 
 }

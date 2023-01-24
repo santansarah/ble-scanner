@@ -21,8 +21,6 @@ val databaseModule = module {
         return dataBase.bleDao()
     }
 
-    fun provideBleRepository(dao: BleDao): BleRepository = BleRepository(dao)
-
     single { provideDataBase(androidApplication()) }
     single { provideDao(get()) }
     single { BleRepository(get()) }

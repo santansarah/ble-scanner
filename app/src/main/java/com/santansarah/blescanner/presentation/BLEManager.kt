@@ -131,27 +131,6 @@ class BLEManager(
         }
     }
 
-    /*@SuppressLint("MissingPermission")
-    private fun scanLeDevice() {
-        scope.launch {
-            if (!scanning) { // Stops scanning after a pre-defined scan period.
-                handler.postDelayed({
-                    scanning = false
-                    Timber.d("stopped scanning...")
-                    btScanner.stopScan(scanCallback)
-                }, SCAN_PERIOD)
-                scanning = true
-                Timber.d("started scanning...")
-                //bleRepository.deleteScans()
-                btScanner.startScan(null, scanSettings, scanCallback)
-            } else {
-                scanning = false
-                btScanner.stopScan(scanCallback)
-                Timber.d("stopped scanning...")
-            }
-        }
-    }*/
-
     @SuppressLint("MissingPermission")
     fun scan() {
         isScanning = true
@@ -165,26 +144,3 @@ class BLEManager(
     }
 
 }
-
-
-/*
-private val bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
-private var scanning = false
-private val handler = Handler()
-
-// Stops scanning after 10 seconds.
-private val SCAN_PERIOD: Long = 10000
-
-private fun scanLeDevice() {
-    if (!scanning) { // Stops scanning after a pre-defined scan period.
-        handler.postDelayed({
-            scanning = false
-            bluetoothLeScanner.stopScan(leScanCallback)
-        }, SCAN_PERIOD)
-        scanning = true
-        bluetoothLeScanner.startScan(leScanCallback)
-    } else {
-        scanning = false
-        bluetoothLeScanner.stopScan(leScanCallback)
-    }
-}*/
