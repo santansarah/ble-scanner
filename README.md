@@ -3,6 +3,7 @@
 Scan your BLE devices with my new Jetpack Compose app. BLE scans include:
 
 * The device name, if known
+* The MAC address
 * A list of advertised services
 * Manufacturer specific data, when possible
 * and a timestamp of when the device was last seen
