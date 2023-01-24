@@ -10,7 +10,7 @@ val newDevice = ScannedDevice(
     manufacturer = "Microsoft",
     services = listOf("Human Readable Device"),
     extra = listOf("Windows 10 Desktop"),
-    lastSeen = 0L
+    lastSeen = 1674510398719
 )
 
 val deviceList = listOf(

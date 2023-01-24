@@ -28,9 +28,9 @@ val md_theme_light_outlineVariant = Color(0xFFD1C2CB)
 val md_theme_light_scrim = Color(0xFF000000)
 
 // cards
-val md_theme_light_surface = Color(0xFFeef3e2)
-val md_theme_light_surfaceVariant = Color(0xFFeef3e2)
-val md_theme_light_surfaceTint = Color(0xFFeef3e2)
+val md_theme_light_surface = Color(0xFFedede8)
+val md_theme_light_surfaceVariant = Color(0xFFedede8)
+val md_theme_light_surfaceTint = Color(0xFFedede8)
 val md_theme_light_onSurface = Color(0xFF0e100f)
 val md_theme_light_outline = Color(0xFF5a6860)
 

@@ -5,11 +5,9 @@ import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.Service
 
 val companies = listOf(
-
     Company(0, "Ericsson Technology Licensing"),
     Company(6, "Microsoft"),
-
-    )
+)
 
 val services = listOf(
     Service(
@@ -23,8 +21,7 @@ val services = listOf(
         uuid = "00001523-1212-EFDE-1523-785FEABCD123",
         source = "nordic"
     ),
-
-    )
+)
 
 val msDevices = listOf(
     MicrosoftDevice(9, "Windows 10 Desktop")
