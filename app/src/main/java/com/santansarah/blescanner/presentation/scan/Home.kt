@@ -49,7 +49,7 @@ fun HomeRoute(
             items(devices.value) { device ->
 
 
-                ScannedDevice(device = device)
+                ScannedDevice(device = device, onClick = vm::connectToDevice)
 
                 Spacer(modifier = Modifier.height(10.dp))
 

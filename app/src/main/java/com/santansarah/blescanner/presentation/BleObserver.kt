@@ -20,7 +20,7 @@ class BleObserver(
     private val activity: ComponentActivity
 ) : DefaultLifecycleObserver, KoinComponent {
 
-    val bleManager = get<BLEManager>()
+    val bleManager = get<BleManager>()
     val btAdapter = get<BluetoothAdapter>()
 
     private val registry: ActivityResultRegistry = activity.activityResultRegistry
@@ -48,7 +48,7 @@ class BleObserver(
 
                 val action = intent.action
 
-                // It means the user has changed his bluetooth state.
+                // It means the user has changed their bluetooth state.
                 if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                     if (btAdapter.state == BluetoothAdapter.STATE_OFF) {
                         bleManager.stopScan()

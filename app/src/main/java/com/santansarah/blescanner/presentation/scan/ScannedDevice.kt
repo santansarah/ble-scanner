@@ -3,6 +3,7 @@ package com.santansarah.blescanner.presentation.scan
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,11 +33,16 @@ import com.santansarah.blescanner.utils.toDate
 
 @Composable
 fun ScannedDevice(
-    device: ScannedDevice
+    device: ScannedDevice,
+    onClick: (String) -> Unit
 ) {
 
     OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick(device.address)
+            },
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -132,7 +138,8 @@ fun ScannedDevicePreview() {
                 )
 
                 ScannedDevice(
-                    device = device
+                    device = device,
+                    {}
                 )
             }
         }

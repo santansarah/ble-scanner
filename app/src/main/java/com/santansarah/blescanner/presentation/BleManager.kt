@@ -19,7 +19,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
 
-class BLEManager(
+class BleManager(
     app: Application,
     private val bleRepository: BleRepository,
     private val scope: CoroutineScope

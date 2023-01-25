@@ -5,7 +5,8 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.santansarah.blescanner.presentation.BLEManager
+import com.santansarah.blescanner.presentation.BleGatt
+import com.santansarah.blescanner.presentation.BleManager
 import com.santansarah.blescanner.presentation.scan.ScanViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,11 +18,11 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    fun provideBluetoohManager(app: Application): BluetoothManager {
+    fun provideBluetoothManager(app: Application): BluetoothManager {
         return app.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     }
 
-    single<BluetoothAdapter> { provideBluetoohManager(androidApplication()).adapter }
+    single<BluetoothAdapter> { provideBluetoothManager(androidApplication()).adapter }
 
     factory(named("IODispatcher")) {
         Dispatchers.IO + Job()
@@ -29,7 +30,8 @@ val appModule = module {
 
     factory { CoroutineScope(get(named("IODispatcher"))) }
 
-    single {  BLEManager(get(), get(), get()) }
-    viewModel { ScanViewModel(get(), get(), Dispatchers.IO) }
+    single {  BleManager(get(), get(), get()) }
+    single { BleGatt(androidApplication(), get(), get()) }
+    viewModel { ScanViewModel(get(), get(), get(), Dispatchers.IO) }
 
 }
