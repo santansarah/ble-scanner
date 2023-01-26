@@ -92,3 +92,6 @@ lint/tmp/
 /app/src/main/java/com/santansarah/blescanner/utils/BLEMfrIds.kt
 /app/src/main/java/com/santansarah/blescanner/utils/Companies.kt
 /app/src/main/java/com/santansarah/blescanner/utils/ServiceIds.kt
+/sharedTest/src/main/java/com/santansarah/sharedtest/MockScanner.kt
+/sharedTest/src/main/java/com/santansarah/sharedtest/MockScanResult.kt
+/sharedTest/src/main/java/com/santansarah/sharedtest/test.kt
