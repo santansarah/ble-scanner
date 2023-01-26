@@ -1,4 +1,4 @@
-# Jetpack Compose BLE Scanner with Room, JUnit 5, and Koin
+# Jetpack Compose BLE Scanner with Room, Koin, and JUnit 5
 
 Scan your BLE devices with my new Jetpack Compose app. BLE scans include:
 
@@ -12,8 +12,10 @@ Includes partial support for [Microsoft Beacon](https://learn.microsoft.com/en-u
 
 ## Video 1: Prepopulated Room Database, Data Layer Setup, and Room JUnit 5 Tests
 
-In this video, I go over my data layer, which includes a pre-populated Room database. I’ll also 
-review my corresponding JUnit 5 tests. This video features:
+https://youtu.be/CpBWF52IOk4
+
+In this video, I go over my data layer, which includes a pre-populated Room database. I’ll also
+go over my corresponding JUnit 5 tests. This video features:
 
 * Nordic's [Bluetooth Numbers Database](https://github.com/NordicSemiconductor/bluetooth-numbers-database)
 * DB Browser for SQLite

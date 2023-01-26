@@ -3,6 +3,7 @@ package com.santansarah.blescanner
 import android.app.Application
 import com.santansarah.blescanner.di.appModule
 import com.santansarah.blescanner.di.databaseModule
+import com.santansarah.blescanner.di.usecasesModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -21,7 +22,7 @@ class BLEScannerApp : Application() {
             // Reference Android context
             androidContext(this@BLEScannerApp)
             // Load modules
-            modules(appModule, databaseModule)
+            modules(appModule, databaseModule, usecasesModule)
         }
 
     }

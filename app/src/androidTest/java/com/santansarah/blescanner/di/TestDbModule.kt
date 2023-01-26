@@ -10,17 +10,17 @@ import org.koin.dsl.module
 
 val testDatabaseModule = module {
 
-    fun provideDataBase(application: Application): BleDatabase {
+    fun provideTestDataBase(application: Application): BleDatabase {
         return Room.inMemoryDatabaseBuilder(application, BleDatabase::class.java)
             .build()
     }
 
-    fun provideDao(dataBase: BleDatabase): BleDao {
+    fun provideTestDao(dataBase: BleDatabase): BleDao {
         return dataBase.bleDao()
     }
 
-    factory { provideDataBase(get()) }
-    factory { provideDao(get()) }
+    factory { provideTestDataBase(get()) }
+    factory { provideTestDao(get()) }
     factory { BleRepository(get()) }
 
 }

@@ -1,9 +1,12 @@
 package com.santansarah.blescanner.data.local
 
+import android.os.ParcelUuid
 import com.santansarah.blescanner.data.local.entities.Company
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
+import com.santansarah.blescanner.utils.toGss
+import com.santansarah.blescanner.utils.toHex
 
 class BleRepository(
     private val dao: BleDao
@@ -37,5 +40,31 @@ class BleRepository(
     suspend fun deleteScans() = dao.deleteScans()
 
     fun getScannedDevices() = dao.getScannedDevices()
+
+    suspend fun getMsDevice(
+        byteArray: ByteArray
+    ): String? {
+        val msDeviceType = byteArray[1].toHex().toInt()
+        return getMicrosoftDeviceById(msDeviceType)?.name
+    }
+
+    suspend fun getServices(
+        serviceIdRecord: List<ParcelUuid>
+    ): List<String>? {
+        var serviceNames: MutableList<String>? = null
+
+        serviceIdRecord.forEach { serviceId ->
+            val formattedId = serviceId.uuid.toGss()
+            getServiceById(formattedId)?.name?.let { serviceName ->
+                if (serviceNames == null)
+                    serviceNames = mutableListOf()
+                serviceNames?.add(serviceName)
+            }
+        }
+
+        return serviceNames?.toList()
+
+    }
+
 
 }
