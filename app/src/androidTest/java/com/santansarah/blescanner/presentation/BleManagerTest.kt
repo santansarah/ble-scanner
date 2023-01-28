@@ -8,7 +8,7 @@ import android.util.SparseArray
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.room.TestBleDatabase
 import com.santansarah.blescanner.domain.usecases.ParseScanResult
-import com.santansarah.blescanner.util.SetUpKoinTest
+import com.santansarah.blescanner.util.KoinTestPerMethod
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
@@ -16,6 +16,7 @@ import io.mockk.mockkClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,26 +24,32 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.test.KoinTest
-import org.koin.test.inject
 import java.util.UUID
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @ExtendWith(MockKExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-@ExtendWith(SetUpKoinTest::class)
 internal class BleManagerTest : KoinTest {
 
-    private val bleDb: TestBleDatabase by inject()
-    private val bleRepository: BleRepository by inject()
-    private val parseScanResult: ParseScanResult by inject()
+    private val testScope = getKoin().createScope<TestBleDatabase>()
+
+    private val bleDb = testScope.get<TestBleDatabase>()
+    private val bleRepository = testScope.get<BleRepository>()
+    private val parseScanResult= testScope.get<ParseScanResult>()
+
+    @JvmField
+    @RegisterExtension
+    val extension = KoinTestPerMethod(bleDb)
+
+    @AfterEach
+    fun dispose() {
+        testScope.close()
+    }
 
     @BeforeEach
     fun setup() {
         println("Before each...")
         clearAllMocks()
-
-        println(bleDb.toString())
-        println(bleRepository.toString())
     }
 
     @Test

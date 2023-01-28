@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -16,16 +17,19 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import java.io.IOException
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class BleDaoTest : KoinTest {
 
-    private val bleDb by inject<TestBleDatabase>()
-    private val bleDao by inject<BleDao>()
+    private val testScope = getKoin().createScope<TestBleDatabase>()
 
-    @AfterAll
-    fun closeDb() {
+    private val bleDb = testScope.get<TestBleDatabase>()
+    private val bleDao = testScope.get<BleDao>()
+
+    @AfterEach
+    fun tearDown() {
         bleDb.close()
+        testScope.close()
     }
 
     @Test

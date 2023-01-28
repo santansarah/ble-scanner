@@ -1,33 +1,42 @@
 package com.santansarah.blescanner.data.local
 
 import com.santansarah.blescanner.data.local.room.TestBleDatabase
-import com.santansarah.blescanner.util.SetUpKoinTest
+import com.santansarah.blescanner.util.KoinTestPerMethod
 import com.santansarah.sharedtest.companies
 import com.santansarah.sharedtest.msDevices
 import com.santansarah.sharedtest.services
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.test.KoinTest
-import org.koin.test.inject
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @OptIn(ExperimentalCoroutinesApi::class)
-@ExtendWith(SetUpKoinTest::class)
 internal class PrepopulatedRepositoryTest : KoinTest {
 
-    private val bleDb by inject<TestBleDatabase>()
-    private val bleRepository by inject<BleRepository>()
+/*
+    private val myScope = getKoin().createScope(UUID.randomUUID().toString(),
+        named("PER_METHOD"))
+*/
 
-    @AfterAll
-    fun closeDb() {
-        bleDb.close()
+    private val testScope = getKoin().createScope<TestBleDatabase>()
+
+    private val bleDb = testScope.get<TestBleDatabase>()
+    private val bleRepository = testScope.get<BleRepository>()
+
+    @JvmField
+    @RegisterExtension
+    val extension = KoinTestPerMethod(bleDb)
+
+    @AfterEach
+    fun dispose() {
+        testScope.close()
     }
 
     @Test
