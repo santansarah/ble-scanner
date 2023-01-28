@@ -1,8 +1,8 @@
 plugins {
+    id 'kotlin-kapt'
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
-    id 'kotlin-kapt'
     id 'de.mannodermaus.android-junit5'
 }
 
@@ -18,7 +18,7 @@ android {
         versionName "1.0"
 
         // add the AndroidJUnitRunner, then connect JUnit 5 to the runner
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.santansarah.blescanner.InstrumentationTestRunner"
         testInstrumentationRunnerArgument "runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder"
 
         vectorDrawables {
@@ -117,6 +117,9 @@ dependencies {
     testImplementation 'io.mockk:mockk:1.13.3'
 
     androidTestImplementation project(":sharedTest")
+    androidTestImplementation "androidx.room:room-testing:$room_version"
+    kaptAndroidTest "androidx.room:room-compiler:$room_version"
+
     androidTestImplementation "io.insert-koin:koin-test:$koin_android_version"
     androidTestImplementation "io.insert-koin:koin-test-junit5:$koin_android_version"
     androidTestImplementation 'androidx.test:core:1.5.0'

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BleDao {
+
     @Query("SELECT * FROM companies WHERE code = :companyId")
     suspend fun getCompanyById(companyId: Int): Company?
 

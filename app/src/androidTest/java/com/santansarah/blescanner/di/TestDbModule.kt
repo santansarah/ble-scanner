@@ -3,24 +3,26 @@ package com.santansarah.blescanner.di
 import android.app.Application
 import androidx.room.Room
 import com.santansarah.blescanner.data.local.BleDao
-import com.santansarah.blescanner.data.local.BleDatabase
 import com.santansarah.blescanner.data.local.BleRepository
-import org.koin.android.ext.koin.androidApplication
+import com.santansarah.blescanner.data.local.TestBleDatabase
+import com.santansarah.blescanner.data.local.TestDao
 import org.koin.dsl.module
 
 val testDatabaseModule = module {
 
-    fun provideTestDataBase(application: Application): BleDatabase {
-        return Room.inMemoryDatabaseBuilder(application, BleDatabase::class.java)
+    fun provideTestDataBase(
+        application: Application
+    ): TestBleDatabase {
+        return Room.inMemoryDatabaseBuilder(application, TestBleDatabase::class.java)
             .build()
     }
 
-    fun provideTestDao(dataBase: BleDatabase): BleDao {
+    fun provideBleDao(dataBase: TestBleDatabase): BleDao {
         return dataBase.bleDao()
     }
 
-    factory { provideTestDataBase(get()) }
-    factory { provideTestDao(get()) }
-    factory { BleRepository(get()) }
+    single { provideTestDataBase(get()) }
+    single { provideBleDao(get()) }
+    single { BleRepository(get()) }
 
 }

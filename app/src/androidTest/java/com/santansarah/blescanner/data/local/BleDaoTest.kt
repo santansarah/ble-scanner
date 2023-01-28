@@ -1,8 +1,6 @@
 package com.santansarah.blescanner.data.local
 
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
-import com.santansarah.blescanner.di.testDatabaseModule
-import com.santansarah.blescanner.util.AddKoinModules
 import com.santansarah.sharedtest.deviceList
 import com.santansarah.sharedtest.newDevice
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import java.io.IOException
@@ -21,12 +18,6 @@ import java.io.IOException
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class BleDaoTest : KoinTest {
-
-    @JvmField
-    @RegisterExtension
-    val extension = AddKoinModules(
-        testDatabaseModule
-    )
 
     private val bleDb by inject<BleDatabase>()
     private val bleDao by inject<BleDao>()
