@@ -1,6 +1,7 @@
 package com.santansarah.blescanner.data.local
 
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.data.local.room.TestBleDatabase
 import com.santansarah.sharedtest.deviceList
 import com.santansarah.sharedtest.newDevice
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,11 +21,10 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class BleRepositoryTest: KoinTest {
 
-    private val bleDb by inject<BleDatabase>()
+    private val bleDb by inject<TestBleDatabase>()
     private val bleRepository by inject<BleRepository>()
 
     @AfterAll
-    @Throws(IOException::class)
     fun closeDb() {
         bleDb.close()
     }

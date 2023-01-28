@@ -24,7 +24,9 @@ class BLEScannerAppTest : Application() {
             androidLogger()
             // Reference Android context
             androidContext(ApplicationProvider.getApplicationContext())
-            // Load modules
+
+            Timber.d("Loading Test Koin modules...")
+
             modules(
                 testAppModule, testDatabaseModule,
                 testUsecasesModule

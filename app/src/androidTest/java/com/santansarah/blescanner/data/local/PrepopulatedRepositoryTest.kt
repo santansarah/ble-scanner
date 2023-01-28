@@ -1,5 +1,7 @@
 package com.santansarah.blescanner.data.local
 
+import com.santansarah.blescanner.data.local.room.TestBleDatabase
+import com.santansarah.blescanner.util.SetUpKoinTest
 import com.santansarah.sharedtest.companies
 import com.santansarah.sharedtest.msDevices
 import com.santansarah.sharedtest.services
@@ -11,14 +13,16 @@ import org.junit.jupiter.api.DisplayName
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(SetUpKoinTest::class)
 internal class PrepopulatedRepositoryTest : KoinTest {
 
-    private val bleDb by inject<BleDatabase>()
+    private val bleDb by inject<TestBleDatabase>()
     private val bleRepository by inject<BleRepository>()
 
     @AfterAll

@@ -1,4 +1,4 @@
-package com.santansarah.blescanner.data.local
+package com.santansarah.blescanner.data.local.room
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -4,16 +4,21 @@ import android.app.Application
 import androidx.room.Room
 import com.santansarah.blescanner.data.local.BleDao
 import com.santansarah.blescanner.data.local.BleRepository
-import com.santansarah.blescanner.data.local.TestBleDatabase
-import com.santansarah.blescanner.data.local.TestDao
+import com.santansarah.blescanner.data.local.room.TestBleDatabase
 import org.koin.dsl.module
+import timber.log.Timber
 
 val testDatabaseModule = module {
 
+    @Synchronized
     fun provideTestDataBase(
         application: Application
     ): TestBleDatabase {
+
+        Timber.d("Creating new database instance....")
+
         return Room.inMemoryDatabaseBuilder(application, TestBleDatabase::class.java)
+            .allowMainThreadQueries()
             .build()
     }
 
