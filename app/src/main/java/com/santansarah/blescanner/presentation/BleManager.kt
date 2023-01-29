@@ -21,7 +21,6 @@ import org.koin.core.component.get
 import timber.log.Timber
 
 class BleManager(
-    app: Application,
     private val bleRepository: BleRepository,
     private val scope: CoroutineScope,
     private val parseScanResult: ParseScanResult
