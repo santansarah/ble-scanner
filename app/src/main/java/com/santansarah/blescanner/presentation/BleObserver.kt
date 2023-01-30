@@ -27,10 +27,6 @@ class BleObserver(
     lateinit var btEnableResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var broadcastReceiver: BroadcastReceiver
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
-    }
-
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         createBroadcastReceiver()

@@ -22,3 +22,10 @@ go over my corresponding JUnit 5 tests. This video features:
 * Room Entities, Dao
 * Koin Dependency Injection
 * JUnit 5 data layer and Room tests
+
+## Video 2: Android BLE Scanner, Compose Bluetooth Permissions, Koin, and JUnit 5 Tests
+
+https://youtu.be/NqxpAq_5wZs
+
+Check out the user interface for my Android BLE Scanner app, written in Jetpack Compose. I'll go
+over my Koin setup, Bluetooth permissions, composables, ScanResult parser, and JUnit 5 tests.
