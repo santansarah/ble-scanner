@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.santansarah.blescanner.data.local.entities.BleCharacteristic
 import com.santansarah.blescanner.data.local.entities.Company
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
@@ -13,9 +14,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Database(
-    entities = [Company::class, Service::class,
+    entities = [Company::class, Service::class, BleCharacteristic::class,
         MicrosoftDevice::class, ScannedDevice::class],
-    version = 7, exportSchema = false
+    version = 8, exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class BleDatabase : RoomDatabase() {

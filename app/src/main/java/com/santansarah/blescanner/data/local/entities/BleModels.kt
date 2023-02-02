@@ -3,7 +3,6 @@ package com.santansarah.blescanner.data.local.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import org.jetbrains.annotations.NotNull
 
 @Entity(tableName = "companies")
 data class Company(
@@ -18,6 +17,15 @@ data class Service(
     val source: String,
     @PrimaryKey val uuid: String
 )
+
+@Entity(tableName = "characteristics")
+data class BleCharacteristic(
+    @PrimaryKey val identifier: String,
+    val name: String,
+    val source: String,
+    val uuid: String
+)
+
 
 @Entity(tableName = "MicrosoftDevices")
 data class MicrosoftDevice(

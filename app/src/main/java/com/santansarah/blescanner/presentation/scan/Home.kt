@@ -16,6 +16,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.presentation.components.ShowPermissions
+import com.santansarah.blescanner.presentation.scan.device.ShowDevice
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.permissionsList
 import org.koin.androidx.compose.koinViewModel
@@ -26,7 +27,8 @@ fun HomeRoute(
     vm: ScanViewModel = koinViewModel()
 ) {
 
-    val devices = vm.deviceList.collectAsStateWithLifecycle().value
+    val scanState = vm.scanState.collectAsStateWithLifecycle().value
+    val devices = scanState.devices
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionsList)
 
     LaunchedEffect(key1 = multiplePermissionsState.allPermissionsGranted) {
@@ -38,7 +40,15 @@ fun HomeRoute(
     if (!multiplePermissionsState.allPermissionsGranted) {
         ShowPermissions(multiplePermissionsState)
     } else {
-        ScannedDeviceList(devices, vm::connectToDevice)
+        if (scanState.selectedDevice == null)
+            ScannedDeviceList(devices, vm::onConnect)
+        else
+            ShowDevice(
+                scanState = scanState,
+                onConnect = vm::onConnect,
+                onDisconnect = vm::onDisconnect,
+                onBack = vm::onBackFromDevice,
+                onRead = vm::readCharacteristic)
     }
 
 }

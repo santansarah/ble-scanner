@@ -5,13 +5,26 @@ import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import com.santansarah.blescanner.data.local.BleRepository
+import com.santansarah.blescanner.data.local.entities.Service
+import com.santansarah.blescanner.domain.models.ConnectionState
+import com.santansarah.blescanner.domain.models.DeviceCharacteristics
+import com.santansarah.blescanner.domain.models.DeviceDescriptor
+import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.utils.decodeHex
+import com.santansarah.blescanner.utils.decodeSkipUnreadable
+import com.santansarah.blescanner.utils.toGss
+import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
-import java.util.Timer
+import java.util.UUID
 
 @SuppressLint("MissingPermission")
 class BleGatt(
@@ -23,32 +36,132 @@ class BleGatt(
     private var btGatt: BluetoothGatt? = null
     private val btAdapter: BluetoothAdapter = get()
 
+    val connectMessage = MutableStateFlow(ConnectionState.DISCONNECTED)
+    val deviceDetails = MutableStateFlow<List<DeviceService>>(emptyList())
+
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                // successfully connected to the GATT Server
-                gatt.discoverServices()
-                btGatt = gatt
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                // disconnected from the GATT Server
+
+            btGatt = gatt
+            Timber.d("status: $status")
+
+            when (newState) {
+                BluetoothProfile.STATE_CONNECTING -> connectMessage.value = ConnectionState.CONNECTING
+                BluetoothProfile.STATE_CONNECTED -> {
+                    connectMessage.value = ConnectionState.CONNECTED
+                    btGatt?.discoverServices()
+                }
+
+                BluetoothProfile.STATE_DISCONNECTING -> connectMessage.value = ConnectionState.DISCONNECTING
+                BluetoothProfile.STATE_DISCONNECTED -> connectMessage.value = ConnectionState.DISCONNECTED
+                else -> connectMessage.value = ConnectionState.DISCONNECTED
             }
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                gatt?.services?.forEach {
-                    it.includedServices.forEach { svc ->
-                        Timber.i("service: $svc")
+
+            scope.launch {
+
+                deviceDetails.value = emptyList()
+                val services = mutableListOf<DeviceService>()
+
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    gatt?.services?.forEach { gatt ->
+
+                        val service = bleRepository.getServiceById(gatt.uuid.toGss()) ?: Service(
+                            "",
+                            "Mfr Service",
+                            "",
+                            gatt.uuid.toString()
+                        )
+
+                        val characteristics = mutableListOf<DeviceCharacteristics>()
+                        val descriptors = mutableListOf<DeviceDescriptor>()
+
+                        gatt.characteristics.forEach { char ->
+                            val deviceCharacteristic = bleRepository
+                                .getCharacteristicById(char.uuid.toGss())
+
+                            val permissions = char.permissions
+                            val properties = char.properties
+                            val writeTypes = char.writeType
+
+                            char.descriptors.forEach { desc ->
+                                descriptors.add(
+                                    DeviceDescriptor(
+                                        desc.uuid.toString(),
+                                        desc.permissions
+                                    )
+                                )
+                            }
+
+                            characteristics.add(
+                                DeviceCharacteristics(
+                                    uuid = char.uuid.toString(),
+                                    name = deviceCharacteristic?.name ?: "Mfr Characteristic",
+                                    descriptor = null,
+                                    permissions = permissions,
+                                    properties = properties,
+                                    writeTypes = writeTypes,
+                                    descriptors = descriptors,
+                                    canRead = char.properties and BluetoothGattCharacteristic.PROPERTY_READ > 0,
+                                    canWrite = char.properties
+                                            and (BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or
+                                            BluetoothGattCharacteristic.PROPERTY_WRITE or
+                                            BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) > 0,
+                                    readValue = null
+                                )
+                            )
+                        }
+
+                        val deviceService = DeviceService(
+                            service.uuid,
+                            service.name,
+                            characteristics
+                        )
+
+                        services.add(deviceService)
+
+                        Timber.d(services.toString())
+
+                        deviceDetails.value = services.toList()
+
                     }
-                    it.characteristics.forEach { char ->
-                        Timber.d("char: $char")
-                    }
+                } else {
+                    Timber.w("onServicesDiscovered received: $status")
                 }
-            } else {
-                Timber.w("onServicesDiscovered received: $status")
             }
         }
 
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+
+                Timber.d(status.toString())
+                Timber.d("Read: ${characteristic.value.decodeSkipUnreadable()}")
+                Timber.d("Read: ${characteristic.uuid}")
+
+                val readValue = characteristic.value.decodeSkipUnreadable()
+
+                val newList = deviceDetails.value.map { svc ->
+                    svc.copy(characteristics =
+                    svc.characteristics.map { char ->
+                        if (char.uuid == characteristic.uuid.toString())
+                            char.updateReadValue(fromDevice = readValue)
+                        else
+                            char
+                    })
+                }
+
+                Timber.d(newList.toString())
+
+                deviceDetails.value = newList
+            }
+
+        }
     }
 
     fun connect(address: String) {
@@ -62,7 +175,18 @@ class BleGatt(
         }
     }
 
-    private fun close() {
+    fun readCharacteristic(uuid: String) {
+        btGatt?.services?.flatMap { it.characteristics }?.find { svcChar ->
+            svcChar.uuid.toString() == uuid
+        }?.also { foundChar ->
+            Timber.d("Found Char: " + foundChar.uuid.toString())
+            btGatt?.readCharacteristic(foundChar)
+        }
+    }
+
+    fun close() {
+        connectMessage.value = ConnectionState.DISCONNECTED
+        deviceDetails.value = emptyList()
         btGatt?.let { gatt ->
             gatt.close()
             btGatt = null

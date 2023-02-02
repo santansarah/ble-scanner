@@ -57,6 +57,7 @@ fun BleApp(
                     end = 14.dp,
                 top = systemBarsPadding.calculateTopPadding() + 14.dp,
                 bottom = systemBarsPadding.calculateBottomPadding() + 14.dp)
+                    .fillMaxSize()
             ) {
                 HomeRoute()
             }

@@ -1,12 +1,14 @@
 package com.santansarah.blescanner.data.local
 
 import android.os.ParcelUuid
+import com.santansarah.blescanner.data.local.entities.BleCharacteristic
 import com.santansarah.blescanner.data.local.entities.Company
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
+import timber.log.Timber
 
 class BleRepository(
     private val dao: BleDao
@@ -15,6 +17,11 @@ class BleRepository(
     suspend fun getCompanyById(id: Int): Company? = dao.getCompanyById(id)
 
     suspend fun getServiceById(uuid: String): Service? = dao.getServiceByUuid(uuid)
+
+    suspend fun getCharacteristicById(uuid: String): BleCharacteristic? {
+        Timber.d(uuid)
+        return dao.getCharacteristicsByUuid(uuid)
+    }
 
     suspend fun getMicrosoftDeviceById(id: Int): MicrosoftDevice? = dao.getMicrosoftDevice(id)
 

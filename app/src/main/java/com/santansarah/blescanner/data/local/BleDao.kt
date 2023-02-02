@@ -1,11 +1,10 @@
 package com.santansarah.blescanner.data.local
 
-import android.location.Address
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.santansarah.blescanner.data.local.entities.BleCharacteristic
 import com.santansarah.blescanner.data.local.entities.Company
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
@@ -20,6 +19,9 @@ interface BleDao {
 
     @Query("SELECT * FROM services where uuid = :uuid")
     suspend fun getServiceByUuid(uuid: String): Service?
+
+    @Query("SELECT * FROM characteristics where uuid = :uuid")
+    suspend fun getCharacteristicsByUuid(uuid: String): BleCharacteristic?
 
     @Query("SELECT * FROM MicrosoftDevices where id = :id")
     suspend fun getMicrosoftDevice(id: Int): MicrosoftDevice?
