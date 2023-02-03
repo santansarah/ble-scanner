@@ -3,6 +3,7 @@ package com.santansarah.blescanner.utils
 import android.os.SystemClock
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import java.util.BitSet
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -14,12 +15,56 @@ import java.util.concurrent.TimeUnit
  * Moreover, it pads the hex value with a leading zero if necessary.
  */
 fun ByteArray.toHex(): String =
-    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte).uppercase() }
+
+fun ByteArray.print(): String =
+    joinToString(separator = ",") { eachByte -> eachByte.toInt().toString() }
+
+fun ByteArray.bitsToHex(): String {
+    val bitSet = BitSet.valueOf(this)
+    Timber.d(bitSet.toString())
+    Timber.d(bitSet[bitSet.size()].toString())
+    return bitSet.toLongArray().toHex()
+}
+
+fun ByteArray.bits(): String {
+    val bitSet = BitSet.valueOf(this)
+    val sb = StringBuilder()
+    for (i in 0..15) {
+        val curBit = if (i <= bitSet.size())
+            bitSet.get(i)
+        else
+            false
+
+        sb.append(if (curBit) '1' else '0')
+    }
+    return sb.reverse().toString()
+}
+
+fun ByteArray.toBinaryString(): String {
+    return this.joinToString(" ") {
+        //Integer.toBinaryString(it.toInt())
+        toBinary(it.toInt(), 8)
+    }
+}
+
+private fun toBinary(num: Int, length: Int): String {
+    var num = num
+    val sb = StringBuilder()
+    for (i in 0 until length) {
+        sb.append(if (num and 1 == 1) '1' else '0')
+        num = num shr 1
+    }
+    return sb.reverse().toString()
+}
+
+fun LongArray.toHex(): String =
+    joinToString(separator = "") { words -> "0x%04x".format(words.toShort()) }
 
 fun Byte.toHex(): String = "%02x".format(this)
 
 fun String.decodeHex(): String {
-    require(length % 2 == 0) {"Must have an even length"}
+    require(length % 2 == 0) { "Must have an even length" }
     return chunked(2)
         .map { it.toInt(16).toByte() }
         .toByteArray()
@@ -29,8 +74,17 @@ fun String.decodeHex(): String {
 fun ByteArray.decodeSkipUnreadable(): String {
     val badChars = '\uFFFD'
 
+    this.forEach {
+        Timber.d(this.indexOf(it).toString() + ": " + it.toInt().toString())
+    }
+
     val newString = this.decodeToString().filter {
-        it.code > 0 }
+        it != badChars
+    }
+
+        /*.filter {
+        it.code > 0
+    }*/
 
     return newString
 }
@@ -47,7 +101,8 @@ fun UUID.toGss() =
 
 fun Long.toMillis() =
     System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(
-        SystemClock.elapsedRealtimeNanos() - this, TimeUnit.NANOSECONDS)
+        SystemClock.elapsedRealtimeNanos() - this, TimeUnit.NANOSECONDS
+    )
 
 fun Long.toDate() =
     SimpleDateFormat("MM/dd/yy h:mm:ss ", Locale.US).format(Date(this))

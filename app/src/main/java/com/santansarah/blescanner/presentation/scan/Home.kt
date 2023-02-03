@@ -3,6 +3,7 @@ package com.santansarah.blescanner.presentation.scan
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Surface
@@ -58,7 +59,9 @@ private fun ScannedDeviceList(
     devices: List<ScannedDevice>,
     onClick: (String) -> Unit
 ) {
-    LazyColumn() {
+    LazyColumn(
+        modifier = Modifier.padding(top = 8.dp)
+    ) {
         items(devices) { device ->
 
             ScannedDevice(device = device, onClick = onClick)

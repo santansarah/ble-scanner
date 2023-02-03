@@ -13,18 +13,14 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceService
-import com.santansarah.blescanner.utils.decodeHex
 import com.santansarah.blescanner.utils.decodeSkipUnreadable
 import com.santansarah.blescanner.utils.toGss
-import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
-import java.util.UUID
 
 @SuppressLint("MissingPermission")
 class BleGatt(
@@ -109,7 +105,7 @@ class BleGatt(
                                             and (BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or
                                             BluetoothGattCharacteristic.PROPERTY_WRITE or
                                             BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) > 0,
-                                    readValue = null
+                                    readBytes = null
                                 )
                             )
                         }
@@ -149,8 +145,9 @@ class BleGatt(
                 val newList = deviceDetails.value.map { svc ->
                     svc.copy(characteristics =
                     svc.characteristics.map { char ->
-                        if (char.uuid == characteristic.uuid.toString())
-                            char.updateReadValue(fromDevice = readValue)
+                        if (char.uuid == characteristic.uuid.toString()) {
+                            char.updateBytes(characteristic.value)
+                        }
                         else
                             char
                     })
@@ -188,6 +185,7 @@ class BleGatt(
         connectMessage.value = ConnectionState.DISCONNECTED
         deviceDetails.value = emptyList()
         btGatt?.let { gatt ->
+            gatt.disconnect()
             gatt.close()
             btGatt = null
         }

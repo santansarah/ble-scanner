@@ -2,9 +2,21 @@ package com.santansarah.blescanner.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.santansarah.blescanner.R
+
+val monoFamily = FontFamily(
+    Font(resId = R.font.space_mono)
+)
+
+val codeFont = TextStyle(
+    fontFamily = monoFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 10.sp
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(

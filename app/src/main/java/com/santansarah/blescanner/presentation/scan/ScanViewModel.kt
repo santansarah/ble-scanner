@@ -76,6 +76,7 @@ class ScanViewModel(
     }
 
     fun onConnect(address: String) {
+        Timber.d("calling connect...")
         val scannedDevice = scanState.value.devices.find {
             it.address == address
         }
@@ -101,6 +102,7 @@ class ScanViewModel(
     }
 
     fun onDisconnect() {
+        Timber.d("calling disconnect...")
         bleGatt.close()
     }
 

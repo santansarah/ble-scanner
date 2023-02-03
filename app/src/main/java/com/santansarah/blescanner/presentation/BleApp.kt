@@ -1,7 +1,9 @@
 package com.santansarah.blescanner.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -27,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.presentation.scan.HomeRoute
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BleApp(
 ) {
@@ -53,10 +61,13 @@ fun BleApp(
 
             val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
             Column(
-                modifier = Modifier.padding(start = 14.dp,
-                    end = 14.dp,
-                top = systemBarsPadding.calculateTopPadding() + 14.dp,
-                bottom = systemBarsPadding.calculateBottomPadding() + 14.dp)
+                modifier = Modifier
+                    .padding(
+                        start = 14.dp,
+                        end = 14.dp,
+                        top = systemBarsPadding.calculateTopPadding() + 8.dp,
+                        bottom = systemBarsPadding.calculateBottomPadding() + 8.dp
+                    )
                     .fillMaxSize()
             ) {
                 HomeRoute()
