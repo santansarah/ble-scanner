@@ -386,7 +386,7 @@ fun previewDeviceDetail() {
                             ScannedDevice(
                                 deviceId = 41,
                                 deviceName = "EASYWAY-BLE",
-                                address = "93:58:44:27:C9:AC",
+                                address = "93:58:00:27:XX:00",
                                 rssi = -93,
                                 manufacturer = "Ericsson Technology Licensing",
                                 services = listOf("Heart Rate"),

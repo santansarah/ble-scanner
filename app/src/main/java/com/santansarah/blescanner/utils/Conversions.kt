@@ -59,7 +59,7 @@ private fun toBinary(num: Int, length: Int): String {
 }
 
 fun LongArray.toHex(): String =
-    joinToString(separator = "") { words -> "0x%04x".format(words.toShort()) }
+    joinToString(separator = "") { words -> "0x%04x".format(words.toShort()).uppercase() }
 
 fun Byte.toHex(): String = "%02x".format(this)
 
