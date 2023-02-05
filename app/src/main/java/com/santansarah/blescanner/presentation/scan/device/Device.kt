@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,30 +15,18 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
@@ -51,9 +40,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -64,10 +50,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -82,35 +68,34 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.scan.ScanState
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.presentation.theme.orangeYellowGradient
-import com.santansarah.blescanner.utils.bits
-import com.santansarah.blescanner.utils.bitsToHex
-import com.santansarah.blescanner.utils.decodeSkipUnreadable
-import com.santansarah.blescanner.utils.print
-import com.santansarah.blescanner.utils.toBinaryString
+import com.santansarah.blescanner.utils.ParsableCharacteristic
 import com.santansarah.blescanner.utils.toDate
-import com.santansarah.blescanner.utils.toHex
+import timber.log.Timber
 
 @Composable
 fun ShowDevice(
+    paddingValues: PaddingValues,
     scanState: ScanState,
     onConnect: (String) -> Unit,
     onDisconnect: () -> Unit,
     onBack: () -> Unit,
-    onRead: (String) -> Unit
+    onRead: (String) -> Unit,
+    onShowUserMessage: (String) -> Unit
 ) {
 
-    val device = scanState.selectedDevice!!.scannedDevice
+    val scannedDevice = scanState.selectedDevice!!.scannedDevice
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .padding(horizontal = 8.dp)
     ) {
 
         AppBarWithBackButton(
-            title = device.deviceName ?: "Unknown",
+            title = scannedDevice.deviceName ?: "Unknown",
             onBack
         )
 
@@ -136,95 +121,47 @@ fun ShowDevice(
 
             ConnectionStatus(
                 connectEnabled, onConnect,
-                device, disconnectEnabled, onDisconnect
+                scannedDevice, disconnectEnabled, onDisconnect
             )
 
 
         }
-
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        //Text(text = device.deviceName ?: "Unknown Name")
-        device.manufacturer?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        device.extra?.let {
-            Text(
-                text = it.joinToString(),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        Text(
-            text = device.address,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = "Last scanned: ${device.lastSeen.toDate()}",
-            style = MaterialTheme.typography.labelSmall
-        )
+        DeviceDetails(scannedDevice)
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (scanState.selectedDevice.services.isNotEmpty()) {
-            val services = scanState.selectedDevice.services
-            val totalServices by rememberSaveable { mutableStateOf(services.count()) }
-            var currentServiceIdx by rememberSaveable { mutableStateOf(0) }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(
-                    enabled = (currentServiceIdx > 0),
-                    onClick = {
-                        currentServiceIdx--
-                    }
-                ) {
-                    Icon(
-                        //modifier = Modifier.align(Alignment.Top),
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Next Service"
-                    )
-                }
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = services[currentServiceIdx].name,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-
-                IconButton(
-                    enabled = (currentServiceIdx != (totalServices - 1)),
-                    onClick = {
-                        currentServiceIdx++
-                    }
-                ) {
-                    Icon(
-                        //modifier = Modifier.align(Alignment.Top),
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Next Service"
-                    )
-                }
-            }
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = services[currentServiceIdx].uuid,
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center
-            )
-
-            ServicePagerDetail(services[currentServiceIdx], onRead)
-
-        }
+        ServicePager(scanState.selectedDevice, onRead, onShowUserMessage)
     }
 
+}
+
+
+@Composable
+private fun DeviceDetails(device: ScannedDevice) {
+    //Text(text = device.deviceName ?: "Unknown Name")
+    device.manufacturer?.let {
+        Text(
+            text = it,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+    device.extra?.let {
+        Text(
+            text = it.joinToString(),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+    Text(
+        text = device.address,
+        style = MaterialTheme.typography.bodyMedium
+    )
+    Text(
+        text = "Last scanned: ${device.lastSeen.toDate()}",
+        style = MaterialTheme.typography.labelSmall
+    )
 }
 
 @Composable
@@ -263,234 +200,59 @@ private fun ConnectionStatus(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-private fun ServicePagerDetail(
-    service: DeviceService,
-    onRead: (String) -> Unit
+fun ReadWriteMenu(
+    expanded: Boolean,
+    onExpanded: (Boolean) -> Unit,
+    char: DeviceCharacteristics,
+    onState: (Int) -> Unit
 ) {
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
-            .verticalScroll(rememberScrollState())
+    Box(
+        //modifier = Modifier.align(Alignment.End)
     ) {
-
-        service.characteristics.forEach { char ->
-            OutlinedCard(
-                modifier = Modifier
-                    .defaultMinSize(minHeight = 200.dp)
-            ) {
-                var state by remember { mutableStateOf(0) }
-                val titles = listOf("Read", "Write")
-                var expanded by remember { mutableStateOf(false) }
-
-                Column(
-                    modifier = Modifier.padding(6.dp)
-                ) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-
-                        Column() {
-
-                            Text(
-                                text = char.name,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = char.uuid,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-
-                        Box(
-                            //modifier = Modifier.align(Alignment.End)
-                        ) {
-                            IconButton(
-                                //modifier = Modifier.offset((-14).dp),
-                                onClick = { expanded = true }) {
-                                Icon(
-                                    //modifier = Modifier.then(Modifier.padding(0.dp)),
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = "Actions")
-                            }
-                            DropdownMenu(
-                                modifier = Modifier.border(1.dp,
-                                    MaterialTheme.colorScheme.primaryContainer),
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
-                                    text = { Text("Read") },
-                                    onClick = { state = 0 },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Outlined.Info,
-                                            contentDescription = "Read"
-                                        )
-                                    })
-                                Divider()
-                                DropdownMenuItem(
-                                    //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
-                                    text = { Text("Write") },
-                                    onClick = { state = 1 },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Outlined.Edit,
-                                            contentDescription = null
-                                        )
-                                    })
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-
-                    if (state == 0) {
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                //.padding(6.dp)
-                        ) {
-                            AssistChip(
-                                label = { Text(text = "Get Data") },
-                                leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = R.drawable.outline_arrow_circle_down
-                                        ),
-                                        contentDescription = "Read Data"
-                                    )
-                                },
-                                onClick = { onRead(char.uuid) })
-                            Spacer(modifier = Modifier.width(10.dp))
-                            AssistChip(
-                                label = { Text(text = "Copy") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Create,
-                                        contentDescription = "Read Data"
-                                    )
-                                },
-                                onClick = { onRead(char.uuid) })
-                        }
-
-                        Box(modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .defaultMinSize(minHeight = 100.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .padding(6.dp)
-                        ) {
-                            char.readBytes?.let { bytes ->
-                                SelectionContainer {
-                                    Column {
-                                        Text(
-                                            text = "String, Hex, Bytes, Binary, Bits, Bit Hex:",
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-                                        Text(
-                                            text = bytes.decodeSkipUnreadable(),
-                                            style = codeFont
-                                        )
-                                        Text(
-                                            text = ("0x" + bytes.toHex()),
-                                            style = codeFont
-                                        )
-                                        Text(
-                                            text = "[" + bytes.print() + "]",
-                                            style = codeFont
-                                        )
-                                        Text(
-                                            text = bytes.toBinaryString(),
-                                            style = codeFont
-                                        )
-                                        Text(
-                                            text = bytes.bits(),
-                                            style = codeFont
-                                        )
-                                        Text(
-                                            text = bytes.bitsToHex(),
-                                            style = codeFont
-                                        )
-                                    }
-                                }
-                            } ?: Text("Click to read data from device.",
-                            style = codeFont)
-                        }
-
-                    } else {
-                        Text(text = "Write: ${char.canWrite}")
-
-                    }
-                }
-            }
-            if (service.characteristics.indexOf(char) < service.characteristics.count() - 1) {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-
-            /*char.descriptors.forEach { desc ->
-                    Text(text = "- ${desc.uuid}")
-                    Text(text = desc.permissions.toString())
-                }*/
-        }
-
-
-    }
-
-}
-
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun AppBarWithBackButton(
-    title: String,
-    onBackClicked: () -> Unit
-) {
-
-    CenterAlignedTopAppBar(
-        //modifier = Modifier.border(2.dp, Color.Blue),
-        windowInsets = WindowInsets(
-            top = 0.dp,
-            bottom = 0.dp
-        ),
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.Transparent
-        ),
-        title = {
-            Text(
-                text = title,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+        IconButton(
+            //modifier = Modifier.offset((-14).dp),
+            onClick = { onExpanded(true) }) {
+            Icon(
+                //modifier = Modifier.then(Modifier.padding(0.dp)),
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "Actions"
             )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClicked) {
-                BackIcon(contentDesc = "Go Back")
-            }
         }
-    )
-}
-
-@Composable
-fun BackIcon(
-    modifier: Modifier = Modifier,
-    contentDesc: String
-) {
-    Icon(
-        imageVector = Icons.Default.ArrowBack,
-        contentDescription = contentDesc
-    )
+        DropdownMenu(
+            modifier = Modifier.border(
+                1.dp,
+                MaterialTheme.colorScheme.primaryContainer
+            ),
+            expanded = expanded,
+            onDismissRequest = { onExpanded(false) }
+        ) {
+            DropdownMenuItem(
+                //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+                enabled = char.canRead,
+                text = { Text("Read") },
+                onClick = { onState(0) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Info,
+                        contentDescription = "Read"
+                    )
+                })
+            Divider()
+            DropdownMenuItem(
+                //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+                enabled = char.canWrite,
+                text = { Text("Write") },
+                onClick = { onState(1) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        contentDescription = null
+                    )
+                })
+        }
+    }
 }
 
 @Preview(
@@ -518,6 +280,7 @@ fun previewDeviceDetail() {
                 )
             ) {
                 ShowDevice(
+                    PaddingValues(4.dp),
                     ScanState(
                         emptyList(),
                         DeviceDetail(
@@ -616,6 +379,7 @@ fun previewDeviceDetail() {
                         ConnectionState.CONNECTING,
                         null
                     ),
+                    {},
                     {},
                     {},
                     {},

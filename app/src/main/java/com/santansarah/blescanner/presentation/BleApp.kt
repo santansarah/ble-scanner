@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -28,7 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.presentation.scan.HomeRoute
@@ -39,39 +43,37 @@ import com.santansarah.blescanner.presentation.scan.HomeRoute
 fun BleApp(
 ) {
 
-    Surface(
-        //modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Box(
+
+        val backgroundImage = if (isSystemInDarkTheme())
+            painterResource(id = R.drawable.ble_background_dark)
+        else
+            painterResource(id = R.drawable.ble_background)
+
+        Image(
+            painter = backgroundImage,
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds,
+        )
+
+        val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
+        val layoutDirection = LocalLayoutDirection.current
+        Surface(
+            color = Color.Transparent,
             modifier = Modifier
+                .padding(
+                    top = systemBarsPadding.calculateTopPadding(),
+                    bottom = systemBarsPadding.calculateBottomPadding(),
+                    start = systemBarsPadding.calculateStartPadding(layoutDirection),
+                    end = systemBarsPadding.calculateEndPadding(layoutDirection)
+                )
                 .fillMaxSize()
         ) {
-
-            val backgroundImage = if (isSystemInDarkTheme())
-                painterResource(id = R.drawable.ble_background_dark)
-            else
-                painterResource(id = R.drawable.ble_background)
-
-            Image(
-                painter = backgroundImage,
-                contentDescription = "",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillBounds,
-            )
-
-            val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
-            Column(
-                modifier = Modifier
-                    .padding(
-                        start = 14.dp,
-                        end = 14.dp,
-                        top = systemBarsPadding.calculateTopPadding() + 8.dp,
-                        bottom = systemBarsPadding.calculateBottomPadding() + 8.dp
-                    )
-                    .fillMaxSize()
-            ) {
-                HomeRoute()
-            }
+            HomeRoute()
         }
     }
 

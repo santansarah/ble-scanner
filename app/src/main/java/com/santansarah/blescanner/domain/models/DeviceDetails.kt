@@ -1,7 +1,18 @@
 package com.santansarah.blescanner.domain.models
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.presentation.theme.codeFont
+import com.santansarah.blescanner.utils.ParsableCharacteristic
+import com.santansarah.blescanner.utils.bits
+import com.santansarah.blescanner.utils.bitsToHex
+import com.santansarah.blescanner.utils.decodeSkipUnreadable
+import com.santansarah.blescanner.utils.print
+import com.santansarah.blescanner.utils.toBinaryString
+import com.santansarah.blescanner.utils.toHex
 import timber.log.Timber
+import java.lang.StringBuilder
 
 enum class ConnectionState {
     CONNECTED,
@@ -38,6 +49,34 @@ data class DeviceCharacteristics(
     fun updateBytes(fromDevice: ByteArray): DeviceCharacteristics {
         Timber.d("fromDevice: $fromDevice")
         return copy(readBytes = fromDevice)
+    }
+
+    fun getReadInfo(): String {
+
+        val sb = StringBuilder()
+
+        readBytes?.let {bytes ->
+            with (sb) {
+                when (uuid) {
+                    ParsableCharacteristic.Appearance.uuid -> {
+                        appendLine("Bits, Categories, Value:")
+                        appendLine(bytes.bits())
+                        appendLine(ParsableCharacteristic.Appearance.getCategories(bytes))
+                        appendLine(bytes.bitsToHex())
+                    }
+
+                    else -> {
+                        appendLine("String, Hex, Bytes, Binary:")
+                        appendLine(bytes.decodeSkipUnreadable())
+                        appendLine(bytes.toHex())
+                        appendLine("[" + bytes.print() + "]")
+                        appendLine(bytes.toBinaryString())
+                    }
+                }
+            }
+        } ?: sb.appendLine("No data.")
+
+        return sb.toString()
     }
 
     override fun equals(other: Any?): Boolean {

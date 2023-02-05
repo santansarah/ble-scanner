@@ -1,15 +1,24 @@
 package com.santansarah.blescanner.presentation.scan
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,7 +31,8 @@ import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.permissionsList
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeRoute(
     vm: ScanViewModel = koinViewModel()
@@ -38,18 +48,36 @@ fun HomeRoute(
         }
     }
 
-    if (!multiplePermissionsState.allPermissionsGranted) {
-        ShowPermissions(multiplePermissionsState)
-    } else {
-        if (scanState.selectedDevice == null)
-            ScannedDeviceList(devices, vm::onConnect)
-        else
-            ShowDevice(
-                scanState = scanState,
-                onConnect = vm::onConnect,
-                onDisconnect = vm::onDisconnect,
-                onBack = vm::onBackFromDevice,
-                onRead = vm::readCharacteristic)
+    val appSnackBarHostState = remember { SnackbarHostState() }
+    scanState.userMessage?.let { userMessage ->
+        LaunchedEffect(scanState.userMessage, userMessage) {
+            appSnackBarHostState.showSnackbar(userMessage)
+            vm.userMessageShown()
+        }
+    }
+
+    Scaffold(
+       // modifier = Modifier.border(2.dp, Color.Magenta),
+        containerColor = Color.Transparent,
+        snackbarHost =  { SnackbarHost(hostState = appSnackBarHostState) },
+    ) { padding ->
+
+        if (!multiplePermissionsState.allPermissionsGranted) {
+            ShowPermissions(multiplePermissionsState)
+        } else {
+            if (scanState.selectedDevice == null)
+                ScannedDeviceList(devices, vm::onConnect, padding)
+            else
+                ShowDevice(
+                    paddingValues = padding,
+                    scanState = scanState,
+                    onConnect = vm::onConnect,
+                    onDisconnect = vm::onDisconnect,
+                    onBack = vm::onBackFromDevice,
+                    onRead = vm::readCharacteristic,
+                    onShowUserMessage = vm::showUserMessage
+                )
+        }
     }
 
 }
@@ -57,10 +85,13 @@ fun HomeRoute(
 @Composable
 private fun ScannedDeviceList(
     devices: List<ScannedDevice>,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
+    paddingValues: PaddingValues
 ) {
     LazyColumn(
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = Modifier
+            //.padding(paddingValues)
+            .padding(8.dp)
     ) {
         items(devices) { device ->
 
@@ -105,7 +136,7 @@ fun ListPreview() {
 
     BLEScannerTheme {
         Surface() {
-            ScannedDeviceList(devices = deviceList, onClick = {})
+            ScannedDeviceList(devices = deviceList, onClick = {}, PaddingValues(4.dp))
         }
     }
 

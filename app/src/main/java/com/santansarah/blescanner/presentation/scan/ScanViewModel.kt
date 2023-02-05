@@ -1,5 +1,6 @@
 package com.santansarah.blescanner.presentation.scan
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
@@ -105,5 +106,16 @@ class ScanViewModel(
         Timber.d("calling disconnect...")
         bleGatt.close()
     }
+
+    fun showUserMessage(message: String) {
+        Timber.d("show message...")
+        _userMessage.value = message
+    }
+
+    fun userMessageShown() {
+        Log.d("debug", "user message set to null.")
+        _userMessage.value = null
+    }
+
 
 }

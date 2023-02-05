@@ -20,6 +20,10 @@ fun ByteArray.toHex(): String =
 fun ByteArray.print(): String =
     joinToString(separator = ",") { eachByte -> eachByte.toInt().toString() }
 
+fun Int.toHex(): String =
+    "0x%04x".format(this).uppercase()
+
+
 fun ByteArray.bitsToHex(): String {
     val bitSet = BitSet.valueOf(this)
     Timber.d(bitSet.toString())
