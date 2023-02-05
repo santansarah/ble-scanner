@@ -1,27 +1,48 @@
 package com.santansarah.blescanner.presentation.scan.device
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -30,6 +51,9 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -40,11 +64,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +85,7 @@ import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.presentation.scan.ScanState
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.presentation.theme.codeFont
+import com.santansarah.blescanner.presentation.theme.orangeYellowGradient
 import com.santansarah.blescanner.utils.bits
 import com.santansarah.blescanner.utils.bitsToHex
 import com.santansarah.blescanner.utils.decodeSkipUnreadable
@@ -65,7 +93,6 @@ import com.santansarah.blescanner.utils.print
 import com.santansarah.blescanner.utils.toBinaryString
 import com.santansarah.blescanner.utils.toDate
 import com.santansarah.blescanner.utils.toHex
-import timber.log.Timber
 
 @Composable
 fun ShowDevice(
@@ -93,9 +120,9 @@ fun ShowDevice(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val connectDisabled = !(scanState.bleMessage == ConnectionState.CONNECTING ||
+            val connectEnabled = !(scanState.bleMessage == ConnectionState.CONNECTING ||
                     scanState.bleMessage == ConnectionState.CONNECTED)
-            val disconnectDisabled = !(scanState.bleMessage == ConnectionState.DISCONNECTING ||
+            val disconnectEnabled = !(scanState.bleMessage == ConnectionState.DISCONNECTING ||
                     scanState.bleMessage == ConnectionState.DISCONNECTED)
 
             val statusText = buildAnnotatedString {
@@ -107,32 +134,10 @@ fun ShowDevice(
 
             Text(text = statusText)
 
-            Row() {
-                FilledIconButton(
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary
-                    ),
-                    enabled = connectDisabled,
-                    onClick = { onConnect(device.address) },
-                    content = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.connect),
-                            contentDescription = "Connect"
-                        )
-                    })
-                FilledIconButton(
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    ),
-                    enabled = disconnectDisabled,
-                    onClick = { onDisconnect() },
-                    content = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.disconnect),
-                            contentDescription = "Disconnect"
-                        )
-                    })
-            }
+            ConnectionStatus(
+                connectEnabled, onConnect,
+                device, disconnectEnabled, onDisconnect
+            )
 
 
         }
@@ -167,7 +172,7 @@ fun ShowDevice(
         if (scanState.selectedDevice.services.isNotEmpty()) {
             val services = scanState.selectedDevice.services
             val totalServices by rememberSaveable { mutableStateOf(services.count()) }
-            var currentService by rememberSaveable { mutableStateOf(0) }
+            var currentServiceIdx by rememberSaveable { mutableStateOf(0) }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -175,31 +180,47 @@ fun ShowDevice(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(
-                    enabled = (currentService > 0),
+                    enabled = (currentServiceIdx > 0),
                     onClick = {
-                        currentService--
+                        currentServiceIdx--
                     }
                 ) {
                     Icon(
+                        //modifier = Modifier.align(Alignment.Top),
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Next Service"
                     )
                 }
-                Text(text = "Services")
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = services[currentServiceIdx].name,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+
                 IconButton(
-                    enabled = (currentService != (totalServices-1)),
+                    enabled = (currentServiceIdx != (totalServices - 1)),
                     onClick = {
-                        currentService++
+                        currentServiceIdx++
                     }
                 ) {
                     Icon(
+                        //modifier = Modifier.align(Alignment.Top),
                         imageVector = Icons.Default.ArrowForward,
                         contentDescription = "Next Service"
                     )
                 }
             }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = services[currentServiceIdx].uuid,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center
+            )
 
-            ServicePagerDetail(services[currentService], onRead)
+            ServicePagerDetail(services[currentServiceIdx], onRead)
 
         }
     }
@@ -207,107 +228,225 @@ fun ShowDevice(
 }
 
 @Composable
+private fun ConnectionStatus(
+    connectEnabled: Boolean,
+    onConnect: (String) -> Unit,
+    device: ScannedDevice,
+    disconnectEnabled: Boolean,
+    onDisconnect: () -> Unit
+) {
+    Row() {
+        FilledIconButton(
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            enabled = connectEnabled,
+            onClick = { onConnect(device.address) },
+            content = {
+                Icon(
+                    painter = painterResource(id = R.drawable.connect),
+                    contentDescription = "Connect"
+                )
+            })
+        FilledIconButton(
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+            ),
+            enabled = disconnectEnabled,
+            onClick = { onDisconnect() },
+            content = {
+                Icon(
+                    painter = painterResource(id = R.drawable.disconnect),
+                    contentDescription = "Disconnect"
+                )
+            })
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun ServicePagerDetail(
     service: DeviceService,
     onRead: (String) -> Unit
 ) {
 
-        OutlinedCard(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+
+        service.characteristics.forEach { char ->
+            OutlinedCard(
                 modifier = Modifier
-                    .padding(12.dp)
-                    .verticalScroll(rememberScrollState())
+                    .defaultMinSize(minHeight = 200.dp)
             ) {
+                var state by remember { mutableStateOf(0) }
+                val titles = listOf("Read", "Write")
+                var expanded by remember { mutableStateOf(false) }
 
-                Text(
-                    text = service.name,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Text(
-                    text = service.uuid,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Divider(
-                    Modifier.padding(top = 4.dp),
-                    2.dp, MaterialTheme.colorScheme.outline
-                )
+                Column(
+                    modifier = Modifier.padding(6.dp)
+                ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
 
-                    service.characteristics.forEach { char ->
-                        Text(
-                            text = char.name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = char.uuid,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Column() {
 
-                        FilledIconButton(
-                            onClick = { onRead(char.uuid) },
-                            enabled = char.canRead
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = R.drawable.outline_arrow_circle_down
-                                ),
-                                contentDescription = "Read Data"
+                            Text(
+                                text = char.name,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = char.uuid,
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
 
-                        char.readBytes?.let {bytes ->
-                            SelectionContainer {
-                                Column {
-                                    Text(
-                                        text = "String, Hex, Bytes, Binary, Bits, Bit Hex:",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Text(
-                                        text = bytes.decodeSkipUnreadable(),
-                                        style = codeFont
-                                    )
-                                    Text(
-                                        text = ("0x" + bytes.toHex()),
-                                        style = codeFont
-                                    )
-                                    Text(
-                                        text = "[" + bytes.print() + "]",
-                                        style = codeFont
-                                    )
-                                    Text(
-                                        text = bytes.toBinaryString(),
-                                        style = codeFont
-                                    )
-                                    Text(
-                                        text = bytes.bits(),
-                                        style = codeFont
-                                    )
-                                    Text(
-                                        text = bytes.bitsToHex(),
-                                        style = codeFont
-                                    )
-                                }
+                        Box(
+                            //modifier = Modifier.align(Alignment.End)
+                        ) {
+                            IconButton(
+                                //modifier = Modifier.offset((-14).dp),
+                                onClick = { expanded = true }) {
+                                Icon(
+                                    //modifier = Modifier.then(Modifier.padding(0.dp)),
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Actions")
+                            }
+                            DropdownMenu(
+                                modifier = Modifier.border(1.dp,
+                                    MaterialTheme.colorScheme.primaryContainer),
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+                                    text = { Text("Read") },
+                                    onClick = { state = 0 },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Outlined.Info,
+                                            contentDescription = "Read"
+                                        )
+                                    })
+                                Divider()
+                                DropdownMenuItem(
+                                    //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+                                    text = { Text("Write") },
+                                    onClick = { state = 1 },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Outlined.Edit,
+                                            contentDescription = null
+                                        )
+                                    })
                             }
                         }
+                    }
 
-                        Text(text = "Write: ${char.canWrite}")
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                        if (service.characteristics.indexOf(char) < service.characteristics.count() - 1) {
-                            Spacer(modifier = Modifier.height(26.dp))
+
+                    if (state == 0) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                //.padding(6.dp)
+                        ) {
+                            AssistChip(
+                                label = { Text(text = "Get Data") },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = R.drawable.outline_arrow_circle_down
+                                        ),
+                                        contentDescription = "Read Data"
+                                    )
+                                },
+                                onClick = { onRead(char.uuid) })
+                            Spacer(modifier = Modifier.width(10.dp))
+                            AssistChip(
+                                label = { Text(text = "Copy") },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Create,
+                                        contentDescription = "Read Data"
+                                    )
+                                },
+                                onClick = { onRead(char.uuid) })
                         }
 
+                        Box(modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 100.dp)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(6.dp)
+                        ) {
+                            char.readBytes?.let { bytes ->
+                                SelectionContainer {
+                                    Column {
+                                        Text(
+                                            text = "String, Hex, Bytes, Binary, Bits, Bit Hex:",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Text(
+                                            text = bytes.decodeSkipUnreadable(),
+                                            style = codeFont
+                                        )
+                                        Text(
+                                            text = ("0x" + bytes.toHex()),
+                                            style = codeFont
+                                        )
+                                        Text(
+                                            text = "[" + bytes.print() + "]",
+                                            style = codeFont
+                                        )
+                                        Text(
+                                            text = bytes.toBinaryString(),
+                                            style = codeFont
+                                        )
+                                        Text(
+                                            text = bytes.bits(),
+                                            style = codeFont
+                                        )
+                                        Text(
+                                            text = bytes.bitsToHex(),
+                                            style = codeFont
+                                        )
+                                    }
+                                }
+                            } ?: Text("Click to read data from device.",
+                            style = codeFont)
+                        }
 
-                        /*char.descriptors.forEach { desc ->
-                                Text(text = "- ${desc.uuid}")
-                                Text(text = desc.permissions.toString())
-                            }*/
+                    } else {
+                        Text(text = "Write: ${char.canWrite}")
+
                     }
                 }
             }
+            if (service.characteristics.indexOf(char) < service.characteristics.count() - 1) {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+
+            /*char.descriptors.forEach { desc ->
+                    Text(text = "- ${desc.uuid}")
+                    Text(text = desc.permissions.toString())
+                }*/
         }
+
+
+    }
 
 }
 
@@ -401,6 +540,18 @@ fun previewDeviceDetail() {
                                         DeviceCharacteristics(
                                             uuid = "00002a00-0000-1000-8000-00805f9b34fb",
                                             name = "Device Name",
+                                            descriptor = null,
+                                            permissions = 0,
+                                            properties = 2,
+                                            writeTypes = 2,
+                                            descriptors = emptyList(),
+                                            canRead = true,
+                                            canWrite = false,
+                                            readBytes = null
+                                        ),
+                                        DeviceCharacteristics(
+                                            uuid = "00002a00-0000-1000-8000-00805f9b34fb",
+                                            name = "Appearance",
                                             descriptor = null,
                                             permissions = 0,
                                             properties = 2,

@@ -64,11 +64,14 @@ class BleGatt(
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     gatt?.services?.forEach { gatt ->
 
-                        val service = bleRepository.getServiceById(gatt.uuid.toGss()) ?: Service(
+                        val serviceName = bleRepository.getServiceById(gatt.uuid.toGss())?.name ?:
+                        "Mfr Service"
+
+                        val service = Service(
                             "",
-                            "Mfr Service",
+                            serviceName,
                             "",
-                            gatt.uuid.toString()
+                            gatt.uuid.toString().uppercase()
                         )
 
                         val characteristics = mutableListOf<DeviceCharacteristics>()
