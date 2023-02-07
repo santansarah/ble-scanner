@@ -1,5 +1,6 @@
 package com.santansarah.blescanner.presentation.scan.device
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.domain.models.DeviceDetail
@@ -48,6 +50,7 @@ fun ServicePager(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
+                //.background(Color.White.copy(.3f)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -86,7 +89,8 @@ fun ServicePager(
             }
         }
         Text(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = 4.dp),
             text = services[currentServiceIdx].uuid,
             style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center
@@ -108,7 +112,7 @@ fun ServicePagerDetail(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            //.padding(12.dp)
+            .padding(8.dp)
             .verticalScroll(rememberScrollState())
     ) {
 

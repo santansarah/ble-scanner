@@ -13,6 +13,8 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.domain.usecases.ParseRead
+import com.santansarah.blescanner.domain.usecases.ParseService
 import com.santansarah.blescanner.utils.decodeSkipUnreadable
 import com.santansarah.blescanner.utils.toGss
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +27,9 @@ import timber.log.Timber
 @SuppressLint("MissingPermission")
 class BleGatt(
     private val app: Application,
-    private val bleRepository: BleRepository,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val parseService: ParseService,
+    private val parseRead: ParseRead
 ) : KoinComponent {
 
     private var btGatt: BluetoothGatt? = null
@@ -37,6 +40,7 @@ class BleGatt(
 
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            super.onConnectionStateChange(gatt, status, newState)
 
             btGatt = gatt
             Timber.d("status: $status")
@@ -55,79 +59,12 @@ class BleGatt(
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            super.onServicesDiscovered(gatt, status)
 
             scope.launch {
-
                 deviceDetails.value = emptyList()
-                val services = mutableListOf<DeviceService>()
-
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    gatt?.services?.forEach { gatt ->
-
-                        val serviceName = bleRepository.getServiceById(gatt.uuid.toGss())?.name ?:
-                        "Mfr Service"
-
-                        val service = Service(
-                            "",
-                            serviceName,
-                            "",
-                            gatt.uuid.toString().uppercase()
-                        )
-
-                        val characteristics = mutableListOf<DeviceCharacteristics>()
-                        val descriptors = mutableListOf<DeviceDescriptor>()
-
-                        gatt.characteristics.forEach { char ->
-                            val deviceCharacteristic = bleRepository
-                                .getCharacteristicById(char.uuid.toGss())
-
-                            val permissions = char.permissions
-                            val properties = char.properties
-                            val writeTypes = char.writeType
-
-                            char.descriptors.forEach { desc ->
-                                descriptors.add(
-                                    DeviceDescriptor(
-                                        desc.uuid.toString(),
-                                        desc.permissions
-                                    )
-                                )
-                            }
-
-                            characteristics.add(
-                                DeviceCharacteristics(
-                                    uuid = char.uuid.toString(),
-                                    name = deviceCharacteristic?.name ?: "Mfr Characteristic",
-                                    descriptor = null,
-                                    permissions = permissions,
-                                    properties = properties,
-                                    writeTypes = writeTypes,
-                                    descriptors = descriptors,
-                                    canRead = char.properties and BluetoothGattCharacteristic.PROPERTY_READ > 0,
-                                    canWrite = char.properties
-                                            and (BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or
-                                            BluetoothGattCharacteristic.PROPERTY_WRITE or
-                                            BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) > 0,
-                                    readBytes = null
-                                )
-                            )
-                        }
-
-                        val deviceService = DeviceService(
-                            service.uuid,
-                            service.name,
-                            characteristics
-                        )
-
-                        services.add(deviceService)
-
-                        Timber.d(services.toString())
-
-                        deviceDetails.value = services.toList()
-
-                    }
-                } else {
-                    Timber.w("onServicesDiscovered received: $status")
+                gatt?.let {
+                    deviceDetails.value = parseService(it.services, status)
                 }
             }
         }
@@ -137,31 +74,10 @@ class BleGatt(
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-
-                Timber.d(status.toString())
-                Timber.d("Read: ${characteristic.value.decodeSkipUnreadable()}")
-                Timber.d("Read: ${characteristic.uuid}")
-
-                val readValue = characteristic.value.decodeSkipUnreadable()
-
-                val newList = deviceDetails.value.map { svc ->
-                    svc.copy(characteristics =
-                    svc.characteristics.map { char ->
-                        if (char.uuid == characteristic.uuid.toString()) {
-                            char.updateBytes(characteristic.value)
-                        }
-                        else
-                            char
-                    })
-                }
-
-                Timber.d(newList.toString())
-
-                deviceDetails.value = newList
-            }
-
+            //super.onCharacteristicRead(gatt, characteristic, status)
+            deviceDetails.value = parseRead(deviceDetails.value, characteristic, status)
         }
+
     }
 
     fun connect(address: String) {

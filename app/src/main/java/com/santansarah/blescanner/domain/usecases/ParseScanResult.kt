@@ -51,8 +51,10 @@ class ParseScanResult
             lastSeen = result.timestampNanos.toMillis()
         )
 
-        val recNum = bleRepository.insertDevice(device)
-        Timber.d("$recNum: $device")
+        if (device.manufacturer != "Microsoft") {
+            val recNum = bleRepository.insertDevice(device)
+        }
+        Timber.d("$device")
 
     }
 

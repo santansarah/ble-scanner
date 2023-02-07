@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -90,8 +91,9 @@ fun ShowDevice(
     val scannedDevice = scanState.selectedDevice!!.scannedDevice
 
     Column(
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 8.dp)
+        modifier = Modifier
+            .fillMaxSize()
+        //.padding(horizontal = 8.dp)
     ) {
 
         AppBarWithBackButton(
@@ -99,37 +101,47 @@ fun ShowDevice(
             onBack
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+            //.background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
+            Column(modifier = Modifier.padding(6.dp)) {
 
-            val connectEnabled = !(scanState.bleMessage == ConnectionState.CONNECTING ||
-                    scanState.bleMessage == ConnectionState.CONNECTED)
-            val disconnectEnabled = !(scanState.bleMessage == ConnectionState.DISCONNECTING ||
-                    scanState.bleMessage == ConnectionState.DISCONNECTED)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-            val statusText = buildAnnotatedString {
-                append("Status: ")
-                withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
-                    append(scanState.bleMessage.toTitle())
+                    val connectEnabled = !(scanState.bleMessage == ConnectionState.CONNECTING ||
+                            scanState.bleMessage == ConnectionState.CONNECTED)
+                    val disconnectEnabled =
+                        !(scanState.bleMessage == ConnectionState.DISCONNECTING ||
+                                scanState.bleMessage == ConnectionState.DISCONNECTED)
+
+                    val statusText = buildAnnotatedString {
+                        append("Status: ")
+                        withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
+                            append(scanState.bleMessage.toTitle())
+                        }
+                    }
+
+                    Text(text = statusText,
+                        color = MaterialTheme.colorScheme.onPrimary)
+
+                    ConnectionStatus(
+                        connectEnabled, onConnect,
+                        scannedDevice, disconnectEnabled, onDisconnect
+                    )
                 }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                DeviceDetails(scannedDevice)
             }
 
-            Text(text = statusText)
-
-            ConnectionStatus(
-                connectEnabled, onConnect,
-                scannedDevice, disconnectEnabled, onDisconnect
-            )
-
-
         }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        DeviceDetails(scannedDevice)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -145,23 +157,28 @@ private fun DeviceDetails(device: ScannedDevice) {
     device.manufacturer?.let {
         Text(
             text = it,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
     device.extra?.let {
         Text(
             text = it.joinToString(),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
     Text(
         text = device.address,
-        style = MaterialTheme.typography.bodyMedium
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onPrimary
     )
     Text(
         text = "Last scanned: ${device.lastSeen.toDate()}",
-        style = MaterialTheme.typography.labelSmall
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onPrimary
     )
+    Spacer(modifier = Modifier.height(4.dp))
 }
 
 @Composable
@@ -187,7 +204,7 @@ private fun ConnectionStatus(
             })
         FilledIconButton(
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                containerColor = MaterialTheme.colorScheme.primary
             ),
             enabled = disconnectEnabled,
             onClick = { onDisconnect() },

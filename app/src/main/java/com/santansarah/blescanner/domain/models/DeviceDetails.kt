@@ -55,6 +55,8 @@ data class DeviceCharacteristics(
 
         val sb = StringBuilder()
 
+        Timber.d("readbytes from first load: $readBytes")
+
         readBytes?.let {bytes ->
             with (sb) {
                 when (uuid) {

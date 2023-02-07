@@ -39,6 +39,7 @@ class BleManager(
 
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult) {
+            super.onScanResult(callbackType, result)
 
             scope.launch {
                 parseScanResult(result)
