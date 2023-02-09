@@ -1,6 +1,9 @@
 package com.santansarah.blescanner.presentation.scan
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
@@ -9,13 +12,16 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.presentation.BleManager
+import com.santansarah.blescanner.utils.decodeHex
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
+import java.lang.Exception
 
 data class ScanState(
     val devices: List<ScannedDevice>,
@@ -105,6 +111,17 @@ class ScanViewModel(
     fun onDisconnect() {
         Timber.d("calling disconnect...")
         bleGatt.close()
+    }
+
+    fun onWriteCharacteristic(uuid: String, bytes: String) {
+        try {
+            if (bytes.isNotEmpty()) {
+                bleGatt.writeBytes(uuid, bytes.decodeHex())
+            } else
+                showUserMessage("Hex can't be null.")
+        } catch (badHex: Exception) {
+            showUserMessage("Invalid Hex String. Must be an even count.")
+        }
     }
 
     fun showUserMessage(message: String) {

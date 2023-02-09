@@ -75,7 +75,8 @@ fun HomeRoute(
                     onDisconnect = vm::onDisconnect,
                     onBack = vm::onBackFromDevice,
                     onRead = vm::readCharacteristic,
-                    onShowUserMessage = vm::showUserMessage
+                    onShowUserMessage = vm::showUserMessage,
+                    onWrite = vm::onWriteCharacteristic
                 )
         }
     }

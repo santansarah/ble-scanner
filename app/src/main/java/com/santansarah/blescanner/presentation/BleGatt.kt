@@ -100,6 +100,17 @@ class BleGatt(
         }
     }
 
+    fun writeBytes(uuid: String, bytes: ByteArray) {
+        btGatt?.services?.flatMap { it.characteristics }?.find { svcChar ->
+            svcChar.uuid.toString() == uuid
+        }?.also { foundChar ->
+            Timber.d("Found Char: " + foundChar.uuid.toString())
+            foundChar.setValue(bytes)
+            btGatt?.writeCharacteristic(foundChar)
+        }
+
+    }
+
     fun close() {
         connectMessage.value = ConnectionState.DISCONNECTED
         deviceDetails.value = emptyList()

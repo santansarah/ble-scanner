@@ -11,55 +11,32 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -72,10 +49,7 @@ import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.scan.ScanState
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
-import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.utils.ParsableCharacteristic
 import com.santansarah.blescanner.utils.toDate
-import timber.log.Timber
 
 @Composable
 fun ShowDevice(
@@ -85,7 +59,8 @@ fun ShowDevice(
     onDisconnect: () -> Unit,
     onBack: () -> Unit,
     onRead: (String) -> Unit,
-    onShowUserMessage: (String) -> Unit
+    onShowUserMessage: (String) -> Unit,
+    onWrite: (String, String) -> Unit
 ) {
 
     val scannedDevice = scanState.selectedDevice!!.scannedDevice
@@ -127,8 +102,10 @@ fun ShowDevice(
                         }
                     }
 
-                    Text(text = statusText,
-                        color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = statusText,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
 
                     ConnectionStatus(
                         connectEnabled, onConnect,
@@ -145,7 +122,7 @@ fun ShowDevice(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ServicePager(scanState.selectedDevice, onRead, onShowUserMessage)
+        ServicePager(scanState.selectedDevice, onRead, onShowUserMessage, onWrite)
     }
 
 }
@@ -158,25 +135,25 @@ private fun DeviceDetails(device: ScannedDevice) {
         Text(
             text = it,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
     device.extra?.let {
         Text(
             text = it.joinToString(),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
     Text(
         text = device.address,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onPrimary
+        color = MaterialTheme.colorScheme.onSecondaryContainer
     )
     Text(
         text = "Last scanned: ${device.lastSeen.toDate()}",
         style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onPrimary
+        color = MaterialTheme.colorScheme.onSecondaryContainer
     )
     Spacer(modifier = Modifier.height(4.dp))
 }
@@ -249,7 +226,10 @@ fun ReadWriteMenu(
                 //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
                 enabled = char.canRead,
                 text = { Text("Read") },
-                onClick = { onState(0) },
+                onClick = {
+                    onState(0)
+                    onExpanded(false)
+                },
                 leadingIcon = {
                     Icon(
                         Icons.Outlined.Info,
@@ -261,7 +241,10 @@ fun ReadWriteMenu(
                 //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
                 enabled = char.canWrite,
                 text = { Text("Write") },
-                onClick = { onState(1) },
+                onClick = {
+                    onState(1)
+                    onExpanded(false)
+                },
                 leadingIcon = {
                     Icon(
                         Icons.Outlined.Edit,
@@ -400,7 +383,8 @@ fun previewDeviceDetail() {
                     {},
                     {},
                     {},
-                    {}
+                    {},
+                    { _: String, _: String -> }
                 )
             }
         }

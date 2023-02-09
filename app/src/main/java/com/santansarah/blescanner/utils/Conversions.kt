@@ -67,12 +67,12 @@ fun LongArray.toHex(): String =
 
 fun Byte.toHex(): String = "%02x".format(this)
 
-fun String.decodeHex(): String {
+fun String.decodeHex(): ByteArray {
     require(length % 2 == 0) { "Must have an even length" }
     return chunked(2)
         .map { it.toInt(16).toByte() }
         .toByteArray()
-        .toString(Charsets.ISO_8859_1)
+        //.toString(Charsets.ISO_8859_1)
 }
 
 fun ByteArray.decodeSkipUnreadable(): String {

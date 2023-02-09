@@ -57,8 +57,8 @@ data class DeviceCharacteristics(
 
         Timber.d("readbytes from first load: $readBytes")
 
-        readBytes?.let {bytes ->
-            with (sb) {
+        readBytes?.let { bytes ->
+            with(sb) {
                 when (uuid) {
                     ParsableCharacteristic.Appearance.uuid -> {
                         appendLine("Bits, Categories, Value:")
@@ -79,6 +79,17 @@ data class DeviceCharacteristics(
         } ?: sb.appendLine("No data.")
 
         return sb.toString()
+    }
+
+    fun getWriteInfo(): Array<String> {
+        return when (uuid) {
+            ParsableCharacteristic.ELKBLEDOM.uuid -> {
+                ParsableCharacteristic.ELKBLEDOM.commands
+            }
+            else -> {
+                emptyArray()
+            }
+        }
     }
 
     override fun equals(other: Any?): Boolean {
