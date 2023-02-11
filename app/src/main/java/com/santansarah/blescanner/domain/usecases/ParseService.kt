@@ -12,6 +12,11 @@ import com.santansarah.blescanner.data.local.entities.Service
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.utils.BlePermissions
+import com.santansarah.blescanner.utils.BleProperties
+import com.santansarah.blescanner.utils.BleWriteTypes
+import com.santansarah.blescanner.utils.canRead
+import com.santansarah.blescanner.utils.canWrite
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toMillis
 import kotlinx.coroutines.launch
@@ -49,16 +54,28 @@ class ParseService
                         .getCharacteristicById(char.uuid.toGss())
 
                     val permissions = char.permissions
-                    val properties = char.properties
-                    val writeTypes = char.writeType
+                    val properties = BleProperties.getAllProperties(char.properties)
+                    val writeTypes = BleWriteTypes.getAllTypes(char.writeType)
 
                     char.descriptors.forEach { desc ->
-                        descriptors.add(
-                            DeviceDescriptor(
-                                desc.uuid.toString(),
-                                desc.permissions
+
+                        if (descriptors.find { existing ->
+                                existing.uuid == desc.uuid.toString() } == null &&
+                                desc.characteristic.uuid == char.uuid) {
+
+                            val deviceDescriptor = bleRepository.getDescriptorById(
+                                desc.uuid.toGss()
                             )
-                        )
+
+                            descriptors.add(
+                                DeviceDescriptor(
+                                    desc.uuid.toString(),
+                                    deviceDescriptor?.name ?: "Unknown",
+                                    BlePermissions.getAllPermissions(desc.permissions),
+                                    null
+                                )
+                            )
+                        }
                     }
 
                     characteristics.add(
@@ -70,12 +87,10 @@ class ParseService
                             properties = properties,
                             writeTypes = writeTypes,
                             descriptors = descriptors,
-                            canRead = char.properties and BluetoothGattCharacteristic.PROPERTY_READ > 0,
-                            canWrite = char.properties
-                                    and (BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or
-                                    BluetoothGattCharacteristic.PROPERTY_WRITE or
-                                    BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE) > 0,
-                            readBytes = null
+                            canRead = properties.canRead(),
+                            canWrite = properties.canWrite(),
+                            readBytes = null,
+                            notificationBytes = null
                         )
                     )
                 }

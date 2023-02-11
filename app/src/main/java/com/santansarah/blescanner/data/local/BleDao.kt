@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.santansarah.blescanner.data.local.entities.BleCharacteristic
 import com.santansarah.blescanner.data.local.entities.Company
+import com.santansarah.blescanner.data.local.entities.Descriptor
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
@@ -37,6 +38,10 @@ interface BleDao {
 
     @Query("DELETE from scanned")
     suspend fun deleteScans()
+
+    @Query("SELECT * FROM descriptors where uuid = :uuid")
+    suspend fun getDescriptorByUuid(uuid: String): Descriptor?
+
 
 }
 

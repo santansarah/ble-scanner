@@ -6,17 +6,15 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
-import com.santansarah.blescanner.data.local.BleRepository
-import com.santansarah.blescanner.data.local.entities.Service
+import android.os.Build
 import com.santansarah.blescanner.domain.models.ConnectionState
-import com.santansarah.blescanner.domain.models.DeviceCharacteristics
-import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.domain.usecases.ParseDescriptor
+import com.santansarah.blescanner.domain.usecases.ParseNotification
 import com.santansarah.blescanner.domain.usecases.ParseRead
 import com.santansarah.blescanner.domain.usecases.ParseService
-import com.santansarah.blescanner.utils.decodeSkipUnreadable
-import com.santansarah.blescanner.utils.toGss
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -29,7 +27,9 @@ class BleGatt(
     private val app: Application,
     private val scope: CoroutineScope,
     private val parseService: ParseService,
-    private val parseRead: ParseRead
+    private val parseRead: ParseRead,
+    private val parseNotification: ParseNotification,
+    private val parseDescriptor: ParseDescriptor
 ) : KoinComponent {
 
     private var btGatt: BluetoothGatt? = null
@@ -46,14 +46,20 @@ class BleGatt(
             Timber.d("status: $status")
 
             when (newState) {
-                BluetoothProfile.STATE_CONNECTING -> connectMessage.value = ConnectionState.CONNECTING
+                BluetoothProfile.STATE_CONNECTING -> connectMessage.value =
+                    ConnectionState.CONNECTING
+
                 BluetoothProfile.STATE_CONNECTED -> {
                     connectMessage.value = ConnectionState.CONNECTED
                     btGatt?.discoverServices()
                 }
 
-                BluetoothProfile.STATE_DISCONNECTING -> connectMessage.value = ConnectionState.DISCONNECTING
-                BluetoothProfile.STATE_DISCONNECTED -> connectMessage.value = ConnectionState.DISCONNECTED
+                BluetoothProfile.STATE_DISCONNECTING -> connectMessage.value =
+                    ConnectionState.DISCONNECTING
+
+                BluetoothProfile.STATE_DISCONNECTED -> connectMessage.value =
+                    ConnectionState.DISCONNECTED
+
                 else -> connectMessage.value = ConnectionState.DISCONNECTED
             }
         }
@@ -65,6 +71,21 @@ class BleGatt(
                 deviceDetails.value = emptyList()
                 gatt?.let {
                     deviceDetails.value = parseService(it.services, status)
+
+                    it.services?.forEach { gattSvcForNotify ->
+                        gattSvcForNotify.characteristics?.forEach { svcChar ->
+                            if (svcChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY > 0) {
+                                val registered = it.setCharacteristicNotification(svcChar, true)
+
+                                Timber.d("registered: $registered")
+
+                                svcChar.descriptors?.forEach { desc ->
+                                    desc.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                                    it.writeDescriptor(desc)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -72,10 +93,40 @@ class BleGatt(
         override fun onCharacteristicRead(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
             status: Int
         ) {
-            //super.onCharacteristicRead(gatt, characteristic, status)
+            super.onCharacteristicRead(gatt, characteristic, value, status)
             deviceDetails.value = parseRead(deviceDetails.value, characteristic, status)
+        }
+
+        @Deprecated("Deprecated in Java")
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+            deviceDetails.value = parseRead(deviceDetails.value, characteristic, status)
+        }
+
+        @Deprecated("Deprecated in Java")
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic)
+            deviceDetails.value = parseNotification(deviceDetails.value, characteristic)
+        }
+
+        @Deprecated("Deprecated in Java")
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
+            super.onDescriptorRead(gatt, descriptor, status)
+            deviceDetails.value = parseDescriptor(deviceDetails.value, descriptor, status)
         }
 
     }
@@ -100,13 +151,37 @@ class BleGatt(
         }
     }
 
+    fun readDescriptor(charUuid: String, descUuid: String) {
+
+        val currentCharacteristic = btGatt?.services?.flatMap { it.characteristics }?.find { char ->
+            char.uuid.toString() == charUuid
+        }
+        currentCharacteristic?.let { char ->
+            char.descriptors.find { desc ->
+                desc.uuid.toString() == descUuid
+            }?.also { foundDesc ->
+                Timber.d("Found Char: " + foundDesc.uuid.toString())
+                btGatt?.readDescriptor(foundDesc)
+            }
+        }
+
+    }
+
     fun writeBytes(uuid: String, bytes: ByteArray) {
         btGatt?.services?.flatMap { it.characteristics }?.find { svcChar ->
             svcChar.uuid.toString() == uuid
         }?.also { foundChar ->
             Timber.d("Found Char: " + foundChar.uuid.toString())
-            foundChar.setValue(bytes)
-            btGatt?.writeCharacteristic(foundChar)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                btGatt?.writeCharacteristic(
+                    foundChar,
+                    bytes,
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                )
+            } else {
+                foundChar.setValue(bytes)
+                btGatt?.writeCharacteristic(foundChar)
+            }
         }
 
     }

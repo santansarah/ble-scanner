@@ -3,6 +3,7 @@ package com.santansarah.blescanner.data.local
 import android.os.ParcelUuid
 import com.santansarah.blescanner.data.local.entities.BleCharacteristic
 import com.santansarah.blescanner.data.local.entities.Company
+import com.santansarah.blescanner.data.local.entities.Descriptor
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
@@ -72,6 +73,8 @@ class BleRepository(
         return serviceNames?.toList()
 
     }
+
+    suspend fun getDescriptorById(uuid: String): Descriptor? = dao.getDescriptorByUuid(uuid)
 
 
 }

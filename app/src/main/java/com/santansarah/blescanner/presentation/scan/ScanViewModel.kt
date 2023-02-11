@@ -1,35 +1,23 @@
 package com.santansarah.blescanner.presentation.scan
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
+import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.presentation.BleManager
 import com.santansarah.blescanner.utils.decodeHex
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import java.lang.Exception
-
-data class ScanState(
-    val devices: List<ScannedDevice>,
-    val selectedDevice: DeviceDetail?,
-    val bleMessage: ConnectionState,
-    val userMessage: String?
-)
-
 
 class ScanViewModel(
     private val bleManager: BleManager,
@@ -100,6 +88,10 @@ class ScanViewModel(
 
     fun readCharacteristic(uuid: String) {
         bleGatt.readCharacteristic(uuid)
+    }
+
+    fun readDescriptor(charUuid: String, descUuid: String) {
+        bleGatt.readDescriptor(charUuid, descUuid)
     }
 
     fun onBackFromDevice() {

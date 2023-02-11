@@ -1,7 +1,9 @@
 package com.santansarah.blescanner.presentation.scan.device
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,23 +12,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,20 +32,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
-import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.presentation.theme.bodySmallItalic
+import com.santansarah.blescanner.utils.propsToString
 
 @Composable
 fun ServicePager(
     selectedDevice: DeviceDetail,
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
-    onWrite: (String, String) -> Unit
+    onWrite: (String, String) -> Unit,
+    onReadDescriptor: (String, String) -> Unit
 ) {
     if (selectedDevice.services.isNotEmpty()) {
         val services = selectedDevice.services
@@ -103,7 +105,13 @@ fun ServicePager(
             textAlign = TextAlign.Center
         )
 
-        ServicePagerDetail(services[currentServiceIdx], onRead, onShowUserMessage, onWrite)
+        ServicePagerDetail(
+            services[currentServiceIdx],
+            onRead,
+            onShowUserMessage,
+            onWrite,
+            onReadDescriptor
+        )
 
     }
 }
@@ -114,7 +122,8 @@ fun ServicePagerDetail(
     service: DeviceService,
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
-    onWrite: (String, String) -> Unit
+    onWrite: (String, String) -> Unit,
+    onReadDescriptor: (String, String) -> Unit
 ) {
 
     Column(
@@ -138,11 +147,13 @@ fun ServicePagerDetail(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
 
-                        Column() {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(.85f)
+                        ) {
 
                             Text(
                                 text = char.name,
@@ -151,6 +162,10 @@ fun ServicePagerDetail(
                             Text(
                                 text = char.uuid.uppercase(),
                                 style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = char.properties.propsToString(),
+                                style = bodySmallItalic
                             )
                         }
 
@@ -172,6 +187,45 @@ fun ServicePagerDetail(
                         WriteCharacteristic(char, onWrite)
 
                     }
+
+                    if (char.descriptors.isNotEmpty()) {
+
+                        char.descriptors.forEach { desc ->
+
+                            Divider(modifier = Modifier.padding(vertical = 10.dp))
+                            //Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary)) {
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    modifier = Modifier.size(22.dp),
+                                    painter = painterResource(id = R.drawable.descriptor),
+                                    contentDescription = "Descriptor Icon"
+                                )
+                                Text(
+                                    modifier = Modifier.padding(start = 4.dp),
+                                    text = desc.name,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                            Text(
+                                //modifier = Modifier.padding(start = 12.dp),
+                                text = desc.uuid.uppercase(),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
+
+                            ReadDescriptorOptions(
+                                char.uuid,
+                                descriptor = desc, onRead = onReadDescriptor,
+                                onShowUserMessage = onShowUserMessage
+                            )
+
+                        }
+                        //}
+                    }
+
                 }
             }
             if (service.characteristics.indexOf(char) < service.characteristics.count() - 1) {

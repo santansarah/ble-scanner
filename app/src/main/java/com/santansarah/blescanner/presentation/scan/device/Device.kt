@@ -46,9 +46,11 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
-import com.santansarah.blescanner.presentation.scan.ScanState
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
+import com.santansarah.blescanner.utils.BleProperties
+import com.santansarah.blescanner.utils.BleWriteTypes
 import com.santansarah.blescanner.utils.toDate
 
 @Composable
@@ -60,7 +62,8 @@ fun ShowDevice(
     onBack: () -> Unit,
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
-    onWrite: (String, String) -> Unit
+    onWrite: (String, String) -> Unit,
+    onReadDescriptor: (String, String) -> Unit
 ) {
 
     val scannedDevice = scanState.selectedDevice!!.scannedDevice
@@ -122,7 +125,7 @@ fun ShowDevice(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ServicePager(scanState.selectedDevice, onRead, onShowUserMessage, onWrite)
+        ServicePager(scanState.selectedDevice, onRead, onShowUserMessage, onWrite, onReadDescriptor)
     }
 
 }
@@ -305,24 +308,26 @@ fun previewDeviceDetail() {
                                             name = "Device Name",
                                             descriptor = null,
                                             permissions = 0,
-                                            properties = 2,
-                                            writeTypes = 2,
+                                            properties = listOf(BleProperties.PROPERTY_READ),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
                                             descriptors = emptyList(),
                                             canRead = true,
                                             canWrite = false,
-                                            readBytes = null
+                                            readBytes = null,
+                                            notificationBytes = null
                                         ),
                                         DeviceCharacteristics(
                                             uuid = "00002a00-0000-1000-8000-00805f9b34fb",
                                             name = "Appearance",
                                             descriptor = null,
                                             permissions = 0,
-                                            properties = 2,
-                                            writeTypes = 2,
+                                            properties = listOf(BleProperties.PROPERTY_READ),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
                                             descriptors = emptyList(),
                                             canRead = true,
                                             canWrite = false,
-                                            readBytes = null
+                                            readBytes = null,
+                                            notificationBytes = null
                                         )
                                     )
                                 ),
@@ -334,9 +339,10 @@ fun previewDeviceDetail() {
                                             uuid = "00002a05-0000-1000-8000-00805f9b34fb",
                                             name = "Service Changed",
                                             descriptor = null,
-                                            permissions = 0, properties = 2, writeTypes = 2,
+                                            permissions = 0, properties = listOf(BleProperties.PROPERTY_READ), writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
                                             descriptors = emptyList(), canRead = true,
-                                            canWrite = false, readBytes = byteArrayOf(-60, 3)
+                                            canWrite = false, readBytes = byteArrayOf(-60, 3),
+                                            notificationBytes = null
                                         )
                                     )
                                 ),
@@ -349,28 +355,31 @@ fun previewDeviceDetail() {
                                             name = "Mfr Characteristic",
                                             descriptor = null,
                                             permissions = 0,
-                                            properties = 8,
-                                            writeTypes = 2,
+                                            properties = listOf(BleProperties.PROPERTY_READ, BleProperties.PROPERTY_WRITE),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
                                             descriptors = emptyList(),
                                             canRead = false,
                                             canWrite = true,
-                                            readBytes = null
+                                            readBytes = null,
+                                            notificationBytes = null
                                         ),
                                         DeviceCharacteristics(
                                             uuid = "0000ae02-0000-1000-8000-00805f9b34fb",
                                             name = "Mfr Characteristic",
-                                            descriptor = null, permissions = 0, properties = 2,
-                                            writeTypes = 2, descriptors = emptyList(),
+                                            descriptor = null, permissions = 0, properties = listOf(BleProperties.PROPERTY_READ),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT), descriptors = emptyList(),
                                             canRead = true, canWrite = false,
-                                            readBytes = null
+                                            readBytes = null,
+                                            notificationBytes = null
                                         ),
                                         DeviceCharacteristics(
                                             uuid = "0000ae03-0000-1000-8000-00805f9b34fb",
                                             name = "Mfr Characteristic",
-                                            descriptor = null, permissions = 0, properties = 16,
-                                            writeTypes = 2, descriptors = emptyList(),
+                                            descriptor = null, permissions = 0, properties = listOf(BleProperties.PROPERTY_READ, BleProperties.PROPERTY_WRITE),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT), descriptors = emptyList(),
                                             canRead = false, canWrite = false,
                                             readBytes = null,
+                                            notificationBytes = null
                                         )
                                     )
                                 )
@@ -384,7 +393,8 @@ fun previewDeviceDetail() {
                     {},
                     {},
                     {},
-                    { _: String, _: String -> }
+                    { _: String, _: String -> },
+                    { _: String, _: String -> },
                 )
             }
         }

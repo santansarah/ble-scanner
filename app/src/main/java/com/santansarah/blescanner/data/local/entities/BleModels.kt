@@ -47,3 +47,11 @@ data class ScannedDevice(
     val extra: List<String>? = null,
     val lastSeen: Long
 )
+
+@Entity(tableName = "descriptors")
+data class Descriptor(
+    val identifier: String,
+    val name: String,
+    val source: String,
+    @PrimaryKey val uuid: String
+)
