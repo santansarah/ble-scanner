@@ -138,10 +138,12 @@ sealed class ParsableCharacteristic(val uuid: String) {
 
     object CCCD : ParsableCharacteristic("00002902$UUID_DEFAULT".lowercase()) {
         fun notificationsEnabled(bytes: ByteArray): String {
-            return if (bytes.contentEquals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE))
-                "Notifications enabled."
+            return if (bytes.contentEquals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ||
+                bytes.contentEquals(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
+            )
+                "Enabled."
             else
-                "Notifications disabled."
+                "Disabled."
         }
     }
 

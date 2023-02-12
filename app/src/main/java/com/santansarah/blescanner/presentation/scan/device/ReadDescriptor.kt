@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,41 +48,34 @@ fun ReadDescriptorOptions(
             .fillMaxWidth()
         //.padding(6.dp)
     ) {
-        AssistChip(
+        FilledIconButton(
             //enabled = char.canRead,
-            label = {
-                Text(
-                    text = "Read",
-                    color = MaterialTheme.colorScheme.onSecondary
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(
-                        id = R.drawable.read_descriptor
-                    ),
-                    contentDescription = "Read"
-                )
-            },
             onClick = { onRead(charUuid, descriptor.uuid) })
-        Spacer(modifier = Modifier.width(10.dp))
+        {
+            Icon(
+                painter = painterResource(
+                    id = R.drawable.read_descriptor
+                ),
+                contentDescription = "Read"
+            )
+        }
+        Spacer(modifier = Modifier.width(4.dp))
         val clipboardManager = LocalClipboardManager.current
-        AssistChip(
+        FilledIconButton(
             enabled = descriptor.readBytes != null,
-            label = { Text(text = "Copy") },
-            leadingIcon = {
-                Icon(
-                    modifier = Modifier.size(22.dp),
-                    painter = painterResource(id = R.drawable.copy),
-                    contentDescription = "Copy",
-                )
-            },
             onClick = {
                 clipboardManager.setText(
                     AnnotatedString(descriptor.getReadInfo())
                 )
                 onShowUserMessage("Data Copied.")
             })
+        {
+            Icon(
+                modifier = Modifier.size(22.dp),
+                painter = painterResource(id = R.drawable.copy),
+                contentDescription = "Copy",
+            )
+        }
     }
 
     Column(

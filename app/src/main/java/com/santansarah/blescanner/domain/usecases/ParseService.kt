@@ -2,12 +2,8 @@ package com.santansarah.blescanner.domain.usecases
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
-import android.bluetooth.le.ScanResult
-import android.util.SparseArray
 import com.santansarah.blescanner.data.local.BleRepository
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
@@ -18,9 +14,8 @@ import com.santansarah.blescanner.utils.BleWriteTypes
 import com.santansarah.blescanner.utils.canRead
 import com.santansarah.blescanner.utils.canWrite
 import com.santansarah.blescanner.utils.toGss
-import com.santansarah.blescanner.utils.toMillis
-import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 
 class ParseService
     (
@@ -28,28 +23,27 @@ class ParseService
 ) {
 
     @SuppressLint("MissingPermission")
-    suspend operator fun invoke(gattService: List<BluetoothGattService>?, status: Int):
+    suspend operator fun invoke(gatt: BluetoothGatt, status: Int):
             List<DeviceService> {
 
         val services = mutableListOf<DeviceService>()
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            gattService?.forEach { gatt ->
+            gatt.services?.forEach { gattService ->
 
                 val serviceName =
-                    bleRepository.getServiceById(gatt.uuid.toGss())?.name ?: "Mfr Service"
+                    bleRepository.getServiceById(gattService.uuid.toGss())?.name ?: "Mfr Service"
 
                 val service = Service(
                     "",
                     serviceName,
                     "",
-                    gatt.uuid.toString().uppercase()
+                    gattService.uuid.toString().uppercase()
                 )
 
                 val characteristics = mutableListOf<DeviceCharacteristics>()
-                val descriptors = mutableListOf<DeviceDescriptor>()
 
-                gatt.characteristics.forEach { char ->
+                gattService.characteristics.forEach { char ->
                     val deviceCharacteristic = bleRepository
                         .getCharacteristicById(char.uuid.toGss())
 
@@ -57,11 +51,14 @@ class ParseService
                     val properties = BleProperties.getAllProperties(char.properties)
                     val writeTypes = BleWriteTypes.getAllTypes(char.writeType)
 
-                    char.descriptors.forEach { desc ->
+                    val descriptors = mutableListOf<DeviceDescriptor>()
+                    char.descriptors?.forEach { desc ->
 
-                        if (descriptors.find { existing ->
-                                existing.uuid == desc.uuid.toString() } == null &&
-                                desc.characteristic.uuid == char.uuid) {
+                        if (descriptors.find { makeSureNotDup ->
+                                makeSureNotDup.uuid == desc.uuid.toString()} == null) {
+
+                            Timber.d(char.uuid.toString())
+                            Timber.d(desc.uuid.toString() + "; " + desc.characteristic.uuid.toString())
 
                             val deviceDescriptor = bleRepository.getDescriptorById(
                                 desc.uuid.toGss()
