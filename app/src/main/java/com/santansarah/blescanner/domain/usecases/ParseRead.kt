@@ -12,6 +12,7 @@ import com.santansarah.blescanner.data.local.entities.Service
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.domain.models.updateBytes
 import com.santansarah.blescanner.utils.decodeSkipUnreadable
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toMillis

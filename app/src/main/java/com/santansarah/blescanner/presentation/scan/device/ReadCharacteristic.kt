@@ -23,9 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
+import com.santansarah.blescanner.domain.bleparsables.Appearance
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
+import com.santansarah.blescanner.domain.models.getReadInfo
 import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.utils.ParsableUuid
 import timber.log.Timber
 
 @Composable
@@ -83,7 +84,7 @@ fun ReadCharacteristic(
         SelectionContainer {
             Column {
                 Timber.d(char.uuid)
-                Timber.d(ParsableUuid.Appearance.uuid)
+                Timber.d(Appearance.uuid)
 
                 Text(
                     text = char.getReadInfo(),

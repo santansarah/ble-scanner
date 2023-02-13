@@ -88,16 +88,19 @@ class ScanViewModel(
 
     fun readCharacteristic(uuid: String) {
         bleGatt.readCharacteristic(uuid)
+        //showUserMessage("Request sent.")
     }
 
     fun readDescriptor(charUuid: String, descUuid: String) {
         bleGatt.readDescriptor(charUuid, descUuid)
+        //showUserMessage("Request sent.")
     }
 
     fun writeDescriptor(charUuid: String, descUuid: String, hexString: String) {
         try {
             if (hexString.isNotEmpty()) {
                 bleGatt.writeDescriptor(charUuid, descUuid, hexString.decodeHex())
+                //showUserMessage("Data sent.")
             } else
                 showUserMessage("Hex can't be null.")
         } catch (badHex: Exception) {
@@ -120,6 +123,7 @@ class ScanViewModel(
         try {
             if (bytes.isNotEmpty()) {
                 bleGatt.writeBytes(uuid, bytes.decodeHex())
+                //showUserMessage("Data sent.")
             } else
                 showUserMessage("Hex can't be null.")
         } catch (badHex: Exception) {

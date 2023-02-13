@@ -9,13 +9,13 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.os.Build
+import com.santansarah.blescanner.domain.bleparsables.CCCD
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.domain.usecases.ParseDescriptor
 import com.santansarah.blescanner.domain.usecases.ParseNotification
 import com.santansarah.blescanner.domain.usecases.ParseRead
 import com.santansarah.blescanner.domain.usecases.ParseService
-import com.santansarah.blescanner.utils.ParsableUuid
 import com.santansarah.blescanner.utils.print
 import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
@@ -213,7 +213,7 @@ class BleGatt(
             gattSvcForNotify.characteristics?.forEach { svcChar ->
 
                 svcChar.descriptors.find { desc ->
-                    desc.uuid.toString() == ParsableUuid.CCCD.uuid
+                    desc.uuid.toString() == CCCD.uuid
                 }?.also { cccd ->
                     val notifyRegistered = btGatt?.setCharacteristicNotification(svcChar, true)
 

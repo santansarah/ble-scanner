@@ -1,6 +1,8 @@
 package com.santansarah.sharedtest
 
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.domain.models.BleProperties
+import com.santansarah.blescanner.domain.models.BleWriteTypes
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
@@ -10,12 +12,13 @@ val deviceNameCharacteristic = DeviceCharacteristics(
     name = "Device Name",
     descriptor = null,
     permissions = 0,
-    properties = 2,
-    writeTypes = 2,
+    properties = listOf(BleProperties.PROPERTY_READ),
+    writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
     descriptors = emptyList(),
     canRead = true,
     canWrite = false,
-    readBytes = null
+    readBytes = null,
+    notificationBytes = null
 )
 
 val deviceAppearanceCharacteristic = DeviceCharacteristics(
@@ -23,12 +26,13 @@ val deviceAppearanceCharacteristic = DeviceCharacteristics(
     name = "Appearance",
     descriptor = null,
     permissions = 0,
-    properties = 2,
-    writeTypes = 2,
+    properties = listOf(BleProperties.PROPERTY_READ),
+    writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
     descriptors = emptyList(),
     canRead = true,
     canWrite = false,
-    readBytes = null
+    readBytes = null,
+    notificationBytes = null
 )
 
 val genericService = DeviceService(
@@ -45,12 +49,13 @@ val mfrCharacteristic = DeviceCharacteristics(
     name = "Mfr Characteristic",
     descriptor = null,
     permissions = 0,
-    properties = 8,
-    writeTypes = 2,
+    properties = listOf(BleProperties.PROPERTY_READ),
+    writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
     descriptors = emptyList(),
     canRead = false,
     canWrite = true,
-    readBytes = null
+    readBytes = null,
+    notificationBytes = null
 )
 
 val mfrService = DeviceService(

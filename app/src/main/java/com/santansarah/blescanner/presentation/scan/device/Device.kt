@@ -42,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.domain.models.BleProperties
+import com.santansarah.blescanner.domain.models.BleWriteTypes
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
@@ -50,8 +52,6 @@ import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
-import com.santansarah.blescanner.utils.BleProperties
-import com.santansarah.blescanner.utils.BleWriteTypes
 import com.santansarah.blescanner.utils.toDate
 
 @Composable

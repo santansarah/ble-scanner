@@ -4,14 +4,14 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.Service
+import com.santansarah.blescanner.domain.models.BlePermissions
+import com.santansarah.blescanner.domain.models.BleProperties
+import com.santansarah.blescanner.domain.models.BleWriteTypes
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceService
-import com.santansarah.blescanner.utils.BlePermissions
-import com.santansarah.blescanner.utils.BleProperties
-import com.santansarah.blescanner.utils.BleWriteTypes
-import com.santansarah.blescanner.utils.canRead
-import com.santansarah.blescanner.utils.canWriteProperties
+import com.santansarah.blescanner.domain.models.canRead
+import com.santansarah.blescanner.domain.models.canWriteProperties
 import com.santansarah.blescanner.utils.toGss
 import timber.log.Timber
 
@@ -53,7 +53,8 @@ class ParseService
                     char.descriptors?.forEach { desc ->
 
                         if (descriptors.find { makeSureNotDup ->
-                                makeSureNotDup.uuid == desc.uuid.toString()} == null) {
+                                makeSureNotDup.uuid == desc.uuid.toString()
+                            } == null) {
 
                             Timber.d(char.uuid.toString())
                             Timber.d(desc.uuid.toString() + "; " + desc.characteristic.uuid.toString())
@@ -68,6 +69,12 @@ class ParseService
                                     name = deviceDescriptor?.name ?: "Unknown",
                                     charUuid = desc.characteristic.uuid.toString(),
                                     permissions = BlePermissions.getAllPermissions(desc.permissions),
+                                    notificationProperty = if (properties.contains(BleProperties.PROPERTY_NOTIFY))
+                                        BleProperties.PROPERTY_NOTIFY else if (properties.contains(
+                                            BleProperties.PROPERTY_INDICATE
+                                        )
+                                    )
+                                        BleProperties.PROPERTY_INDICATE else null,
                                     readBytes = null
                                 )
                             )

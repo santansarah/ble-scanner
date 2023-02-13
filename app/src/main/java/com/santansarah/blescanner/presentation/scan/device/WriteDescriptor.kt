@@ -30,11 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
+import com.santansarah.blescanner.domain.bleparsables.CCCD
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
+import com.santansarah.blescanner.domain.models.canWritePermissions
+import com.santansarah.blescanner.domain.models.getWriteCommands
 import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.utils.ParsableUuid
-import com.santansarah.blescanner.utils.canWritePermissions
-
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +45,7 @@ fun WriteDescriptor(
     onWrite: (String, String, String) -> Unit
 ) {
 
-    val enabled = if (descriptor.uuid == ParsableUuid.CCCD.uuid)
+    val enabled = if (descriptor.uuid == CCCD.uuid)
         true
     else
         descriptor.permissions.canWritePermissions()
@@ -54,7 +56,12 @@ fun WriteDescriptor(
             mutableStateOf("")
         }
 
-        val listItems = descriptor.getWriteInfo()
+        var wroteHex by rememberSaveable {
+            mutableStateOf("")
+        }
+
+
+        val listItems = descriptor.getWriteCommands()
         if (listItems.isNotEmpty()) {
             Text(
                 text = "Hints:",
@@ -103,7 +110,17 @@ fun WriteDescriptor(
                 .defaultMinSize(minHeight = 100.dp),
         )
 
-        //val finalHex = hexToWrite.ifEmpty { customHexToWrite }
+        if (wroteHex.isNotEmpty()) {
+
+            val sdf = SimpleDateFormat.getDateTimeInstance()
+            val currentDateAndTime = sdf.format(Date())
+
+            Text(
+                text = "Wrote: $wroteHex on $currentDateAndTime",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
 
         AssistChip(
             enabled = enabled,
@@ -122,6 +139,8 @@ fun WriteDescriptor(
                     descriptor.uuid,
                     customHexToWrite.substringAfter("0x")
                 )
+                wroteHex = customHexToWrite
+                customHexToWrite = ""
             })
 
     }

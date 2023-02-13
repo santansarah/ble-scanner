@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.domain.models.propsToString
 import com.santansarah.blescanner.presentation.theme.bodySmallItalic
-import com.santansarah.blescanner.utils.propsToString
 
 @Composable
 fun ServicePager(

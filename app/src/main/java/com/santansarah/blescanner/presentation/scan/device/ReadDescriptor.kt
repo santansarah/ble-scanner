@@ -25,9 +25,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
+import com.santansarah.blescanner.domain.bleparsables.CCCD
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
+import com.santansarah.blescanner.domain.models.getReadInfo
 import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.utils.ParsableUuid
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +63,7 @@ fun ReadDescriptor(
                 contentDescription = "Read"
             )
         }
-        Spacer(modifier = Modifier.width(2.dp))
+        //Spacer(modifier = Modifier.width(2.dp))
         val clipboardManager = LocalClipboardManager.current
         IconButton(
             //enabled = char.canRead,
@@ -85,7 +86,7 @@ fun ReadDescriptor(
         }
     }
 
-    val boxMinHeight = if (descriptor.uuid == ParsableUuid.CCCD.uuid)
+    val boxMinHeight = if (descriptor.uuid == CCCD.uuid)
         50.dp
     else
         100.dp

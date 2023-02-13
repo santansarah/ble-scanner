@@ -31,7 +31,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
+import com.santansarah.blescanner.domain.models.getWriteCommands
 import com.santansarah.blescanner.presentation.theme.codeFont
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +49,11 @@ fun WriteCharacteristic(
             mutableStateOf("")
         }
 
-        val listItems = char.getWriteInfo()
+        var wroteHex by rememberSaveable {
+            mutableStateOf("")
+        }
+
+        val listItems = char.getWriteCommands()
         if (listItems.isNotEmpty()) {
             Text(
                 text = "Hints:",
@@ -95,8 +102,17 @@ fun WriteCharacteristic(
                 .defaultMinSize(minHeight = 100.dp),
         )
 
-        //val finalHex = hexToWrite.ifEmpty { customHexToWrite }
+        if (wroteHex.isNotEmpty()) {
 
+            val sdf = SimpleDateFormat.getDateTimeInstance()
+            val currentDateAndTime = sdf.format(Date())
+
+            Text(
+                text = "Wrote: $wroteHex on $currentDateAndTime",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         AssistChip(
             enabled = char.canWrite,
             label = { Text(text = "Write") },
@@ -113,6 +129,8 @@ fun WriteCharacteristic(
                     char.uuid,
                     customHexToWrite.substringAfter("0x")
                 )
+                wroteHex = customHexToWrite
+                customHexToWrite = ""
             })
 
     }
