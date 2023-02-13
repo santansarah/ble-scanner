@@ -107,6 +107,7 @@ class BleGatt(
             characteristic: BluetoothGattCharacteristic
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
+            Timber.d("characteristic changed: ${characteristic.value.print()}")
             deviceDetails.value = parseNotification(deviceDetails.value, characteristic)
         }
 
@@ -132,38 +133,6 @@ class BleGatt(
             status: Int
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-
-            with(characteristic) {
-                when (status) {
-                    BluetoothGatt.GATT_SUCCESS -> {
-                        Timber.i(
-                            "BluetoothGattCallback",
-                            "Wrote to characteristic $uuid | value: ${value.toHex()}"
-                        )
-                    }
-
-                    BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH -> {
-                        Timber.e(
-                            "BluetoothGattCallback",
-                            "Write exceeded connection ATT MTU!"
-                        )
-                    }
-
-                    BluetoothGatt.GATT_WRITE_NOT_PERMITTED -> {
-                        Timber.e(
-                            "BluetoothGattCallback",
-                            "Write not permitted for $uuid!"
-                        )
-                    }
-
-                    else -> {
-                        Timber.e(
-                            "BluetoothGattCallback",
-                            "Characteristic write failed for $uuid, error: $status"
-                        )
-                    }
-                }
-            }
         }
 
         override fun onDescriptorWrite(
@@ -172,37 +141,7 @@ class BleGatt(
             status: Int
         ) {
             super.onDescriptorWrite(gatt, descriptor, status)
-
             Timber.d("descriptor write: ${descriptor.uuid}, ${descriptor.characteristic.uuid}, $status")
-
-            with(descriptor) {
-                when (status) {
-                    BluetoothGatt.GATT_SUCCESS -> {
-                        //btGatt?.readDescriptor(descriptor)
-                    }
-
-                    BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH -> {
-                        Timber.e(
-                            "BluetoothGattCallback",
-                            "Write exceeded connection ATT MTU!"
-                        )
-                    }
-
-                    BluetoothGatt.GATT_WRITE_NOT_PERMITTED -> {
-                        Timber.e(
-                            "BluetoothGattCallback",
-                            "Write not permitted for $uuid!"
-                        )
-                    }
-
-                    else -> {
-                        Timber.e(
-                            "BluetoothGattCallback",
-                            "descriptor write failed for $uuid, error: $status"
-                        )
-                    }
-                }
-            }
         }
 
     }
@@ -227,7 +166,7 @@ class BleGatt(
                         btGatt?.writeDescriptor(cccd)
                     }
 
-                    // give the gatt a little breathing room for writes
+                    // give gatt a little breathing room for writes
                     delay(300L)
 
                 }

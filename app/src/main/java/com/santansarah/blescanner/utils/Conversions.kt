@@ -15,13 +15,13 @@ import java.util.concurrent.TimeUnit
  * Moreover, it pads the hex value with a leading zero if necessary.
  */
 fun ByteArray.toHex(): String =
-    joinToString(separator = "") { eachByte -> "%02x".format(eachByte).uppercase() }
+    "0x" + joinToString(separator = "") { eachByte -> "%02X".format(eachByte).uppercase() }
 
 fun ByteArray.print(): String =
     joinToString(separator = ",") { eachByte -> eachByte.toInt().toString() }
 
 fun Int.toHex(): String =
-    "0x%04x".format(this).uppercase()
+    "0x%04X".format(this)
 
 
 fun ByteArray.bitsToHex(): String {
@@ -63,9 +63,9 @@ private fun toBinary(num: Int, length: Int): String {
 }
 
 fun LongArray.toHex(): String =
-    joinToString(separator = "") { words -> "0x%04x".format(words.toShort()).uppercase() }
+    joinToString(separator = "") { words -> "0x%04X".format(words.toShort()) }
 
-fun Byte.toHex(): String = "%02x".format(this)
+fun Byte.toHex(): String = "%02X".format(this)
 
 fun String.decodeHex(): ByteArray {
     require(length % 2 == 0) { "Must have an even length" }

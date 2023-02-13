@@ -87,7 +87,8 @@ fun DeviceCharacteristics.updateDescriptors(uuidFromDevice: String, fromDevice: 
 
 fun DeviceCharacteristics.updateNotification(fromDevice: ByteArray): DeviceCharacteristics {
     Timber.d("fromNotify: $fromDevice")
-    return copy(notificationBytes = fromDevice)
+    //return copy(notificationBytes = fromDevice)
+    return copy(readBytes = fromDevice)
 }
 
 fun DeviceCharacteristics.getReadInfo(): String {
@@ -100,10 +101,7 @@ fun DeviceCharacteristics.getReadInfo(): String {
         with(sb) {
             when (uuid) {
                 Appearance.uuid -> {
-                    appendLine("Bits, Categories, Value:")
-                    appendLine(bytes.bits())
                     appendLine(Appearance.getReadStringFromBytes(bytes))
-                    appendLine(bytes.bitsToHex())
                 }
 
                 PreferredConnectionParams.uuid ->
