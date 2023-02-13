@@ -78,10 +78,18 @@ enum class BleProperties(val value: Int) {
 }
 
 fun List<BleProperties>.canRead(): Boolean = this.contains(BleProperties.PROPERTY_READ)
-fun List<BleProperties>.canWrite(): Boolean = this.any(
+fun List<BleProperties>.canWriteProperties(): Boolean = this.any(
     listOf(
         BleProperties.PROPERTY_WRITE, BleProperties.PROPERTY_SIGNED_WRITE,
         BleProperties.PROPERTY_WRITE_NO_RESPONSE
+    )::contains
+)
+
+fun List<BlePermissions>.canWritePermissions(): Boolean = this.any(
+    listOf(
+        BlePermissions.PERMISSION_WRITE, BlePermissions.PERMISSION_WRITE_ENCRYPTED,
+        BlePermissions.PERMISSION_WRITE_ENCRYPTED_MITM, BlePermissions.PERMISSION_WRITE_SIGNED,
+        BlePermissions.PERMISSION_WRITE_SIGNED_MITM
     )::contains
 )
 
@@ -90,9 +98,9 @@ fun List<BleProperties>.propsToString() =
 
 fun List<BleWriteTypes>.writeTypesToString() = this.joinToString(", ") { it.name }
 
-sealed class ParsableCharacteristic(val uuid: String) {
+sealed class ParsableUuid(val uuid: String) {
 
-    object ELKBLEDOM : ParsableCharacteristic("0000FFF3$UUID_DEFAULT".lowercase()) {
+    object ELKBLEDOM : ParsableUuid("0000FFF3$UUID_DEFAULT".lowercase()) {
 
         const val on = "7e0004f00001ff00ef"
         const val off = "7e0004000000ff00ef"
@@ -119,7 +127,7 @@ sealed class ParsableCharacteristic(val uuid: String) {
 
     }
 
-    object Appearance : ParsableCharacteristic("00002A01$UUID_DEFAULT".lowercase()) {
+    object Appearance : ParsableUuid("00002A01$UUID_DEFAULT".lowercase()) {
 
         fun getCategories(bytes: ByteArray): String {
             val bitSet = bytes.bits()
@@ -136,7 +144,15 @@ sealed class ParsableCharacteristic(val uuid: String) {
 
     }
 
-    object CCCD : ParsableCharacteristic("00002902$UUID_DEFAULT".lowercase()) {
+    object CCCD : ParsableUuid("00002902$UUID_DEFAULT".lowercase()) {
+
+        val commands = arrayOf(
+            "Enable Notifications: ${BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE.toHex()}",
+            "Disable Notifications: ${BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE.toHex()}",
+            "Enable Indications: ${BluetoothGattDescriptor.ENABLE_INDICATION_VALUE.toHex()}",
+            "Disable Indications: ${BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE.toHex()}"
+        )
+
         fun notificationsEnabled(bytes: ByteArray): String {
             return if (bytes.contentEquals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ||
                 bytes.contentEquals(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
@@ -147,7 +163,7 @@ sealed class ParsableCharacteristic(val uuid: String) {
         }
     }
 
-    object PreferredConnectionParams : ParsableCharacteristic("00002A04$UUID_DEFAULT".lowercase()) {
+    object PreferredConnectionParams : ParsableUuid("00002A04$UUID_DEFAULT".lowercase()) {
 
         fun getConnectionPrefs(bytes: ByteArray): String {
 

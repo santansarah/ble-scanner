@@ -2,7 +2,6 @@ package com.santansarah.blescanner.domain.usecases
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattService
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.Service
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
@@ -12,10 +11,9 @@ import com.santansarah.blescanner.utils.BlePermissions
 import com.santansarah.blescanner.utils.BleProperties
 import com.santansarah.blescanner.utils.BleWriteTypes
 import com.santansarah.blescanner.utils.canRead
-import com.santansarah.blescanner.utils.canWrite
+import com.santansarah.blescanner.utils.canWriteProperties
 import com.santansarah.blescanner.utils.toGss
 import timber.log.Timber
-import java.util.UUID
 
 class ParseService
     (
@@ -66,10 +64,11 @@ class ParseService
 
                             descriptors.add(
                                 DeviceDescriptor(
-                                    desc.uuid.toString(),
-                                    deviceDescriptor?.name ?: "Unknown",
-                                    BlePermissions.getAllPermissions(desc.permissions),
-                                    null
+                                    uuid = desc.uuid.toString(),
+                                    name = deviceDescriptor?.name ?: "Unknown",
+                                    charUuid = desc.characteristic.uuid.toString(),
+                                    permissions = BlePermissions.getAllPermissions(desc.permissions),
+                                    readBytes = null
                                 )
                             )
                         }
@@ -85,7 +84,7 @@ class ParseService
                             writeTypes = writeTypes,
                             descriptors = descriptors,
                             canRead = properties.canRead(),
-                            canWrite = properties.canWrite(),
+                            canWrite = properties.canWriteProperties(),
                             readBytes = null,
                             notificationBytes = null
                         )

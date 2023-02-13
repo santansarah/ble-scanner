@@ -1,24 +1,20 @@
 package com.santansarah.blescanner.presentation.scan.device
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,15 +25,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
-import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.utils.ParsableCharacteristic
-import timber.log.Timber
+import com.santansarah.blescanner.utils.ParsableUuid
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ReadDescriptorOptions(
+fun ReadDescriptor(
     charUuid: String,
     descriptor: DeviceDescriptor,
     onRead: (String, String) -> Unit,
@@ -45,11 +39,20 @@ fun ReadDescriptorOptions(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-        //.padding(6.dp)
+            .offset(y = (-8).dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        FilledIconButton(
+        Icon(
+            painter = painterResource(id = R.drawable.descriptor_buttons),
+            contentDescription = "Descriptor Buttons",
+            tint = MaterialTheme.colorScheme.onSecondary
+        )
+        IconButton(
             //enabled = char.canRead,
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
             onClick = { onRead(charUuid, descriptor.uuid) })
         {
             Icon(
@@ -59,9 +62,13 @@ fun ReadDescriptorOptions(
                 contentDescription = "Read"
             )
         }
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(2.dp))
         val clipboardManager = LocalClipboardManager.current
-        FilledIconButton(
+        IconButton(
+            //enabled = char.canRead,
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
             enabled = descriptor.readBytes != null,
             onClick = {
                 clipboardManager.setText(
@@ -78,11 +85,16 @@ fun ReadDescriptorOptions(
         }
     }
 
+    val boxMinHeight = if (descriptor.uuid == ParsableUuid.CCCD.uuid)
+        50.dp
+    else
+        100.dp
+
     Column(
         modifier =
         Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 100.dp)
+            .defaultMinSize(minHeight = boxMinHeight)
             .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(6.dp)
     ) {

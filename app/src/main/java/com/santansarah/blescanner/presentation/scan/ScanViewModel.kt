@@ -94,6 +94,17 @@ class ScanViewModel(
         bleGatt.readDescriptor(charUuid, descUuid)
     }
 
+    fun writeDescriptor(charUuid: String, descUuid: String, hexString: String) {
+        try {
+            if (hexString.isNotEmpty()) {
+                bleGatt.writeDescriptor(charUuid, descUuid, hexString.decodeHex())
+            } else
+                showUserMessage("Hex can't be null.")
+        } catch (badHex: Exception) {
+            showUserMessage("Invalid Hex String. Must be an even count.")
+        }
+    }
+
     fun onBackFromDevice() {
         bleGatt.close()
         _selectedDevice.value = null

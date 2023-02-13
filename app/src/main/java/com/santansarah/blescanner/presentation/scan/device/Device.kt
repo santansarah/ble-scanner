@@ -44,6 +44,7 @@ import com.santansarah.blescanner.R
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
+import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.domain.models.ScanState
@@ -63,7 +64,8 @@ fun ShowDevice(
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
     onWrite: (String, String) -> Unit,
-    onReadDescriptor: (String, String) -> Unit
+    onReadDescriptor: (String, String) -> Unit,
+    onWriteDescriptor: (String, String, String) -> Unit
 ) {
 
     val scannedDevice = scanState.selectedDevice!!.scannedDevice
@@ -125,7 +127,14 @@ fun ShowDevice(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ServicePager(scanState.selectedDevice, onRead, onShowUserMessage, onWrite, onReadDescriptor)
+        ServicePager(
+            selectedDevice = scanState.selectedDevice,
+            onRead = onRead,
+            onShowUserMessage = onShowUserMessage,
+            onWrite = onWrite,
+            onReadDescriptor = onReadDescriptor,
+            onWriteDescriptor = onWriteDescriptor
+        )
     }
 
 }
@@ -202,11 +211,10 @@ private fun ConnectionStatus(
 fun ReadWriteMenu(
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit,
-    char: DeviceCharacteristics,
     onState: (Int) -> Unit
 ) {
     Box(
-        //modifier = Modifier.align(Alignment.End)
+        modifier = Modifier.fillMaxSize()
     ) {
         IconButton(
             //modifier = Modifier.offset((-14).dp),
@@ -227,7 +235,7 @@ fun ReadWriteMenu(
         ) {
             DropdownMenuItem(
                 //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
-                enabled = char.canRead,
+                //enabled = char.canRead,
                 text = { Text("Read") },
                 onClick = {
                     onState(0)
@@ -242,7 +250,7 @@ fun ReadWriteMenu(
             Divider()
             DropdownMenuItem(
                 //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
-                enabled = char.canWrite,
+                //enabled = char.canWrite,
                 text = { Text("Write") },
                 onClick = {
                     onState(1)
@@ -339,9 +347,13 @@ fun previewDeviceDetail() {
                                             uuid = "00002a05-0000-1000-8000-00805f9b34fb",
                                             name = "Service Changed",
                                             descriptor = null,
-                                            permissions = 0, properties = listOf(BleProperties.PROPERTY_READ), writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(), canRead = true,
-                                            canWrite = false, readBytes = byteArrayOf(-60, 3),
+                                            permissions = 0,
+                                            properties = listOf(BleProperties.PROPERTY_READ),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                                            descriptors = emptyList(),
+                                            canRead = true,
+                                            canWrite = false,
+                                            readBytes = byteArrayOf(-60, 3),
                                             notificationBytes = null
                                         )
                                     )
@@ -355,7 +367,10 @@ fun previewDeviceDetail() {
                                             name = "Mfr Characteristic",
                                             descriptor = null,
                                             permissions = 0,
-                                            properties = listOf(BleProperties.PROPERTY_READ, BleProperties.PROPERTY_WRITE),
+                                            properties = listOf(
+                                                BleProperties.PROPERTY_READ,
+                                                BleProperties.PROPERTY_WRITE
+                                            ),
                                             writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
                                             descriptors = emptyList(),
                                             canRead = false,
@@ -366,18 +381,29 @@ fun previewDeviceDetail() {
                                         DeviceCharacteristics(
                                             uuid = "0000ae02-0000-1000-8000-00805f9b34fb",
                                             name = "Mfr Characteristic",
-                                            descriptor = null, permissions = 0, properties = listOf(BleProperties.PROPERTY_READ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT), descriptors = emptyList(),
-                                            canRead = true, canWrite = false,
+                                            descriptor = null,
+                                            permissions = 0,
+                                            properties = listOf(BleProperties.PROPERTY_READ),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                                            descriptors = emptyList(),
+                                            canRead = true,
+                                            canWrite = false,
                                             readBytes = null,
                                             notificationBytes = null
                                         ),
                                         DeviceCharacteristics(
                                             uuid = "0000ae03-0000-1000-8000-00805f9b34fb",
                                             name = "Mfr Characteristic",
-                                            descriptor = null, permissions = 0, properties = listOf(BleProperties.PROPERTY_READ, BleProperties.PROPERTY_WRITE),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT), descriptors = emptyList(),
-                                            canRead = false, canWrite = false,
+                                            descriptor = null,
+                                            permissions = 0,
+                                            properties = listOf(
+                                                BleProperties.PROPERTY_READ,
+                                                BleProperties.PROPERTY_WRITE
+                                            ),
+                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                                            descriptors = emptyList(),
+                                            canRead = false,
+                                            canWrite = false,
                                             readBytes = null,
                                             notificationBytes = null
                                         )
@@ -395,6 +421,7 @@ fun previewDeviceDetail() {
                     {},
                     { _: String, _: String -> },
                     { _: String, _: String -> },
+                    { _: String, _: String, _: String -> },
                 )
             }
         }

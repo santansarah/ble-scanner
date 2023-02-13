@@ -1,13 +1,10 @@
 package com.santansarah.blescanner.domain.models
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
-import com.santansarah.blescanner.presentation.theme.codeFont
 import com.santansarah.blescanner.utils.BlePermissions
 import com.santansarah.blescanner.utils.BleProperties
 import com.santansarah.blescanner.utils.BleWriteTypes
-import com.santansarah.blescanner.utils.ParsableCharacteristic
+import com.santansarah.blescanner.utils.ParsableUuid
 import com.santansarah.blescanner.utils.bits
 import com.santansarah.blescanner.utils.bitsToHex
 import com.santansarah.blescanner.utils.decodeSkipUnreadable
@@ -72,15 +69,15 @@ data class DeviceCharacteristics(
         readBytes?.let { bytes ->
             with(sb) {
                 when (uuid) {
-                    ParsableCharacteristic.Appearance.uuid -> {
+                    ParsableUuid.Appearance.uuid -> {
                         appendLine("Bits, Categories, Value:")
                         appendLine(bytes.bits())
-                        appendLine(ParsableCharacteristic.Appearance.getCategories(bytes))
+                        appendLine(ParsableUuid.Appearance.getCategories(bytes))
                         appendLine(bytes.bitsToHex())
                     }
 
-                    ParsableCharacteristic.PreferredConnectionParams.uuid ->
-                       append(ParsableCharacteristic.PreferredConnectionParams.getConnectionPrefs(bytes))
+                    ParsableUuid.PreferredConnectionParams.uuid ->
+                       append(ParsableUuid.PreferredConnectionParams.getConnectionPrefs(bytes))
 
                     else -> {
                         appendLine("String, Hex, Bytes, Binary:")
@@ -98,8 +95,8 @@ data class DeviceCharacteristics(
 
     fun getWriteInfo(): Array<String> {
         return when (uuid) {
-            ParsableCharacteristic.ELKBLEDOM.uuid -> {
-                ParsableCharacteristic.ELKBLEDOM.commands
+            ParsableUuid.ELKBLEDOM.uuid -> {
+                ParsableUuid.ELKBLEDOM.commands
             }
 
             else -> {
@@ -113,9 +110,22 @@ data class DeviceCharacteristics(
 data class DeviceDescriptor(
     val uuid: String,
     val name: String,
+    val charUuid: String,
     val permissions: List<BlePermissions>,
     val readBytes: ByteArray?
 ) {
+
+    fun getWriteInfo(): Array<String> {
+        return when (uuid) {
+            ParsableUuid.CCCD.uuid -> {
+                ParsableUuid.CCCD.commands
+            }
+
+            else -> {
+                emptyArray()
+            }
+        }
+    }
 
     fun getReadInfo(): String {
 
@@ -126,8 +136,8 @@ data class DeviceDescriptor(
         readBytes?.let { bytes ->
             with(sb) {
                 when (uuid) {
-                    ParsableCharacteristic.CCCD.uuid -> {
-                        appendLine(ParsableCharacteristic.CCCD.notificationsEnabled(bytes))
+                    ParsableUuid.CCCD.uuid -> {
+                        appendLine(ParsableUuid.CCCD.notificationsEnabled(bytes))
                         appendLine("[" + bytes.print() + "]")
                     }
 

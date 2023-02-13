@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.presentation.theme.codeFont
-import com.santansarah.blescanner.utils.ParsableCharacteristic
+import com.santansarah.blescanner.utils.ParsableUuid
 import timber.log.Timber
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ReadDeviceOptions(
+fun ReadCharacteristic(
     char: DeviceCharacteristics,
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit
@@ -83,7 +83,7 @@ fun ReadDeviceOptions(
         SelectionContainer {
             Column {
                 Timber.d(char.uuid)
-                Timber.d(ParsableCharacteristic.Appearance.uuid)
+                Timber.d(ParsableUuid.Appearance.uuid)
 
                 Text(
                     text = char.getReadInfo(),

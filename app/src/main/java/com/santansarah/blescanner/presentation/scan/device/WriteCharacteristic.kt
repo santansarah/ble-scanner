@@ -1,15 +1,11 @@
 package com.santansarah.blescanner.presentation.scan.device
 
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -28,19 +24,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.textInputServiceFactory
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
@@ -80,6 +67,7 @@ fun WriteCharacteristic(
         Spacer(Modifier.height(10.dp))
 
         OutlinedTextField(
+            enabled = char.canWrite,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ),
@@ -110,14 +98,14 @@ fun WriteCharacteristic(
         //val finalHex = hexToWrite.ifEmpty { customHexToWrite }
 
         AssistChip(
-            enabled = char.canRead,
-            label = { Text(text = "Write Data") },
+            enabled = char.canWrite,
+            label = { Text(text = "Write") },
             leadingIcon = {
                 Icon(
                     painter = painterResource(
-                        id = R.drawable.outline_arrow_circle_down
+                        id = R.drawable.write_data
                     ),
-                    contentDescription = "Read Data"
+                    contentDescription = "Write"
                 )
             },
             onClick = {

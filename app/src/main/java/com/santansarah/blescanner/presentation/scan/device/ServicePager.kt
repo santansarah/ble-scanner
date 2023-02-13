@@ -1,9 +1,6 @@
 package com.santansarah.blescanner.presentation.scan.device
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -32,8 +28,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,7 +43,8 @@ fun ServicePager(
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
     onWrite: (String, String) -> Unit,
-    onReadDescriptor: (String, String) -> Unit
+    onReadDescriptor: (String, String) -> Unit,
+    onWriteDescriptor: (String, String, String) -> Unit
 ) {
     if (selectedDevice.services.isNotEmpty()) {
         val services = selectedDevice.services
@@ -110,7 +105,8 @@ fun ServicePager(
             onRead,
             onShowUserMessage,
             onWrite,
-            onReadDescriptor
+            onReadDescriptor,
+            onWriteDescriptor
         )
 
     }
@@ -123,7 +119,8 @@ fun ServicePagerDetail(
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
     onWrite: (String, String) -> Unit,
-    onReadDescriptor: (String, String) -> Unit
+    onReadDescriptor: (String, String) -> Unit,
+    onWriteDescriptor: (String, String, String) -> Unit
 ) {
 
     Column(
@@ -172,7 +169,6 @@ fun ServicePagerDetail(
                         ReadWriteMenu(
                             expanded = expanded,
                             onExpanded = { expanded = it },
-                            char = char,
                             onState = { state = it })
                     }
 
@@ -180,47 +176,65 @@ fun ServicePagerDetail(
 
 
                     if (state == 0) {
-
-                        ReadDeviceOptions(char, onRead, onShowUserMessage)
-
+                        ReadCharacteristic(char, onRead, onShowUserMessage)
                     } else {
                         WriteCharacteristic(char, onWrite)
-
                     }
 
                     if (char.descriptors.isNotEmpty()) {
 
                         char.descriptors.forEach { desc ->
 
+                            var descriptorState by rememberSaveable { mutableStateOf(0) }
+                            var descriptorExpanded by rememberSaveable { mutableStateOf(false) }
+
                             Divider(modifier = Modifier.padding(vertical = 10.dp))
-                            //Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondary)) {
 
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    modifier = Modifier.size(22.dp),
-                                    painter = painterResource(id = R.drawable.descriptor),
-                                    contentDescription = "Descriptor Icon"
-                                )
-                                Text(
-                                    modifier = Modifier.padding(start = 4.dp),
-                                    text = desc.name,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.onSecondary
-                                )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(.85f)
+                                ) {
+
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            modifier = Modifier.size(22.dp),
+                                            painter = painterResource(id = R.drawable.descriptor),
+                                            contentDescription = "Descriptor Icon"
+                                        )
+                                        Text(
+                                            modifier = Modifier.padding(start = 4.dp),
+                                            text = desc.name,
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
+                                    Text(
+                                        //modifier = Modifier.padding(start = 12.dp),
+                                        text = desc.uuid.uppercase(),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+
+                                ReadWriteMenu(
+                                    expanded = descriptorExpanded,
+                                    onExpanded = { descriptorExpanded = it },
+                                    onState = { descriptorState = it })
                             }
-                            Text(
-                                //modifier = Modifier.padding(start = 12.dp),
-                                text = desc.uuid.uppercase(),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondary
-                            )
 
-                            ReadDescriptorOptions(
-                                char.uuid,
-                                descriptor = desc, onRead = onReadDescriptor,
-                                onShowUserMessage = onShowUserMessage
-                            )
+                            if (descriptorState == 0) {
+                                ReadDescriptor(
+                                    char.uuid,
+                                    descriptor = desc, onRead = onReadDescriptor,
+                                    onShowUserMessage = onShowUserMessage
+                                )
+                            } else
+                                WriteDescriptor(descriptor = desc, onWrite = onWriteDescriptor)
 
                         }
                         //}

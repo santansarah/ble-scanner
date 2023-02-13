@@ -15,7 +15,7 @@ import com.santansarah.blescanner.domain.usecases.ParseDescriptor
 import com.santansarah.blescanner.domain.usecases.ParseNotification
 import com.santansarah.blescanner.domain.usecases.ParseRead
 import com.santansarah.blescanner.domain.usecases.ParseService
-import com.santansarah.blescanner.utils.ParsableCharacteristic
+import com.santansarah.blescanner.utils.ParsableUuid
 import com.santansarah.blescanner.utils.print
 import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
@@ -209,44 +209,29 @@ class BleGatt(
 
     suspend fun enableNotificationsAndIndications() {
 
-/*
-        val btService = btGatt?.getService(UUID.fromString("00000af0$UUID_DEFAULT".lowercase()))
-        val btChar =
-            btService?.getCharacteristic(UUID.fromString("0000af7$UUID_DEFAULT".lowercase()))
-        val btDesc = btChar?.getDescriptor(UUID.fromString("00002902$UUID_DEFAULT"))
-
-        val registered = btGatt?.setCharacteristicNotification(btChar, true)
-        Timber.d("${btChar?.uuid} registered: $registered")
-
-        btDesc?.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-        btGatt?.writeDescriptor(btDesc)
-*/
-
         btGatt?.services?.forEach { gattSvcForNotify ->
             gattSvcForNotify.characteristics?.forEach { svcChar ->
 
-                if (svcChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY > 0) {
+                svcChar.descriptors.find { desc ->
+                    desc.uuid.toString() == ParsableUuid.CCCD.uuid
+                }?.also { cccd ->
                     val notifyRegistered = btGatt?.setCharacteristicNotification(svcChar, true)
-                    Timber.d("${svcChar.uuid} registered: $notifyRegistered")
 
-                    val notifyDescriptor = svcChar.getDescriptor(
-                        UUID.fromString(ParsableCharacteristic.CCCD.uuid.lowercase()))
-                    notifyDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-                    btGatt?.writeDescriptor(notifyDescriptor)
+                    if (svcChar.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY > 0) {
+                        cccd.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                        btGatt?.writeDescriptor(cccd)
+                    }
+
+                    if (svcChar.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE > 0) {
+                        cccd.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
+                        btGatt?.writeDescriptor(cccd)
+                    }
+
+                    // give the gatt a little breathing room for writes
+                    delay(300L)
+
                 }
 
-                if (svcChar.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE > 0) {
-                    val indicateRegistered = btGatt?.setCharacteristicNotification(svcChar, true)
-                    Timber.d("${svcChar.uuid} registered: $indicateRegistered")
-
-                    val indicateDescriptor = svcChar.getDescriptor(
-                        UUID.fromString(ParsableCharacteristic.CCCD.uuid.lowercase()))
-                    indicateDescriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)
-                    btGatt?.writeDescriptor(indicateDescriptor)
-                }
-
-                // give the gatt a little breathing room for writes
-                delay(300L)
             }
         }
     }
@@ -305,6 +290,15 @@ class BleGatt(
             }
         }
 
+    }
+
+    fun writeDescriptor(charUuid: String, uuid: String, bytes: ByteArray) {
+        btGatt?.services?.flatMap { it.characteristics }?.flatMap { it.descriptors }
+            ?.find { it.characteristic.uuid.toString() == charUuid && it.uuid.toString() == uuid }
+            ?.also { foundDescriptor ->
+                foundDescriptor.setValue(bytes)
+                btGatt?.writeDescriptor(foundDescriptor)
+            }
     }
 
     fun close() {
