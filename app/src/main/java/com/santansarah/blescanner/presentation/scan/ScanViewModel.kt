@@ -1,6 +1,7 @@
 package com.santansarah.blescanner.presentation.scan
 
-import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
@@ -26,6 +27,9 @@ class ScanViewModel(
     dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
+    val isScanning by mutableStateOf(bleManager.isScanning)
+    val scannerMessage = bleManager.userMessage
+
     private val _devices = bleRepository.getScannedDevices()
     private val _selectedDevice = MutableStateFlow<DeviceDetail?>(null)
     private val _bleMessage = bleGatt.connectMessage
@@ -37,8 +41,6 @@ class ScanViewModel(
         _devices, _selectedDevice,
         _bleMessage, _userMessage, _deviceDetails
     ) { devices, selectedDevice, bleMessage, userMessage, deviceDetails ->
-
-        Timber.d(deviceDetails.toString())
 
         val currentDevice = selectedDevice?.let {
             DeviceDetail(
@@ -139,6 +141,10 @@ class ScanViewModel(
     fun userMessageShown() {
         Timber.tag("debug").d("user message set to null.")
         _userMessage.value = null
+    }
+
+    fun scannerMessageShown() {
+        bleManager.userMessageShown()
     }
 
 

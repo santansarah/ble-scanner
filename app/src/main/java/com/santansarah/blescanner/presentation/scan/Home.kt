@@ -25,10 +25,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
+import com.santansarah.blescanner.presentation.components.HomeAppBar
 import com.santansarah.blescanner.presentation.components.ShowPermissions
 import com.santansarah.blescanner.presentation.scan.device.ShowDevice
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.permissionsList
+import kotlinx.coroutines.flow.asStateFlow
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -39,13 +42,16 @@ fun HomeRoute(
 ) {
 
     val scanState = vm.scanState.collectAsStateWithLifecycle().value
+    val scannerMessage = vm.scannerMessage.collectAsStateWithLifecycle().value
     val devices = scanState.devices
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionsList)
+    val isScanning = vm.isScanning.collectAsStateWithLifecycle().value
 
     LaunchedEffect(key1 = multiplePermissionsState.allPermissionsGranted) {
         if (multiplePermissionsState.allPermissionsGranted) {
             vm.startScan()
-        }
+        } else
+            vm.stopScan()
     }
 
     val appSnackBarHostState = remember { SnackbarHostState() }
@@ -56,24 +62,45 @@ fun HomeRoute(
         }
     }
 
+    scannerMessage?.let { scanningMessage ->
+        LaunchedEffect(scanningMessage) {
+            appSnackBarHostState.showSnackbar(scanningMessage)
+            vm.scannerMessageShown()
+        }
+    }
+
     Scaffold(
-       // modifier = Modifier.border(2.dp, Color.Magenta),
+        // modifier = Modifier.border(2.dp, Color.Magenta),
         containerColor = Color.Transparent,
-        snackbarHost =  { SnackbarHost(hostState = appSnackBarHostState) },
+        snackbarHost = { SnackbarHost(hostState = appSnackBarHostState) },
+        topBar = {
+            if (scanState.selectedDevice == null)
+                HomeAppBar(
+                    scanning = isScanning,
+                    onStartScan = vm::startScan,
+                    onStopScan = vm::stopScan
+                )
+            else
+                AppBarWithBackButton(
+                    title = scanState.selectedDevice.scannedDevice.deviceName ?: "Unknown",
+                    vm::onBackFromDevice
+                )
+        }
     ) { padding ->
 
         if (!multiplePermissionsState.allPermissionsGranted) {
             ShowPermissions(multiplePermissionsState)
         } else {
             if (scanState.selectedDevice == null)
-                ScannedDeviceList(devices, vm::onConnect, padding)
+                ScannedDeviceList(
+                    devices = devices, onClick = vm::onConnect, paddingValues = padding,
+                )
             else
                 ShowDevice(
                     paddingValues = padding,
                     scanState = scanState,
                     onConnect = vm::onConnect,
                     onDisconnect = vm::onDisconnect,
-                    onBack = vm::onBackFromDevice,
                     onRead = vm::readCharacteristic,
                     onShowUserMessage = vm::showUserMessage,
                     onWrite = vm::onWriteCharacteristic,
@@ -89,12 +116,15 @@ fun HomeRoute(
 private fun ScannedDeviceList(
     devices: List<ScannedDevice>,
     onClick: (String) -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
+
     LazyColumn(
         modifier = Modifier
-            //.padding(paddingValues)
-            .padding(8.dp)
+            .padding(
+                top = paddingValues.calculateTopPadding() + 8.dp,
+                start = 8.dp, end = 8.dp
+            )
     ) {
         items(devices) { device ->
 

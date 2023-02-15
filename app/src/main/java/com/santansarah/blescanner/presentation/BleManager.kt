@@ -8,6 +8,8 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.ParcelUuid
 import android.util.SparseArray
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.usecases.ParseScanResult
@@ -15,6 +17,7 @@ import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
 import com.santansarah.blescanner.utils.toMillis
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -24,12 +27,14 @@ class BleManager(
     private val bleRepository: BleRepository,
     private val scope: CoroutineScope,
     private val parseScanResult: ParseScanResult
-): KoinComponent {
-
-    var isScanning = false
+) : KoinComponent {
 
     private val btAdapter: BluetoothAdapter = get()
     private val btScanner = btAdapter.bluetoothLeScanner
+
+    val userMessage = MutableStateFlow<String?>(null)
+
+    val isScanning = MutableStateFlow(true)
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -50,6 +55,9 @@ class BleManager(
     }
 
     init {
+        if (!btAdapter.isEnabled)
+            isScanning.value = false
+
         scope.launch {
             bleRepository.deleteScans()
             //scan()
@@ -58,14 +66,23 @@ class BleManager(
 
     @SuppressLint("MissingPermission")
     fun scan() {
-        isScanning = true
-        btScanner.startScan(null,scanSettings,scanCallback)
+        if (btAdapter.isEnabled) {
+            isScanning.value = true
+            btScanner?.startScan(null, scanSettings, scanCallback)
+            Timber.d("started scan")
+        } else {
+            userMessage.value = "You must enable Bluetooth to start scanning."
+        }
     }
 
     @SuppressLint("MissingPermission")
     fun stopScan() {
-        isScanning = false
+        isScanning.value = false
         btScanner.stopScan(scanCallback)
+    }
+
+    fun userMessageShown() {
+        userMessage.value = null
     }
 
 }

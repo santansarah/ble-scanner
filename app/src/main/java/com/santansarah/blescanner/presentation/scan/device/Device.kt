@@ -60,7 +60,6 @@ fun ShowDevice(
     scanState: ScanState,
     onConnect: (String) -> Unit,
     onDisconnect: () -> Unit,
-    onBack: () -> Unit,
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
     onWrite: (String, String) -> Unit,
@@ -72,14 +71,10 @@ fun ShowDevice(
 
     Column(
         modifier = Modifier
+            .padding(paddingValues)
             .fillMaxSize()
         //.padding(horizontal = 8.dp)
     ) {
-
-        AppBarWithBackButton(
-            title = scannedDevice.deviceName ?: "Unknown",
-            onBack
-        )
 
         Column(
             modifier = Modifier
@@ -414,7 +409,6 @@ fun previewDeviceDetail() {
                         ConnectionState.CONNECTING,
                         null
                     ),
-                    {},
                     {},
                     {},
                     {},

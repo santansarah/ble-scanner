@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -60,17 +61,13 @@ fun BleApp(
             contentScale = ContentScale.FillBounds,
         )
 
-        val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
-        val layoutDirection = LocalLayoutDirection.current
+       // val temp = WindowInsets.systemBars
+       // val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
+        //val layoutDirection = LocalLayoutDirection.current
         Surface(
             color = Color.Transparent,
             modifier = Modifier
-                .padding(
-                    top = systemBarsPadding.calculateTopPadding(),
-                    bottom = systemBarsPadding.calculateBottomPadding(),
-                    start = systemBarsPadding.calculateStartPadding(layoutDirection),
-                    end = systemBarsPadding.calculateEndPadding(layoutDirection)
-                )
+                .statusBarsPadding().navigationBarsPadding()
                 .fillMaxSize()
         ) {
             HomeRoute()
