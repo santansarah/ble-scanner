@@ -137,7 +137,7 @@ class ScanViewModel(
     }
 
     fun userMessageShown() {
-        Log.d("debug", "user message set to null.")
+        Timber.tag("debug").d("user message set to null.")
         _userMessage.value = null
     }
 

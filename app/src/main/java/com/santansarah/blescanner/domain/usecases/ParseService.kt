@@ -52,33 +52,28 @@ class ParseService
                     val descriptors = mutableListOf<DeviceDescriptor>()
                     char.descriptors?.forEach { desc ->
 
-                        if (descriptors.find { makeSureNotDup ->
-                                makeSureNotDup.uuid == desc.uuid.toString()
-                            } == null) {
+                        Timber.d(char.uuid.toString())
+                        Timber.d(desc.uuid.toString() + "; " + desc.characteristic.uuid.toString())
 
-                            Timber.d(char.uuid.toString())
-                            Timber.d(desc.uuid.toString() + "; " + desc.characteristic.uuid.toString())
+                        val deviceDescriptor = bleRepository.getDescriptorById(
+                            desc.uuid.toGss()
+                        )
 
-                            val deviceDescriptor = bleRepository.getDescriptorById(
-                                desc.uuid.toGss()
-                            )
-
-                            descriptors.add(
-                                DeviceDescriptor(
-                                    uuid = desc.uuid.toString(),
-                                    name = deviceDescriptor?.name ?: "Unknown",
-                                    charUuid = desc.characteristic.uuid.toString(),
-                                    permissions = BlePermissions.getAllPermissions(desc.permissions),
-                                    notificationProperty = if (properties.contains(BleProperties.PROPERTY_NOTIFY))
-                                        BleProperties.PROPERTY_NOTIFY else if (properties.contains(
-                                            BleProperties.PROPERTY_INDICATE
-                                        )
+                        descriptors.add(
+                            DeviceDescriptor(
+                                uuid = desc.uuid.toString(),
+                                name = deviceDescriptor?.name ?: "Unknown",
+                                charUuid = desc.characteristic.uuid.toString(),
+                                permissions = BlePermissions.getAllPermissions(desc.permissions),
+                                notificationProperty = if (properties.contains(BleProperties.PROPERTY_NOTIFY))
+                                    BleProperties.PROPERTY_NOTIFY else if (properties.contains(
+                                        BleProperties.PROPERTY_INDICATE
                                     )
-                                        BleProperties.PROPERTY_INDICATE else null,
-                                    readBytes = null
                                 )
+                                    BleProperties.PROPERTY_INDICATE else null,
+                                readBytes = null
                             )
-                        }
+                        )
                     }
 
                     characteristics.add(

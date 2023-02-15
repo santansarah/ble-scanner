@@ -29,3 +29,12 @@ https://youtu.be/NqxpAq_5wZs
 
 Check out the user interface for my Android BLE Scanner app, written in Jetpack Compose. I'll go
 over my Koin setup, Bluetooth permissions, composables, ScanResult parser, and JUnit 5 tests.
+
+## Video 3: Connect to BLE Devices, Read/Write/Parse Characteristics and Descriptors with Android Bluetooth Gatt
+
+https://youtu.be/mjDDJ3HaBGg
+
+Learn how I use Bluetooth Gatt to connect to my BLE devices. In this video, I'll go over my Bluetooth
+Gatt Callback, custom Characteristic parsers including Appearance, Preferred Connection Parameters,
+and Client Characteristic Configuration, and my BLE Scanner ViewModel. I'll also go over my
+Jetpack Compose BLE Service pager and Compose UI to interact with BLE devices.
