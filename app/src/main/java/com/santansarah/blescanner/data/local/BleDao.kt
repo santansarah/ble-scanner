@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.santansarah.blescanner.data.local.entities.BleCharacteristic
 import com.santansarah.blescanner.data.local.entities.Company
 import com.santansarah.blescanner.data.local.entities.Descriptor
@@ -42,6 +43,8 @@ interface BleDao {
     @Query("SELECT * FROM descriptors where uuid = :uuid")
     suspend fun getDescriptorByUuid(uuid: String): Descriptor?
 
+    @Update
+    suspend fun updateDevice(scannedDevice: ScannedDevice)
 
 }
 

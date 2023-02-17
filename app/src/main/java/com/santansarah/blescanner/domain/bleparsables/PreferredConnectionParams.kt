@@ -20,16 +20,17 @@ object PreferredConnectionParams : ParsableUuid("00002A04$UUID_DEFAULT".lowercas
             for (i in indices step 2) {
                 val twoByteArray = this.copyOfRange(i, i + 2)
                 val bitSet = java.util.BitSet.valueOf(twoByteArray)
+                val bitValue = bitSet.toLongArray().firstOrNull() ?: 0
+
                 when (i) {
                     0 -> sb.append(
-                        "Connection Interval(ms): ${
-                            bitSet.toLongArray().first() * 1.25
+                        "Connection Interval(ms): ${bitValue * 1.25
                         } - "
                     )
 
-                    2 -> sb.append((bitSet.toLongArray().first() * 1.25).toString() + "\n")
-                    4 -> sb.appendLine("Latency: ${bitSet.toLongArray().first()}")
-                    6 -> sb.appendLine("Timeout Multiplier: ${bitSet.toLongArray().first()}")
+                    2 -> sb.append((bitValue * 1.25).toString() + "\n")
+                    4 -> sb.appendLine("Latency: $bitValue")
+                    6 -> sb.appendLine("Timeout Multiplier: $bitValue")
                     else -> {}
                 }
             }

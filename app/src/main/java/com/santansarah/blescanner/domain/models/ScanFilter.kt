@@ -1,0 +1,21 @@
+package com.santansarah.blescanner.domain.models
+
+import com.santansarah.blescanner.R
+
+enum class ScanFilterOption{
+    RSSI,
+    NAME,
+    FAVORITES
+}
+
+data class ScanFilter(
+    val filterOption: ScanFilterOption,
+    val icon: Int,
+    val text: String
+)
+
+val SCAN_FILTERS = listOf(
+    ScanFilter(ScanFilterOption.RSSI, R.drawable.signal, "RSSI"),
+    ScanFilter(ScanFilterOption.NAME, R.drawable.az_sort, "Name"),
+    ScanFilter(ScanFilterOption.FAVORITES, R.drawable.favorite_selected, "Favorites"),
+)

@@ -7,8 +7,14 @@ import com.santansarah.blescanner.data.local.entities.Descriptor
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
+import com.santansarah.blescanner.domain.models.ScanFilter
+import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 class BleRepository(
@@ -37,7 +43,17 @@ class BleRepository(
             manufacturer = existingDevice?.manufacturer ?: device.manufacturer,
             services = device.services,
             extra = device.extra,
-            lastSeen = device.lastSeen
+            lastSeen = device.lastSeen,
+            customName = existingDevice?.customName,
+            baseRssi = existingDevice?.let {
+                val lowRssi = it.baseRssi - 20
+                val highRssi = it.baseRssi + 20
+                if (device.rssi in lowRssi..highRssi)
+                    it.baseRssi
+                else
+                    device.rssi
+            } ?: device.rssi,
+            favorite = existingDevice?.favorite ?: false
         )
 
         return dao.insertDevice(deviceToUpsert)
@@ -47,7 +63,23 @@ class BleRepository(
 
     suspend fun deleteScans() = dao.deleteScans()
 
-    fun getScannedDevices() = dao.getScannedDevices()
+    fun getScannedDevices(scanFilter: ScanFilterOption?): Flow<List<ScannedDevice>> {
+
+        val devices = dao.getScannedDevices()
+        Timber.d("got devices..")
+
+        return scanFilter?.let { scanFilter ->
+            when (scanFilter) {
+                ScanFilterOption.RSSI -> devices.map { deviceList -> deviceList.sortedByDescending { it.baseRssi} }
+                ScanFilterOption.NAME -> devices.map { deviceList ->
+                    deviceList.filter { it.deviceName != null || it.customName != null}
+                        .sortedBy { it.customName ?: it.deviceName }
+                }
+                ScanFilterOption.FAVORITES -> devices.map { deviceList -> deviceList.filter { it.favorite }}
+            }
+        } ?: devices
+
+    }
 
     suspend fun getMsDevice(
         byteArray: ByteArray
@@ -76,5 +108,6 @@ class BleRepository(
 
     suspend fun getDescriptorById(uuid: String): Descriptor? = dao.getDescriptorByUuid(uuid)
 
+    suspend fun updateDevice(scannedDevice: ScannedDevice) = dao.updateDevice(scannedDevice)
 
 }

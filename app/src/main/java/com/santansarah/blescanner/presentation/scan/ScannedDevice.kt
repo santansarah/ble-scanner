@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
@@ -29,12 +31,14 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
+import com.santansarah.blescanner.presentation.theme.labelSmallItalic
 import com.santansarah.blescanner.utils.toDate
 
 @Composable
 fun ScannedDevice(
     device: ScannedDevice,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
+    onFavorite: (ScannedDevice) -> Unit
 ) {
 
     OutlinedCard(
@@ -70,9 +74,18 @@ fun ScannedDevice(
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center
                 )
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "(${device.baseRssi})",
+                    style = labelSmallItalic,
+                    textAlign = TextAlign.Center
+                )
             }
-            Column() {
-                Text(text = device.deviceName ?: "Unknown Name")
+            Column(modifier = Modifier.fillMaxWidth(.9f)) {
+                Text(
+                    text = device.customName ?: device.deviceName
+                    ?: "Unknown Name"
+                )
                 device.manufacturer?.let {
                     Text(
                         text = it,
@@ -100,6 +113,21 @@ fun ScannedDevice(
                     style = MaterialTheme.typography.labelSmall
                 )
             }
+            Box(contentAlignment = Alignment.TopEnd) {
+
+                val favoriteIcon = if (device.favorite) R.drawable.favorite_selected
+                else R.drawable.favorite_unselected
+
+                IconButton(onClick = {
+                    onFavorite(device)
+                }) {
+                    Icon(
+                        //modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = favoriteIcon),
+                        contentDescription = "Favorite"
+                    )
+                }
+            }
         }
     }
 
@@ -116,7 +144,8 @@ fun ScannedDevicePreview() {
     val device = ScannedDevice(
         0, "LED", "24:A9:30:53:5A:97", -45,
         "Microsoft", listOf("Human Readable Device"),
-        listOf("Windows 10 Desktop"), 0L
+        listOf("Windows 10 Desktop"), 0L, "My Name",
+        -55, favorite = false
     )
     BLEScannerTheme {
         Surface() {
@@ -139,7 +168,7 @@ fun ScannedDevicePreview() {
 
                 ScannedDevice(
                     device = device,
-                    {}
+                    {}, {}
                 )
             }
         }

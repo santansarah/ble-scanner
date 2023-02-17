@@ -48,7 +48,10 @@ class ParseScanResult
             manufacturer = mfName,
             services = services,
             extra = extra,
-            lastSeen = result.timestampNanos.toMillis()
+            lastSeen = result.timestampNanos.toMillis(),
+            customName = null,
+            baseRssi = 0,
+            favorite = false
         )
 
         if (device.manufacturer != "Microsoft") {

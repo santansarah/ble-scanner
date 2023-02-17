@@ -3,6 +3,7 @@ package com.santansarah.blescanner.presentation.scan
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.components.HomeAppBar
 import com.santansarah.blescanner.presentation.components.ShowPermissions
@@ -91,10 +93,13 @@ fun HomeRoute(
         if (!multiplePermissionsState.allPermissionsGranted) {
             ShowPermissions(multiplePermissionsState)
         } else {
-            if (scanState.selectedDevice == null)
-                ScannedDeviceList(
+            if (scanState.selectedDevice == null) {
+                DeviceListScreen(
                     devices = devices, onClick = vm::onConnect, paddingValues = padding,
+                    onFilter = vm::onFilter, scanFilterOption = scanState.scanFilterOption,
+                    onFavorite = vm::onFavorite
                 )
+            }
             else
                 ShowDevice(
                     paddingValues = padding,
@@ -113,22 +118,36 @@ fun HomeRoute(
 }
 
 @Composable
+fun DeviceListScreen(
+    paddingValues: PaddingValues,
+    devices: List<ScannedDevice>,
+    onClick: (String) -> Unit,
+    onFilter: (ScanFilterOption?) -> Unit,
+    scanFilterOption: ScanFilterOption?,
+    onFavorite: (ScannedDevice) -> Unit
+) {
+    Column(modifier = Modifier.padding(
+        top = paddingValues.calculateTopPadding())){
+
+        ScanFilters(onFilter = onFilter, scanFilterOption = scanFilterOption)
+        ScannedDeviceList(devices, onClick, onFavorite)
+
+    }
+}
+
+@Composable
 private fun ScannedDeviceList(
     devices: List<ScannedDevice>,
     onClick: (String) -> Unit,
-    paddingValues: PaddingValues,
+    onFavorite: (ScannedDevice) -> Unit
 ) {
 
     LazyColumn(
-        modifier = Modifier
-            .padding(
-                top = paddingValues.calculateTopPadding() + 8.dp,
-                start = 8.dp, end = 8.dp
-            )
+        modifier = Modifier.padding(8.dp)
     ) {
         items(devices) { device ->
 
-            ScannedDevice(device = device, onClick = onClick)
+            ScannedDevice(device = device, onClick = onClick, onFavorite = onFavorite)
             Spacer(modifier = Modifier.height(10.dp))
 
         }
@@ -153,7 +172,10 @@ fun ListPreview() {
             manufacturer = null,
             services = listOf("[Human Interface Device"),
             extra = null,
-            lastSeen = 1674510398719
+            lastSeen = 1674510398719,
+            customName = null,
+            baseRssi = 0,
+            favorite = false
         ),
         ScannedDevice(
             deviceId = 0,
@@ -163,13 +185,16 @@ fun ListPreview() {
             manufacturer = "Ericsson Technology Licensing",
             services = null,
             extra = null,
-            lastSeen = 1674510397416
+            lastSeen = 1674510397416,
+            customName = null,
+            baseRssi = 0,
+            favorite = false
         )
     )
 
     BLEScannerTheme {
         Surface() {
-            ScannedDeviceList(devices = deviceList, onClick = {}, PaddingValues(4.dp))
+            ScannedDeviceList(devices = deviceList, onClick = {},{})
         }
     }
 

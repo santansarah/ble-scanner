@@ -7,7 +7,8 @@ data class ScanState(
     val devices: List<ScannedDevice>,
     val selectedDevice: DeviceDetail?,
     val bleMessage: ConnectionState,
-    val userMessage: String?
+    val userMessage: String?,
+    val scanFilterOption: ScanFilterOption?
 )
 
 enum class ConnectionState {

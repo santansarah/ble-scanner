@@ -29,6 +29,16 @@ val bodySmallItalic =
         letterSpacing = 0.4.sp
     )
 
+val labelSmallItalic =
+    TextStyle(
+        fontStyle = FontStyle.Italic,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(

@@ -272,7 +272,9 @@ fun previewDeviceDetail() {
     val device = ScannedDevice(
         0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
         "Microsoft", listOf("Human Readable Device"),
-        listOf("Windows 10 Desktop"), 0L
+        listOf("Windows 10 Desktop"), 0L,
+        customName = null,
+        baseRssi = 0,favorite = false
     )
     BLEScannerTheme {
         Surface() {
@@ -299,7 +301,10 @@ fun previewDeviceDetail() {
                                 manufacturer = "Ericsson Technology Licensing",
                                 services = listOf("Heart Rate"),
                                 extra = null,
-                                lastSeen = 1675293173796
+                                lastSeen = 1675293173796,
+                                customName = null,
+                                baseRssi = -55,
+                                favorite = false
                             ),
                             services = listOf(
                                 DeviceService(
@@ -407,6 +412,7 @@ fun previewDeviceDetail() {
                             )
                         ),
                         ConnectionState.CONNECTING,
+                        null,
                         null
                     ),
                     {},

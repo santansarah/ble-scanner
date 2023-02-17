@@ -45,7 +45,10 @@ data class ScannedDevice(
     val manufacturer: String?,
     val services: List<String>? = null,
     val extra: List<String>? = null,
-    val lastSeen: Long
+    val lastSeen: Long,
+    val customName: String?,
+    val baseRssi: Int,
+    val favorite: Boolean
 )
 
 @Entity(tableName = "descriptors")
