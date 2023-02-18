@@ -42,15 +42,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.data.local.entities.displayName
 import com.santansarah.blescanner.domain.models.BleProperties
 import com.santansarah.blescanner.domain.models.BleWriteTypes
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
-import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.domain.models.ScanState
-import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.toDate
 
@@ -64,7 +63,10 @@ fun ShowDevice(
     onShowUserMessage: (String) -> Unit,
     onWrite: (String, String) -> Unit,
     onReadDescriptor: (String, String) -> Unit,
-    onWriteDescriptor: (String, String, String) -> Unit
+    onWriteDescriptor: (String, String, String) -> Unit,
+    onEdit: (Boolean) -> Unit,
+    isEditing: Boolean,
+    onSave: (String) -> Unit
 ) {
 
     val scannedDevice = scanState.selectedDevice!!.scannedDevice
@@ -122,21 +124,24 @@ fun ShowDevice(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ServicePager(
-            selectedDevice = scanState.selectedDevice,
-            onRead = onRead,
-            onShowUserMessage = onShowUserMessage,
-            onWrite = onWrite,
-            onReadDescriptor = onReadDescriptor,
-            onWriteDescriptor = onWriteDescriptor
-        )
+        if (isEditing)
+            EditDevice(onSave = onSave, updateEdit = onEdit, scanState.selectedDevice.scannedDevice.displayName())
+        else
+            ServicePager(
+                selectedDevice = scanState.selectedDevice,
+                onRead = onRead,
+                onShowUserMessage = onShowUserMessage,
+                onWrite = onWrite,
+                onReadDescriptor = onReadDescriptor,
+                onWriteDescriptor = onWriteDescriptor
+            )
     }
 
 }
 
 
 @Composable
-private fun DeviceDetails(device: ScannedDevice) {
+fun DeviceDetails(device: ScannedDevice) {
     //Text(text = device.deviceName ?: "Unknown Name")
     device.manufacturer?.let {
         Text(
@@ -274,7 +279,7 @@ fun previewDeviceDetail() {
         "Microsoft", listOf("Human Readable Device"),
         listOf("Windows 10 Desktop"), 0L,
         customName = null,
-        baseRssi = 0,favorite = false, forget = false
+        baseRssi = 0, favorite = false, forget = false
     )
     BLEScannerTheme {
         Surface() {
@@ -423,6 +428,9 @@ fun previewDeviceDetail() {
                     { _: String, _: String -> },
                     { _: String, _: String -> },
                     { _: String, _: String, _: String -> },
+                    {},
+                    false,
+                    {}
                 )
             }
         }

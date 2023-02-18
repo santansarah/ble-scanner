@@ -27,7 +27,7 @@ fun DeviceMenu(
     device: ScannedDevice,
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit,
-    onEdit: (ScannedDevice) -> Unit,
+    onEdit: (Boolean) -> Unit,
     onFavorite: (ScannedDevice) -> Unit,
     onForget: (ScannedDevice) -> Unit
 ) {
@@ -57,7 +57,7 @@ fun DeviceMenu(
             text = { Text("Edit") },
             onClick = {
                 onExpanded(false)
-                onEdit(device)
+                onEdit(true)
             },
             leadingIcon = {
                 Icon(

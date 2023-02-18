@@ -32,7 +32,7 @@ import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 fun AppBarWithBackButton(
     onBackClicked: () -> Unit,
     device: ScannedDevice,
-    onEdit: (ScannedDevice) -> Unit,
+    onEdit: (Boolean) -> Unit,
     onFavorite: (ScannedDevice) -> Unit,
     onForget: (ScannedDevice) -> Unit
 ) {

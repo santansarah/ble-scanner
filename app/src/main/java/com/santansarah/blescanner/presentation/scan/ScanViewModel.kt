@@ -113,6 +113,15 @@ class ScanViewModel(
         }
     }
 
+    fun onNameChange(newName: String) {
+        _selectedDevice.value?.scannedDevice?.let {
+            viewModelScope.launch(dispatcher) {
+                bleRepository.updateDevice(it.copy(customName = newName))
+                showUserMessage("$newName updated.")
+            }
+        }
+    }
+
     fun onConnect(address: String) {
         Timber.d("calling connect...")
         val scannedDevice = scanState.value.devices.find {

@@ -17,7 +17,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +75,8 @@ fun HomeRoute(
         }
     }
 
+    var isEditing by rememberSaveable { mutableStateOf(false) }
+
     Scaffold(
         // modifier = Modifier.border(2.dp, Color.Magenta),
         containerColor = Color.Transparent,
@@ -86,7 +92,7 @@ fun HomeRoute(
                 AppBarWithBackButton(
                     onBackClicked = vm::onBackFromDevice,
                     device = scanState.selectedDevice.scannedDevice,
-                    onEdit = {},
+                    onEdit = { isEditing = it},
                     onFavorite = vm::onFavorite,
                     onForget = vm::onForget
                 )
@@ -113,7 +119,10 @@ fun HomeRoute(
                     onShowUserMessage = vm::showUserMessage,
                     onWrite = vm::onWriteCharacteristic,
                     onReadDescriptor = vm::readDescriptor,
-                    onWriteDescriptor = vm::writeDescriptor
+                    onWriteDescriptor = vm::writeDescriptor,
+                    onEdit = { isEditing = it},
+                    isEditing = isEditing,
+                    onSave = vm::onNameChange
                 )
         }
     }
