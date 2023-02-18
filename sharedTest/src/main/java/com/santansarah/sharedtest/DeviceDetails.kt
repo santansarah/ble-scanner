@@ -76,7 +76,11 @@ val deviceDetail = DeviceDetail(
         manufacturer = "Ericsson Technology Licensing",
         services = listOf("Heart Rate"),
         extra = null,
-        lastSeen = 1675293173796
+        lastSeen = 1675293173796,
+        customName = null,
+        baseRssi = -88,
+        favorite = false,
+        forget = false
     ),
     services = listOf(
         genericService,

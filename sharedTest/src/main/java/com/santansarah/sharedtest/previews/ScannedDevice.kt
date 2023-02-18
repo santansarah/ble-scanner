@@ -33,7 +33,8 @@ fun ScannedDevicePreview() {
                     .fillMaxSize()
             ) {
 
-                ScannedDevice(device = device, onClick = {})
+                ScannedDevice(device = device, onClick = {}, onForget = {},
+                onFavorite = {})
 
             }
         }

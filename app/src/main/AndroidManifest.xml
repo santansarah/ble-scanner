@@ -30,6 +30,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BLEScanner"
         tools:targetApi="31">
+        <!-- If you want to disable android.startup completely. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

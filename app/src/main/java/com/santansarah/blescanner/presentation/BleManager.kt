@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
+import java.util.Date
 
 class BleManager(
     private val bleRepository: BleRepository,
@@ -33,8 +34,10 @@ class BleManager(
     private val btScanner = btAdapter.bluetoothLeScanner
 
     val userMessage = MutableStateFlow<String?>(null)
-
     val isScanning = MutableStateFlow(true)
+
+    private var lastCleanupTimestamp: Long? = null
+    private val CLEANUP_DURATION = 60000L
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -48,20 +51,31 @@ class BleManager(
 
             scope.launch {
                 parseScanResult(result)
+                launch { deleteNotSeen() }
             }
 
         }
 
     }
 
+    suspend fun deleteNotSeen() {
+        lastCleanupTimestamp?.let {
+            if (System.currentTimeMillis() - it > CLEANUP_DURATION) {
+                bleRepository.deleteNotSeen()
+                Timber.d("deleted not seen")
+                lastCleanupTimestamp = System.currentTimeMillis()
+            }
+        }
+    }
+
     init {
         if (!btAdapter.isEnabled)
             isScanning.value = false
 
-        scope.launch {
+        /*scope.launch {
             bleRepository.deleteScans()
             //scan()
-        }
+        }*/
     }
 
     @SuppressLint("MissingPermission")
@@ -69,6 +83,7 @@ class BleManager(
         if (btAdapter.isEnabled) {
             isScanning.value = true
             btScanner?.startScan(null, scanSettings, scanCallback)
+            lastCleanupTimestamp = System.currentTimeMillis()
             Timber.d("started scan")
         } else {
             userMessage.value = "You must enable Bluetooth to start scanning."

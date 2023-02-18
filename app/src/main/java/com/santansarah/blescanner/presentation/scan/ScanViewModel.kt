@@ -90,7 +90,13 @@ class ScanViewModel(
 
     fun onFavorite(scannedDevice: ScannedDevice) {
         viewModelScope.launch(dispatcher) {
-            bleRepository.updateDevice(scannedDevice.copy(favorite = true))
+            bleRepository.updateDevice(scannedDevice.copy(favorite = !scannedDevice.favorite))
+        }
+    }
+
+    fun onForget(scannedDevice: ScannedDevice) {
+        viewModelScope.launch(dispatcher) {
+            bleRepository.updateDevice(scannedDevice.copy(forget = true))
         }
     }
 

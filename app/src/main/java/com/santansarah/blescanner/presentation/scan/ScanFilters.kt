@@ -66,6 +66,7 @@ fun ScanFilters(
                     label = {
                         Text(
                             text = scanFilter.text,
+                            style = MaterialTheme.typography.bodySmall
                             //color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     },

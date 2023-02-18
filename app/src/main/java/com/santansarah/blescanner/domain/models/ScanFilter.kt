@@ -5,7 +5,8 @@ import com.santansarah.blescanner.R
 enum class ScanFilterOption{
     RSSI,
     NAME,
-    FAVORITES
+    FAVORITES,
+    FORGET
 }
 
 data class ScanFilter(
@@ -18,4 +19,5 @@ val SCAN_FILTERS = listOf(
     ScanFilter(ScanFilterOption.RSSI, R.drawable.signal, "RSSI"),
     ScanFilter(ScanFilterOption.NAME, R.drawable.az_sort, "Name"),
     ScanFilter(ScanFilterOption.FAVORITES, R.drawable.favorite_selected, "Favorites"),
+    ScanFilter(ScanFilterOption.FORGET, R.drawable.delete_forever, "Forget"),
 )

@@ -97,7 +97,7 @@ fun HomeRoute(
                 DeviceListScreen(
                     devices = devices, onClick = vm::onConnect, paddingValues = padding,
                     onFilter = vm::onFilter, scanFilterOption = scanState.scanFilterOption,
-                    onFavorite = vm::onFavorite
+                    onFavorite = vm::onFavorite, onForget = vm::onForget
                 )
             }
             else
@@ -124,13 +124,14 @@ fun DeviceListScreen(
     onClick: (String) -> Unit,
     onFilter: (ScanFilterOption?) -> Unit,
     scanFilterOption: ScanFilterOption?,
-    onFavorite: (ScannedDevice) -> Unit
+    onFavorite: (ScannedDevice) -> Unit,
+    onForget: (ScannedDevice) -> Unit
 ) {
     Column(modifier = Modifier.padding(
         top = paddingValues.calculateTopPadding())){
 
         ScanFilters(onFilter = onFilter, scanFilterOption = scanFilterOption)
-        ScannedDeviceList(devices, onClick, onFavorite)
+        ScannedDeviceList(devices, onClick, onFavorite, onForget)
 
     }
 }
@@ -139,7 +140,8 @@ fun DeviceListScreen(
 private fun ScannedDeviceList(
     devices: List<ScannedDevice>,
     onClick: (String) -> Unit,
-    onFavorite: (ScannedDevice) -> Unit
+    onFavorite: (ScannedDevice) -> Unit,
+    onForget: (ScannedDevice) -> Unit
 ) {
 
     LazyColumn(
@@ -147,7 +149,8 @@ private fun ScannedDeviceList(
     ) {
         items(devices) { device ->
 
-            ScannedDevice(device = device, onClick = onClick, onFavorite = onFavorite)
+            ScannedDevice(device = device, onClick = onClick, onFavorite = onFavorite,
+            onForget = onForget)
             Spacer(modifier = Modifier.height(10.dp))
 
         }
@@ -175,7 +178,8 @@ fun ListPreview() {
             lastSeen = 1674510398719,
             customName = null,
             baseRssi = 0,
-            favorite = false
+            favorite = false,
+            forget = false
         ),
         ScannedDevice(
             deviceId = 0,
@@ -188,13 +192,14 @@ fun ListPreview() {
             lastSeen = 1674510397416,
             customName = null,
             baseRssi = 0,
-            favorite = false
+            favorite = false,
+            forget = false
         )
     )
 
     BLEScannerTheme {
         Surface() {
-            ScannedDeviceList(devices = deviceList, onClick = {},{})
+            ScannedDeviceList(devices = deviceList, onClick = {},{}, {})
         }
     }
 

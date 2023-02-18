@@ -9,6 +9,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -62,7 +63,7 @@ fun HomeAppBar(
     onStopScan: () -> Unit
 ) {
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         //modifier = Modifier.border(2.dp, Color.Blue),
         windowInsets = WindowInsets(
             top = 0.dp,
@@ -76,7 +77,7 @@ fun HomeAppBar(
         ),
         title = {
             Text(
-                text = if (scanning) "Scanning" else "Stopped",
+                text = if (scanning) "Your Devices" else "Scan Stopped",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 //style = MaterialTheme.typography.titleMedium

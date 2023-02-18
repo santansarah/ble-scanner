@@ -104,6 +104,10 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-navigation:$koin_android_version"
     implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
 
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation 'io.insert-koin:koin-androidx-workmanager:3.3.3'
+
+
     //testing
     testImplementation "io.insert-koin:koin-test:$koin_android_version"
     testImplementation "io.insert-koin:koin-test-junit5:$koin_android_version"
@@ -129,5 +133,7 @@ dependencies {
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
     androidTestImplementation 'io.mockk:mockk-android:1.13.3'
     androidTestImplementation 'app.cash.turbine:turbine:0.12.1'
+    androidTestImplementation("androidx.work:work-testing:2.8.0")
+
 
 }

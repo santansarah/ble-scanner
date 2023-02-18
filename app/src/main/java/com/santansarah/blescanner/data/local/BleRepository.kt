@@ -53,7 +53,8 @@ class BleRepository(
                 else
                     device.rssi
             } ?: device.rssi,
-            favorite = existingDevice?.favorite ?: false
+            favorite = existingDevice?.favorite ?: false,
+            forget = existingDevice?.forget ?: false
         )
 
         return dao.insertDevice(deviceToUpsert)
@@ -70,14 +71,25 @@ class BleRepository(
 
         return scanFilter?.let { scanFilter ->
             when (scanFilter) {
-                ScanFilterOption.RSSI -> devices.map { deviceList -> deviceList.sortedByDescending { it.baseRssi} }
+                ScanFilterOption.RSSI -> devices.map { deviceList ->
+                    deviceList.filter { !it.forget }.sortedByDescending { it.baseRssi }
+                }
+
                 ScanFilterOption.NAME -> devices.map { deviceList ->
-                    deviceList.filter { it.deviceName != null || it.customName != null}
+                    deviceList.filter {
+                        (it.deviceName != null || it.customName != null) && !it.forget
+                    }
                         .sortedBy { it.customName ?: it.deviceName }
                 }
-                ScanFilterOption.FAVORITES -> devices.map { deviceList -> deviceList.filter { it.favorite }}
+
+                ScanFilterOption.FAVORITES -> devices.map { deviceList ->
+                    deviceList.filter { it.favorite && !it.forget }
+                }
+                ScanFilterOption.FORGET -> devices.map { deviceList ->
+                    deviceList.filter { it.forget }
+                }
             }
-        } ?: devices
+        } ?: devices.map { deviceList -> deviceList.filter { !it.forget } }
 
     }
 
@@ -109,5 +121,7 @@ class BleRepository(
     suspend fun getDescriptorById(uuid: String): Descriptor? = dao.getDescriptorByUuid(uuid)
 
     suspend fun updateDevice(scannedDevice: ScannedDevice) = dao.updateDevice(scannedDevice)
+
+    suspend fun deleteNotSeen() = dao.deleteNotSeen()
 
 }

@@ -274,7 +274,7 @@ fun previewDeviceDetail() {
         "Microsoft", listOf("Human Readable Device"),
         listOf("Windows 10 Desktop"), 0L,
         customName = null,
-        baseRssi = 0,favorite = false
+        baseRssi = 0,favorite = false, forget = false
     )
     BLEScannerTheme {
         Surface() {
@@ -304,7 +304,8 @@ fun previewDeviceDetail() {
                                 lastSeen = 1675293173796,
                                 customName = null,
                                 baseRssi = -55,
-                                favorite = false
+                                favorite = false,
+                                forget = false
                             ),
                             services = listOf(
                                 DeviceService(

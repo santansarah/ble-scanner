@@ -46,5 +46,10 @@ interface BleDao {
     @Update
     suspend fun updateDevice(scannedDevice: ScannedDevice)
 
+    @Query(
+        """delete from scanned where 
+        (julianday(CURRENT_TIMESTAMP)-julianday(datetime(lastSeen/1000, 'unixepoch')))*86400000 > 15000 
+        and customName is null and favorite = 0""")
+    suspend fun deleteNotSeen()
 }
 

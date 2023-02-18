@@ -51,7 +51,8 @@ class ParseScanResult
             lastSeen = result.timestampNanos.toMillis(),
             customName = null,
             baseRssi = 0,
-            favorite = false
+            favorite = false,
+            forget = false
         )
 
         if (device.manufacturer != "Microsoft") {

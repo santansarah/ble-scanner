@@ -10,7 +10,11 @@ val newDevice = ScannedDevice(
     manufacturer = "Microsoft",
     services = listOf("Human Readable Device"),
     extra = listOf("Windows 10 Desktop"),
-    lastSeen = 1674510398719
+    lastSeen = 1674510398719,
+    customName = null,
+    baseRssi = -88,
+    favorite = false,
+    forget = false
 )
 
 val deviceList = listOf(
@@ -22,7 +26,11 @@ val deviceList = listOf(
         manufacturer = null,
         services = listOf("[Human Interface Device"),
         extra = null,
-        lastSeen = 1674510398719
+        lastSeen = 1674510398719,
+        customName = null,
+        baseRssi = -88,
+        favorite = false,
+        forget = false
     ),
     ScannedDevice(
         deviceId = 0,
@@ -32,6 +40,10 @@ val deviceList = listOf(
         manufacturer = "Ericsson Technology Licensing",
         services = null,
         extra = null,
-        lastSeen = 1674510397416
+        lastSeen = 1674510397416,
+        customName = null,
+        baseRssi = -88,
+        favorite = false,
+        forget = false
     )
 )
