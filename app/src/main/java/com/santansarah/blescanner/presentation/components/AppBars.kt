@@ -12,20 +12,32 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
+import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.presentation.scan.device.DeviceMenu
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun AppBarWithBackButton(
-    title: String,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    device: ScannedDevice,
+    onEdit: (ScannedDevice) -> Unit,
+    onFavorite: (ScannedDevice) -> Unit,
+    onForget: (ScannedDevice) -> Unit
 ) {
+
+    var deviceMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     CenterAlignedTopAppBar(
         //modifier = Modifier.border(2.dp, Color.Blue),
@@ -41,7 +53,7 @@ fun AppBarWithBackButton(
         ),
         title = {
             Text(
-                text = title,
+                text = device.displayName(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -50,6 +62,16 @@ fun AppBarWithBackButton(
             IconButton(onClick = onBackClicked) {
                 BackIcon(contentDesc = "Go Back")
             }
+        },
+        actions = {
+            DeviceMenu(
+                device = device,
+                expanded = deviceMenuExpanded,
+                onExpanded = {deviceMenuExpanded = it},
+                onEdit = onEdit,
+                onFavorite = onFavorite,
+                onForget = onForget
+            )
         }
     )
 }
@@ -119,10 +141,16 @@ fun HomeAppBar(
 @Preview
 @Composable
 fun PreviewAppBar() {
+    val device = ScannedDevice(
+        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
+        "Microsoft", listOf("Human Readable Device"),
+        listOf("Windows 10 Desktop"), 0L,
+        customName = null,
+        baseRssi = 0,favorite = false, forget = false
+    )
     BLEScannerTheme() {
-        AppBarWithBackButton(title = "ELK-BLEDOM") {
-            
-        }
+        AppBarWithBackButton({},device,
+            {}, {}, {})
     }
 }
 

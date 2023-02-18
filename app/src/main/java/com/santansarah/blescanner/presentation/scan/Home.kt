@@ -84,8 +84,11 @@ fun HomeRoute(
                 )
             else
                 AppBarWithBackButton(
-                    title = scanState.selectedDevice.scannedDevice.deviceName ?: "Unknown",
-                    vm::onBackFromDevice
+                    onBackClicked = vm::onBackFromDevice,
+                    device = scanState.selectedDevice.scannedDevice,
+                    onEdit = {},
+                    onFavorite = vm::onFavorite,
+                    onForget = vm::onForget
                 )
         }
     ) { padding ->

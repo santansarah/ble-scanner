@@ -52,6 +52,8 @@ data class ScannedDevice(
     val forget: Boolean
 )
 
+fun ScannedDevice.displayName() = (this.customName ?: this.deviceName ?: "Unknown").trim()
+
 @Entity(tableName = "descriptors")
 data class Descriptor(
     val identifier: String,

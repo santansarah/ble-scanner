@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.data.local.entities.displayName
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.ScanFilterOption
@@ -53,15 +54,20 @@ class ScanViewModel(
         _bleMessage, _userMessage, _deviceDetails
     ) {devices, selectedDevice, bleMessage, userMessage, deviceDetails ->
 
-        val currentDevice = selectedDevice?.let {
+        val scannedDeviceList = devices.second
+        val refreshSelectedDevice = scannedDeviceList.find {
+            it.address == selectedDevice?.scannedDevice?.address
+        }
+
+        val currentDevice = refreshSelectedDevice?.let { scannedDevice ->
             DeviceDetail(
-                it.scannedDevice,
-                deviceDetails
+                scannedDevice = scannedDevice,
+                services = deviceDetails
             )
         }
 
         ScanState(
-            devices.second,
+            scannedDeviceList,
             currentDevice,
             bleMessage,
             userMessage,
@@ -90,13 +96,20 @@ class ScanViewModel(
 
     fun onFavorite(scannedDevice: ScannedDevice) {
         viewModelScope.launch(dispatcher) {
-            bleRepository.updateDevice(scannedDevice.copy(favorite = !scannedDevice.favorite))
+
+            val isFavorite = !scannedDevice.favorite
+            val favoriteAction = if (isFavorite) "added to" else "removed from"
+
+            bleRepository.updateDevice(scannedDevice.copy(favorite = isFavorite))
+            showUserMessage("${scannedDevice.displayName()} $favoriteAction Favorites.")
         }
     }
 
     fun onForget(scannedDevice: ScannedDevice) {
         viewModelScope.launch(dispatcher) {
             bleRepository.updateDevice(scannedDevice.copy(forget = true))
+            _selectedDevice.value = null
+            showUserMessage("${scannedDevice.displayName()} forgotten.")
         }
     }
 
