@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.os.Build
+import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.bleparsables.CCCD
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceService
@@ -133,6 +134,7 @@ class BleGatt(
             status: Int
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
+            btGatt?.readCharacteristic(characteristic)
         }
 
         override fun onDescriptorWrite(

@@ -11,11 +11,20 @@ data class ScanState(
     val scanFilterOption: ScanFilterOption?
 )
 
+data class ControlState(
+    //val isScanning: Boolean,
+    val device: ScannedDevice?,
+    val services: List<DeviceService>,
+    val bleMessage: ConnectionState,
+    val userMessage: String?,
+)
+
 enum class ConnectionState {
     CONNECTED,
     CONNECTING,
     DISCONNECTING,
-    DISCONNECTED;
+    DISCONNECTED,
+    UNKNOWN;
 
     fun toTitle() = this.name.lowercase().replaceFirstChar { it.uppercase() }
 }

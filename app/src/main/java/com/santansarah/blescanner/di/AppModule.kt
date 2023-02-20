@@ -12,6 +12,7 @@ import androidx.work.WorkRequest
 import com.santansarah.blescanner.domain.DeleteNotSeenWorker
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.presentation.BleManager
+import com.santansarah.blescanner.presentation.control.ControlViewModel
 import com.santansarah.blescanner.presentation.scan.ScanViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,7 @@ val appModule = module {
 
     single<BluetoothAdapter> { provideBluetoothManager(androidApplication()).adapter }
 
-    factory<CoroutineDispatcher>(named("IODispatcher")) {
+    factory(named("IODispatcher")) {
         Dispatchers.IO
     }
 
@@ -51,6 +52,8 @@ val appModule = module {
 
     single { BleManager(get(), get(), get()) }
     single { BleGatt(androidApplication(), get(), get(), get(), get(), get()) }
-    viewModel { ScanViewModel(get(), get(), get(), Dispatchers.IO) }
+
+    viewModel { ScanViewModel(get(), get(), get(), get(named("IODispatcher"))) }
+    viewModel { ControlViewModel(get(), get(), get(named("IODispatcher")), get()) }
 
 }

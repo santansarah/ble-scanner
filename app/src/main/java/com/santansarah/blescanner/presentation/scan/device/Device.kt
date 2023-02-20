@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -33,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -43,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.domain.bleparsables.ELKBLEDOM
 import com.santansarah.blescanner.domain.models.BleProperties
 import com.santansarah.blescanner.domain.models.BleWriteTypes
 import com.santansarah.blescanner.domain.models.ConnectionState
@@ -66,7 +71,8 @@ fun ShowDevice(
     onWriteDescriptor: (String, String, String) -> Unit,
     onEdit: (Boolean) -> Unit,
     isEditing: Boolean,
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
+    onControlClick: (String) -> Unit
 ) {
 
     val scannedDevice = scanState.selectedDevice!!.scannedDevice
@@ -109,10 +115,14 @@ fun ShowDevice(
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
 
-                    ConnectionStatus(
-                        connectEnabled, onConnect,
-                        scannedDevice, disconnectEnabled, onDisconnect
-                    )
+                    DeviceButtons(
+                        connectEnabled = connectEnabled,
+                        onConnect = onConnect,
+                        device = scannedDevice,
+                        disconnectEnabled = disconnectEnabled,
+                        onDisconnect = onDisconnect,
+                        services = scanState.selectedDevice.services,
+                        onControlClick = onControlClick,)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -125,8 +135,8 @@ fun ShowDevice(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (isEditing)
-            EditDevice(onSave = onSave, updateEdit = onEdit, scanState.selectedDevice.scannedDevice.displayName())
-        else
+            EditDevice(onSave = onSave, updateEdit = onEdit, scannedDevice.displayName())
+        else {
             ServicePager(
                 selectedDevice = scanState.selectedDevice,
                 onRead = onRead,
@@ -135,6 +145,8 @@ fun ShowDevice(
                 onReadDescriptor = onReadDescriptor,
                 onWriteDescriptor = onWriteDescriptor
             )
+
+        }
     }
 
 }
@@ -171,41 +183,70 @@ fun DeviceDetails(device: ScannedDevice) {
 }
 
 @Composable
-private fun ConnectionStatus(
+fun DeviceButtons(
+    connectEnabled: Boolean,
+    onConnect: (String) -> Unit,
+    device: ScannedDevice,
+    disconnectEnabled: Boolean,
+    onDisconnect: () -> Unit,
+    services: List<DeviceService>,
+    onControlClick: (String) -> Unit,
+) {
+    Row() {
+        ConnectButtons(connectEnabled, onConnect, device, disconnectEnabled, onDisconnect)
+        services.flatMap { it.characteristics }.find {
+            it.uuid == ELKBLEDOM.uuid
+        }?.also {
+            FilledIconButton(
+                /*colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = Color(0xFF0087ff),
+                    contentColor = Color(0xFFe2e2e9)
+                ),*/
+                onClick = { onControlClick(device.address) },
+                content = {
+                    Icon(
+                        modifier = Modifier.size(28.dp),
+                        painter = painterResource(id = R.drawable.control),
+                        contentDescription = "Disconnect"
+                    )
+                })
+        }
+    }
+}
+
+@Composable
+fun ConnectButtons(
     connectEnabled: Boolean,
     onConnect: (String) -> Unit,
     device: ScannedDevice,
     disconnectEnabled: Boolean,
     onDisconnect: () -> Unit
 ) {
-    Row() {
-        FilledIconButton(
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            ),
-            enabled = connectEnabled,
-            onClick = { onConnect(device.address) },
-            content = {
-                Icon(
-                    painter = painterResource(id = R.drawable.connect),
-                    contentDescription = "Connect"
-                )
-            })
-        FilledIconButton(
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            ),
-            enabled = disconnectEnabled,
-            onClick = { onDisconnect() },
-            content = {
-                Icon(
-                    painter = painterResource(id = R.drawable.disconnect),
-                    contentDescription = "Disconnect"
-                )
-            })
-    }
+    FilledIconButton(
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        enabled = connectEnabled,
+        onClick = { onConnect(device.address) },
+        content = {
+            Icon(
+                painter = painterResource(id = R.drawable.connect),
+                contentDescription = "Connect"
+            )
+        })
+    FilledIconButton(
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        enabled = disconnectEnabled,
+        onClick = { onDisconnect() },
+        content = {
+            Icon(
+                painter = painterResource(id = R.drawable.disconnect),
+                contentDescription = "Disconnect"
+            )
+        })
 }
-
 
 @Composable
 fun ReadWriteMenu(
@@ -430,6 +471,7 @@ fun previewDeviceDetail() {
                     { _: String, _: String, _: String -> },
                     {},
                     false,
+                    {},
                     {}
                 )
             }

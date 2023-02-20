@@ -23,6 +23,8 @@ fun ByteArray.print(): String =
 fun Int.toHex(): String =
     "0x%04X".format(this)
 
+fun Int.toHex2(): String =
+    "%02X".format(this)
 
 fun ByteArray.bitsToHex(): String {
     val bitSet = BitSet.valueOf(this)
@@ -68,11 +70,13 @@ fun LongArray.toHex(): String =
 fun Byte.toHex(): String = "%02X".format(this)
 
 fun String.decodeHex(): ByteArray {
-    require(length % 2 == 0) { "Must have an even length" }
-    return chunked(2)
-        .map { it.toInt(16).toByte() }
-        .toByteArray()
+    with (this.substringAfter("0x")) {
+        require(length % 2 == 0) { "Must have an even length" }
+        return chunked(2)
+            .map { it.toInt(16).toByte() }
+            .toByteArray()
         //.toString(Charsets.ISO_8859_1)
+    }
 }
 
 fun ByteArray.decodeSkipUnreadable(): String {

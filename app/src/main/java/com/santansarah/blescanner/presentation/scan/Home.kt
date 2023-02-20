@@ -44,7 +44,8 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeRoute(
-    vm: ScanViewModel = koinViewModel()
+    vm: ScanViewModel = koinViewModel(),
+    onControlClick: (String) -> Unit
 ) {
 
     val scanState = vm.scanState.collectAsStateWithLifecycle().value
@@ -122,7 +123,8 @@ fun HomeRoute(
                     onWriteDescriptor = vm::writeDescriptor,
                     onEdit = { isEditing = it},
                     isEditing = isEditing,
-                    onSave = vm::onNameChange
+                    onSave = vm::onNameChange,
+                    onControlClick = onControlClick
                 )
         }
     }
