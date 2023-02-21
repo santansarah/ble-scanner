@@ -37,12 +37,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
@@ -55,6 +57,8 @@ import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.domain.models.ScanState
+import com.santansarah.blescanner.presentation.previewparams.PreviewDeviceDetailProvider
+import com.santansarah.blescanner.presentation.previewparams.ScannedDevicePreviewParameterProvider
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.toDate
 
@@ -122,7 +126,8 @@ fun ShowDevice(
                         disconnectEnabled = disconnectEnabled,
                         onDisconnect = onDisconnect,
                         services = scanState.selectedDevice.services,
-                        onControlClick = onControlClick,)
+                        onControlClick = onControlClick,
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -224,7 +229,10 @@ fun ConnectButtons(
 ) {
     FilledIconButton(
         colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.tertiary.copy(.3f),
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         enabled = connectEnabled,
         onClick = { onConnect(device.address) },
@@ -236,7 +244,10 @@ fun ConnectButtons(
         })
     FilledIconButton(
         colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.tertiary.copy(.3f),
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         enabled = disconnectEnabled,
         onClick = { onDisconnect() },
@@ -288,7 +299,7 @@ fun ReadWriteMenu(
                         contentDescription = "Read"
                     )
                 })
-            Divider()
+            Divider(color = MaterialTheme.colorScheme.primaryContainer)
             DropdownMenuItem(
                 //modifier = Modifier.background(MaterialTheme.colorScheme.primary),
                 //enabled = char.canWrite,
@@ -308,173 +319,41 @@ fun ReadWriteMenu(
 }
 
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+    backgroundColor = 0xFF17191b
 )
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    showBackground = true,
+    backgroundColor = 0xFFc0e5dd
 )
 @Composable
-fun previewDeviceDetail() {
-    val device = ScannedDevice(
-        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
-        "Microsoft", listOf("Human Readable Device"),
-        listOf("Windows 10 Desktop"), 0L,
-        customName = null,
-        baseRssi = 0, favorite = false, forget = false
-    )
+fun PreviewDeviceDetail(
+    @PreviewParameter(PreviewDeviceDetailProvider::class) deviceDetail: DeviceDetail
+) {
     BLEScannerTheme {
-        Surface() {
-            val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
-            Column(
-                modifier = Modifier.padding(
-                    start = 14.dp,
-                    end = 14.dp,
-                    top = systemBarsPadding.calculateTopPadding() + 14.dp,
-                    bottom = systemBarsPadding.calculateBottomPadding() + 14.dp
-                )
-            ) {
-                ShowDevice(
-                    PaddingValues(4.dp),
-                    ScanState(
-                        emptyList(),
-                        DeviceDetail(
-                            scannedDevice =
-                            ScannedDevice(
-                                deviceId = 41,
-                                deviceName = "EASYWAY-BLE",
-                                address = "93:58:00:27:XX:00",
-                                rssi = -93,
-                                manufacturer = "Ericsson Technology Licensing",
-                                services = listOf("Heart Rate"),
-                                extra = null,
-                                lastSeen = 1675293173796,
-                                customName = null,
-                                baseRssi = -55,
-                                favorite = false,
-                                forget = false
-                            ),
-                            services = listOf(
-                                DeviceService(
-                                    uuid = "1800",
-                                    name = "Generic Access",
-                                    characteristics = listOf(
-                                        DeviceCharacteristics(
-                                            uuid = "00002a00-0000-1000-8000-00805f9b34fb",
-                                            name = "Device Name",
-                                            descriptor = null,
-                                            permissions = 0,
-                                            properties = listOf(BleProperties.PROPERTY_READ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(),
-                                            canRead = true,
-                                            canWrite = false,
-                                            readBytes = null,
-                                            notificationBytes = null
-                                        ),
-                                        DeviceCharacteristics(
-                                            uuid = "00002a00-0000-1000-8000-00805f9b34fb",
-                                            name = "Appearance",
-                                            descriptor = null,
-                                            permissions = 0,
-                                            properties = listOf(BleProperties.PROPERTY_READ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(),
-                                            canRead = true,
-                                            canWrite = false,
-                                            readBytes = null,
-                                            notificationBytes = null
-                                        )
-                                    )
-                                ),
-                                DeviceService(
-                                    uuid = "1801",
-                                    name = "Generic Attribute",
-                                    characteristics = listOf(
-                                        DeviceCharacteristics(
-                                            uuid = "00002a05-0000-1000-8000-00805f9b34fb",
-                                            name = "Service Changed",
-                                            descriptor = null,
-                                            permissions = 0,
-                                            properties = listOf(BleProperties.PROPERTY_READ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(),
-                                            canRead = true,
-                                            canWrite = false,
-                                            readBytes = byteArrayOf(-60, 3),
-                                            notificationBytes = null
-                                        )
-                                    )
-                                ),
-                                DeviceService(
-                                    uuid = "0000ae00-0000-1000-8000-00805f9b34fb",
-                                    name = "Mfr Service",
-                                    characteristics = listOf(
-                                        DeviceCharacteristics(
-                                            uuid = "0000ae01-0000-1000-8000-00805f9b34fb",
-                                            name = "Mfr Characteristic",
-                                            descriptor = null,
-                                            permissions = 0,
-                                            properties = listOf(
-                                                BleProperties.PROPERTY_READ,
-                                                BleProperties.PROPERTY_WRITE
-                                            ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(),
-                                            canRead = false,
-                                            canWrite = true,
-                                            readBytes = null,
-                                            notificationBytes = null
-                                        ),
-                                        DeviceCharacteristics(
-                                            uuid = "0000ae02-0000-1000-8000-00805f9b34fb",
-                                            name = "Mfr Characteristic",
-                                            descriptor = null,
-                                            permissions = 0,
-                                            properties = listOf(BleProperties.PROPERTY_READ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(),
-                                            canRead = true,
-                                            canWrite = false,
-                                            readBytes = null,
-                                            notificationBytes = null
-                                        ),
-                                        DeviceCharacteristics(
-                                            uuid = "0000ae03-0000-1000-8000-00805f9b34fb",
-                                            name = "Mfr Characteristic",
-                                            descriptor = null,
-                                            permissions = 0,
-                                            properties = listOf(
-                                                BleProperties.PROPERTY_READ,
-                                                BleProperties.PROPERTY_WRITE
-                                            ),
-                                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-                                            descriptors = emptyList(),
-                                            canRead = false,
-                                            canWrite = false,
-                                            readBytes = null,
-                                            notificationBytes = null
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        ConnectionState.CONNECTING,
-                        null,
-                        null
-                    ),
-                    {},
-                    {},
-                    {},
-                    {},
-                    { _: String, _: String -> },
-                    { _: String, _: String -> },
-                    { _: String, _: String, _: String -> },
-                    {},
-                    false,
-                    {},
-                    {}
-                )
-            }
-        }
+
+        ShowDevice(
+            PaddingValues(4.dp),
+            ScanState(
+                emptyList(),
+                deviceDetail,
+                ConnectionState.CONNECTING,
+                null,
+                null
+            ),
+            {},
+            {},
+            {},
+            {},
+            { _: String, _: String -> },
+            { _: String, _: String -> },
+            { _: String, _: String, _: String -> },
+            {},
+            false,
+            {},
+            {}
+        )
     }
 }

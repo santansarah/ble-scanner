@@ -1,7 +1,9 @@
 package com.santansarah.blescanner.presentation.scan.device
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -30,11 +33,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
+import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.domain.models.propsToString
+import com.santansarah.blescanner.presentation.previewparams.PreviewDeviceDetailProvider
+import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.presentation.theme.bodySmallItalic
 
 @Composable
@@ -58,6 +67,10 @@ fun ServicePager(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(.3f)
+                ),
                 enabled = (currentServiceIdx > 0),
                 onClick = {
                     currentServiceIdx--
@@ -66,7 +79,7 @@ fun ServicePager(
                 Icon(
                     //modifier = Modifier.align(Alignment.Top),
                     imageVector = Icons.Default.KeyboardArrowLeft,
-                    contentDescription = "Next Service"
+                    contentDescription = "Next Service",
                 )
             }
             Column(
@@ -74,11 +87,16 @@ fun ServicePager(
             ) {
                 Text(
                     text = services[currentServiceIdx].name,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             IconButton(
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(.3f)
+                ),
                 enabled = (currentServiceIdx != (totalServices - 1)),
                 onClick = {
                     currentServiceIdx++
@@ -87,7 +105,7 @@ fun ServicePager(
                 Icon(
                     //modifier = Modifier.align(Alignment.Top),
                     imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = "Next Service"
+                    contentDescription = "Next Service",
                 )
             }
         }
@@ -97,7 +115,8 @@ fun ServicePager(
                 .padding(bottom = 4.dp),
             text = services[currentServiceIdx].uuid,
             style = MaterialTheme.typography.labelMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         ServicePagerDetail(
@@ -204,7 +223,8 @@ fun ServicePagerDetail(
                                         Icon(
                                             modifier = Modifier.size(22.dp),
                                             painter = painterResource(id = R.drawable.descriptor),
-                                            contentDescription = "Descriptor Icon"
+                                            contentDescription = "Descriptor Icon",
+                                            tint = MaterialTheme.colorScheme.onSecondary
                                         )
                                         Text(
                                             modifier = Modifier.padding(start = 4.dp),
@@ -256,4 +276,33 @@ fun ServicePagerDetail(
 
     }
 
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+    backgroundColor = 0xFF17191b
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    showBackground = true,
+    backgroundColor = 0xFFc0e5dd
+)
+@Composable
+fun PreviewServicePager(
+    @PreviewParameter(PreviewDeviceDetailProvider::class) deviceDetail: DeviceDetail
+) {
+    BLEScannerTheme {
+
+        Column {
+            ServicePager(
+                deviceDetail,
+                {},
+                {},
+                { _: String, _: String -> },
+                { _: String, _: String -> },
+                { _: String, _: String, _: String -> },
+            )
+        }
+    }
 }

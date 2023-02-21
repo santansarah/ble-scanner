@@ -1,0 +1,171 @@
+package com.santansarah.blescanner.presentation.previewparams
+
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.domain.bleparsables.CCCD
+import com.santansarah.blescanner.domain.models.BleProperties
+import com.santansarah.blescanner.domain.models.BleWriteTypes
+import com.santansarah.blescanner.domain.models.DeviceCharacteristics
+import com.santansarah.blescanner.domain.models.DeviceDescriptor
+import com.santansarah.blescanner.domain.models.DeviceDetail
+import com.santansarah.blescanner.domain.models.DeviceService
+
+class ScannedDevicePreviewParameterProvider : PreviewParameterProvider<ScannedDevice> {
+    override val values = sequenceOf(
+        ScannedDevice(
+            deviceId = 41,
+            deviceName = "EASYWAY-BLE",
+            address = "93:58:00:27:XX:00",
+            rssi = -93,
+            manufacturer = "Ericsson Technology Licensing",
+            services = listOf("Heart Rate"),
+            extra = null,
+            lastSeen = 1675293173796,
+            customName = null,
+            baseRssi = -55,
+            favorite = false,
+            forget = false
+        )
+    )
+}
+class PreviewDeviceDetailProvider : PreviewParameterProvider<DeviceDetail> {
+    override val values = sequenceOf(
+        DeviceDetail(
+            scannedDevice =
+            ScannedDevice(
+                deviceId = 41,
+                deviceName = "EASYWAY-BLE",
+                address = "93:58:00:27:XX:00",
+                rssi = -93,
+                manufacturer = "Ericsson Technology Licensing",
+                services = listOf("Heart Rate"),
+                extra = null,
+                lastSeen = 1675293173796,
+                customName = null,
+                baseRssi = -55,
+                favorite = false,
+                forget = false
+            ),
+            services = listOf(
+                DeviceService(
+                    uuid = "1800",
+                    name = "Generic Access",
+                    characteristics = listOf(
+                        DeviceCharacteristics(
+                            uuid = "00002a00-0000-1000-8000-00805f9b34fb",
+                            name = "Device Name",
+                            descriptor = null,
+                            permissions = 0,
+                            properties = listOf(BleProperties.PROPERTY_READ),
+                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                            descriptors = listOf( DeviceDescriptor(
+                                CCCD.uuid,
+                                "Client Characteristic Configuration", "",
+                                emptyList(), BleProperties.PROPERTY_INDICATE, null
+                            )),
+                            canRead = true,
+                            canWrite = false,
+                            readBytes = null,
+                            notificationBytes = null
+                        ),
+                        DeviceCharacteristics(
+                            uuid = "00002a00-0000-1000-8000-00805f9b34fb",
+                            name = "Appearance",
+                            descriptor = null,
+                            permissions = 0,
+                            properties = listOf(BleProperties.PROPERTY_READ),
+                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                            descriptors = emptyList(),
+                            canRead = true,
+                            canWrite = false,
+                            readBytes = null,
+                            notificationBytes = null
+                        )
+                    )
+                ),
+                DeviceService(
+                    uuid = "1801",
+                    name = "Generic Attribute",
+                    characteristics = listOf(
+                        DeviceCharacteristics(
+                            uuid = "00002a05-0000-1000-8000-00805f9b34fb",
+                            name = "Service Changed",
+                            descriptor = null,
+                            permissions = 0,
+                            properties = listOf(BleProperties.PROPERTY_READ),
+                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                            descriptors = emptyList(),
+                            canRead = true,
+                            canWrite = false,
+                            readBytes = byteArrayOf(-60, 3),
+                            notificationBytes = null
+                        )
+                    )
+                ),
+                DeviceService(
+                    uuid = "0000ae00-0000-1000-8000-00805f9b34fb",
+                    name = "Mfr Service",
+                    characteristics = listOf(
+                        DeviceCharacteristics(
+                            uuid = "0000ae01-0000-1000-8000-00805f9b34fb",
+                            name = "Mfr Characteristic",
+                            descriptor = null,
+                            permissions = 0,
+                            properties = listOf(
+                                BleProperties.PROPERTY_READ,
+                                BleProperties.PROPERTY_WRITE
+                            ),
+                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                            descriptors = emptyList(),
+                            canRead = false,
+                            canWrite = true,
+                            readBytes = null,
+                            notificationBytes = null
+                        ),
+                        DeviceCharacteristics(
+                            uuid = "0000ae02-0000-1000-8000-00805f9b34fb",
+                            name = "Mfr Characteristic",
+                            descriptor = null,
+                            permissions = 0,
+                            properties = listOf(BleProperties.PROPERTY_READ),
+                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                            descriptors = emptyList(),
+                            canRead = true,
+                            canWrite = false,
+                            readBytes = null,
+                            notificationBytes = null
+                        ),
+                        DeviceCharacteristics(
+                            uuid = "0000ae03-0000-1000-8000-00805f9b34fb",
+                            name = "Mfr Characteristic",
+                            descriptor = null,
+                            permissions = 0,
+                            properties = listOf(
+                                BleProperties.PROPERTY_READ,
+                                BleProperties.PROPERTY_WRITE
+                            ),
+                            writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
+                            descriptors = emptyList(),
+                            canRead = false,
+                            canWrite = false,
+                            readBytes = null,
+                            notificationBytes = null
+                        )
+                    )
+                )
+            )
+        )
+    )
+}
+/*
+class ScannedDevicePreviewParameterProvider : PreviewParameterProvider<ScannedDevice> {
+    override val values = sequenceOf(
+        ScannedDevice(
+            0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
+            "Microsoft", listOf("Human Readable Device"),
+            listOf("Windows 10 Desktop"), 0L,
+            customName = null,
+            baseRssi = 0, favorite = false, forget = false
+        )
+    )
+}*/
