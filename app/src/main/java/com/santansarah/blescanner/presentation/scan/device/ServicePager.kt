@@ -3,7 +3,6 @@ package com.santansarah.blescanner.presentation.scan.device
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -35,19 +34,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
-import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
-import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.domain.models.propsToString
 import com.santansarah.blescanner.presentation.previewparams.PreviewDeviceDetailProvider
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.presentation.theme.bodySmallItalic
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutMode
 
 @Composable
 fun ServicePager(
+    appLayoutInfo: AppLayoutInfo,
     selectedDevice: DeviceDetail,
     onRead: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
@@ -55,79 +56,89 @@ fun ServicePager(
     onReadDescriptor: (String, String) -> Unit,
     onWriteDescriptor: (String, String, String) -> Unit
 ) {
+
+    val mainBodyModifier = when(appLayoutInfo.appLayoutMode) {
+        AppLayoutMode.LANDSCAPE_NORMAL -> Modifier.padding(horizontal = 20.dp)
+        AppLayoutMode.LANDSCAPE_BIG -> Modifier.padding(horizontal = 40.dp)
+        else -> Modifier
+    }
+
     if (selectedDevice.services.isNotEmpty()) {
-        val services = selectedDevice.services
-        val totalServices by rememberSaveable { mutableStateOf(services.count()) }
-        var currentServiceIdx by rememberSaveable { mutableStateOf(0) }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            //.background(Color.White.copy(.3f)),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = mainBodyModifier
         ) {
-            IconButton(
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(.3f)
-                ),
-                enabled = (currentServiceIdx > 0),
-                onClick = {
-                    currentServiceIdx--
-                }
-            ) {
-                Icon(
-                    //modifier = Modifier.align(Alignment.Top),
-                    imageVector = Icons.Default.KeyboardArrowLeft,
-                    contentDescription = "Next Service",
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = services[currentServiceIdx].name,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            val services = selectedDevice.services
+            val totalServices by rememberSaveable { mutableStateOf(services.count()) }
+            var currentServiceIdx by rememberSaveable { mutableStateOf(0) }
 
-            IconButton(
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(.3f)
-                ),
-                enabled = (currentServiceIdx != (totalServices - 1)),
-                onClick = {
-                    currentServiceIdx++
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                //.background(Color.White.copy(.3f)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    //modifier = Modifier.align(Alignment.Top),
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = "Next Service",
-                )
+                IconButton(
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(.3f)
+                    ),
+                    enabled = (currentServiceIdx > 0),
+                    onClick = {
+                        currentServiceIdx--
+                    }
+                ) {
+                    Icon(
+                        //modifier = Modifier.align(Alignment.Top),
+                        imageVector = Icons.Default.KeyboardArrowLeft,
+                        contentDescription = "Next Service",
+                    )
+                }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = services[currentServiceIdx].name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                IconButton(
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(.3f)
+                    ),
+                    enabled = (currentServiceIdx != (totalServices - 1)),
+                    onClick = {
+                        currentServiceIdx++
+                    }
+                ) {
+                    Icon(
+                        //modifier = Modifier.align(Alignment.Top),
+                        imageVector = Icons.Default.KeyboardArrowRight,
+                        contentDescription = "Next Service",
+                    )
+                }
             }
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
+                text = services[currentServiceIdx].uuid,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            ServicePagerDetail(
+                services[currentServiceIdx],
+                onRead,
+                onShowUserMessage,
+                onWrite,
+                onReadDescriptor,
+                onWriteDescriptor
+            )
         }
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
-            text = services[currentServiceIdx].uuid,
-            style = MaterialTheme.typography.labelMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        ServicePagerDetail(
-            services[currentServiceIdx],
-            onRead,
-            onShowUserMessage,
-            onWrite,
-            onReadDescriptor,
-            onWriteDescriptor
-        )
-
     }
 }
 
@@ -296,6 +307,11 @@ fun PreviewServicePager(
 
         Column {
             ServicePager(
+                appLayoutInfo = AppLayoutInfo(
+                    appLayoutMode = AppLayoutMode.PORTRAIT,
+                    windowDpSize = DpSize(392.dp, 850.dp),
+                    foldableInfo = null
+                ),
                 deviceDetail,
                 {},
                 {},

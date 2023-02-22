@@ -17,11 +17,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.domain.models.AppRoutes.HOME_SCREEN
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BleApp(
+    appLayoutInfo: AppLayoutInfo
 ) {
 
     Box(
@@ -48,8 +50,10 @@ fun BleApp(
                 .navigationBarsPadding()
                 .fillMaxSize()
         ) {
-            AppNavGraph(navController = rememberNavController(),
-                startDestination = HOME_SCREEN)
+            AppNavGraph(
+                navController = rememberNavController(),
+                startDestination = HOME_SCREEN, appLayoutInfo = appLayoutInfo
+            )
         }
     }
 

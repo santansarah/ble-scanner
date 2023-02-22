@@ -7,10 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.domain.models.BleConnectEvents
+import com.santansarah.blescanner.domain.models.BleReadWriteCommands
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.domain.models.ScanState
+import com.santansarah.blescanner.domain.models.ScanUI
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.presentation.BleManager
 import com.santansarah.blescanner.utils.decodeHex
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ScanViewModel(
@@ -50,9 +54,10 @@ class ScanViewModel(
     private val _userMessage = MutableStateFlow<String?>(null)
     private val _deviceDetails = bleGatt.deviceDetails
 
-    val scanState = combine(_devices, _selectedDevice,
+    val scanState = combine(
+        _devices, _selectedDevice,
         _bleMessage, _userMessage, _deviceDetails
-    ) {devices, selectedDevice, bleMessage, userMessage, deviceDetails ->
+    ) { devices, selectedDevice, bleMessage, userMessage, deviceDetails ->
 
         val scannedDeviceList = devices.second
         val refreshSelectedDevice = scannedDeviceList.find {
@@ -67,18 +72,53 @@ class ScanViewModel(
         }
 
         ScanState(
-            scannedDeviceList,
-            currentDevice,
-            bleMessage,
-            userMessage,
-            devices.first
+            ScanUI(
+                scannedDeviceList,
+                currentDevice,
+                bleMessage,
+                userMessage,
+                devices.first,
+            ),
+            BleConnectEvents(
+                onConnect = {
+                    onConnect(it)
+                },
+                onDisconnect = { onDisconnect() }
+            ),
+            BleReadWriteCommands(
+                onRead = { readCharacteristic(it) },
+                onWrite = { uuid, bytes ->
+                    onWriteCharacteristic(uuid, bytes)
+                },
+                onReadDescriptor = { charUuid, uuid ->
+                    readDescriptor(charUuid, uuid)
+                },
+                onWriteDescriptor = { charUuid, descUuid, hexString ->
+                    writeDescriptor(charUuid, descUuid, hexString)
+                }
+            )
         )
     }.flowOn(dispatcher)
         //.onStart { emit("Loading...") }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ScanState(emptyList(), null, ConnectionState.DISCONNECTED, null, null)
+            initialValue = ScanState(
+                ScanUI(
+                devices = emptyList(),
+                selectedDevice = null,
+                bleMessage = ConnectionState.DISCONNECTED,
+                userMessage = null,
+                scanFilterOption = null,
+                ),
+                bleConnectEvents = BleConnectEvents({}, {}),
+                bleReadWriteCommands = BleReadWriteCommands(
+                    {},
+                    { _: String, _: String -> },
+                    { _: String, _: String -> },
+                    { _: String, _: String, _: String -> },
+                )
+            )
         )
 
     fun startScan() {
@@ -124,7 +164,7 @@ class ScanViewModel(
 
     fun onConnect(address: String) {
         Timber.d("calling connect...")
-        val scannedDevice = scanState.value.devices.find {
+        val scannedDevice = scanState.value.scanUI.devices.find {
             it.address == address
         }
 

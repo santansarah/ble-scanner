@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.santansarah.blescanner"
-        minSdk 29
+        minSdk 30
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -109,6 +109,11 @@ dependencies {
     implementation 'io.insert-koin:koin-androidx-workmanager:3.3.3'
 
     implementation 'com.github.skydoves:colorpicker-compose:1.0.1'
+
+    // window layout
+    implementation "androidx.window:window:1.1.0-alpha04"
+    implementation "androidx.compose.material3:material3-window-size-class:1.1.0-alpha06"
+
 
 
     //testing

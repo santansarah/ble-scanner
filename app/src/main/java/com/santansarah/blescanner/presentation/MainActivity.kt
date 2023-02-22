@@ -1,28 +1,23 @@
 package com.santansarah.blescanner.presentation
 
-import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import com.santansarah.blescanner.domain.DeleteNotSeenWorker
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
-import org.koin.android.ext.android.get
-import org.koin.androidx.compose.get
-import org.koin.core.context.GlobalContext.get
-import org.koin.core.qualifier.named
-import java.util.concurrent.TimeUnit
+import com.santansarah.blescanner.utils.windowinfo.getFoldableInfoFlow
+import com.santansarah.blescanner.utils.windowinfo.getWindowLayoutType
+import com.santansarah.blescanner.utils.windowinfo.getWindowSizeClasses
 
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -37,9 +32,20 @@ class MainActivity : ComponentActivity() {
             .enqueue(deleteNotSeenRequest)
 */
 
+        val devicePostureFlow = getFoldableInfoFlow(this)
+
         setContent {
+
+            val windowSize = getWindowSizeClasses(this)
+            val devicePosture by devicePostureFlow.collectAsStateWithLifecycle()
+
+            val appLayoutInfo = getWindowLayoutType(
+                windowInfo = windowSize,
+                foldableInfo = devicePosture
+            )
+
             BLEScannerTheme {
-                BleApp()
+                BleApp(appLayoutInfo)
             }
         }
     }

@@ -13,10 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.koin.androidx.scope.scope
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber

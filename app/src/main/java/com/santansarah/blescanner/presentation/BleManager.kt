@@ -1,28 +1,18 @@
 package com.santansarah.blescanner.presentation
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.os.ParcelUuid
-import android.util.SparseArray
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import com.santansarah.blescanner.data.local.BleRepository
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.usecases.ParseScanResult
-import com.santansarah.blescanner.utils.toGss
-import com.santansarah.blescanner.utils.toHex
-import com.santansarah.blescanner.utils.toMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
-import java.util.Date
 
 class BleManager(
     private val bleRepository: BleRepository,
@@ -92,8 +82,15 @@ class BleManager(
 
     @SuppressLint("MissingPermission")
     fun stopScan() {
-        isScanning.value = false
-        btScanner.stopScan(scanCallback)
+        try {
+            if (btAdapter.isEnabled)
+                btScanner.stopScan(scanCallback)
+        } catch (e: Exception) {
+            Timber.d(e.message)
+        }
+        finally {
+            isScanning.value = false
+        }
     }
 
     fun userMessageShown() {
