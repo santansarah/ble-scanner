@@ -55,7 +55,8 @@ class ParseScanResult
             forget = false
         )
 
-        if (device.manufacturer != "Microsoft") {
+        if (device.manufacturer != "Microsoft"
+            || device.deviceName?.endsWith("-PC") == false) {
             val recNum = bleRepository.insertDevice(device)
         }
         Timber.d("$device")

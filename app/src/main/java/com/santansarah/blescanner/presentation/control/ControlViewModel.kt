@@ -11,7 +11,6 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.ControlState
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.utils.decodeHex
-import com.santansarah.blescanner.utils.toHex
 import com.santansarah.blescanner.utils.toHex2
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.Exception
 
 class ControlViewModel(
     private val bleGatt: BleGatt,
@@ -97,6 +95,14 @@ class ControlViewModel(
             onWriteCharacteristic(ELKBLEDOM.uuid, ELKBLEDOM.OFF)
         else
             onWriteCharacteristic(ELKBLEDOM.uuid, ELKBLEDOM.ON)
+    }
+
+    fun deviceOn() {
+        onWriteCharacteristic(ELKBLEDOM.uuid, ELKBLEDOM.ON)
+    }
+
+    fun deviceOff() {
+        onWriteCharacteristic(ELKBLEDOM.uuid, ELKBLEDOM.OFF)
     }
 
     fun changeColor(hexColor: String) {

@@ -102,8 +102,8 @@ fun ControlScreen(
                                             controlState.device, disconnectEnabled, vm::onDisconnect
                                         )
                                         OnOffButton(
-                                            checked = vm.getOnOffState(),
-                                            onCheckChanged = vm::toggleOnOff
+                                            turnOn = vm::deviceOn,
+                                            turnOff = vm::deviceOff,
                                         )
                                     }
                                 }
@@ -149,8 +149,8 @@ fun ControlScreen(
                         }
 
                         OnOffButton(
-                            checked = vm.getOnOffState(),
-                            onCheckChanged = vm::toggleOnOff
+                            turnOn = vm::deviceOn,
+                            turnOff = vm::deviceOff,
                         )
 
                     }
