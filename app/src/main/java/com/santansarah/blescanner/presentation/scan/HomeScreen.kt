@@ -3,12 +3,13 @@ package com.santansarah.blescanner.presentation.scan
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.santansarah.blescanner.domain.models.DeviceEvents
 import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.presentation.previewparams.FeatureParams
 import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
@@ -26,35 +27,47 @@ fun HomeScreen(
     scanState: ScanState,
     onControlClick: (String) -> Unit,
     onShowUserMessage: (String) -> Unit,
-    onSave: (String) -> Unit,
+    deviceEvents: DeviceEvents,
     isEditing: Boolean,
-    onEdit: (Boolean) -> Unit
+    onBackClicked: () -> Unit,
+    onSave: (String) -> Unit
 ) {
 
     if (appLayoutInfo.appLayoutMode.isLandscape()) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         ) {
-            ShowDeviceDetail(
-                scanUi = scanState.scanUI,
-                bleConnectEvents = scanState.bleConnectEvents,
-                onControlClick = onControlClick,
-                appLayoutInfo = appLayoutInfo
-            )
-            ShowDeviceBody(
-                appLayoutInfo = appLayoutInfo,
-                scanUi = scanState.scanUI,
-                bleReadWriteCommands = scanState.bleReadWriteCommands,
-                onShowUserMessage = onShowUserMessage,
-                onEdit = onEdit,
-                isEditing = isEditing,
-                onSave = onSave
-            )
+
+            val sidePanelModifier = Modifier.weight(2f)
+
+            Column(
+                modifier = sidePanelModifier
+            ) {
+                ShowDeviceDetail(
+                    scanState = scanState,
+                    onBackClicked = onBackClicked,
+                    onControlClick = onControlClick,
+                    appLayoutInfo = appLayoutInfo
+                )
+            }
+            Column(
+                modifier = Modifier.weight(3f)
+            ) {
+                ShowDeviceBody(
+                    appLayoutInfo = appLayoutInfo,
+                    scanUi = scanState.scanUI,
+                    bleReadWriteCommands = scanState.bleReadWriteCommands,
+                    onShowUserMessage = onShowUserMessage,
+                    onEdit = deviceEvents.onIsEditing,
+                    isEditing = isEditing,
+                    onSave = onSave
+                )
+            }
         }
     } else {
         ShowDeviceDetail(
-            scanUi = scanState.scanUI,
-            bleConnectEvents = scanState.bleConnectEvents,
+            scanState = scanState,
+            onBackClicked = onBackClicked,
             onControlClick = onControlClick,
             appLayoutInfo = appLayoutInfo
         )
@@ -65,7 +78,7 @@ fun HomeScreen(
             scanUi = scanState.scanUI,
             bleReadWriteCommands = scanState.bleReadWriteCommands,
             onShowUserMessage = onShowUserMessage,
-            onEdit =onEdit,
+            onEdit = deviceEvents.onIsEditing,
             isEditing = isEditing,
             onSave = onSave
         )
@@ -86,7 +99,8 @@ fun PreviewHomeScreen(
                 onShowUserMessage = {},
                 onSave = {},
                 isEditing = false,
-                onEdit = {}
+                onBackClicked = {},
+                deviceEvents = DeviceEvents({},{},{})
             )
         }
     }
@@ -106,7 +120,8 @@ fun PreviewLandscapeDeviceDetailScreen(
                 onShowUserMessage = {},
                 onSave = {},
                 isEditing = false,
-                onEdit = {}
+                onBackClicked = {},
+                deviceEvents = DeviceEvents({},{},{})
             )
         }
     }

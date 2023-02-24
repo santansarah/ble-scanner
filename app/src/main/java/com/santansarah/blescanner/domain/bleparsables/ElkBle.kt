@@ -34,6 +34,8 @@ object ELKBLEDOM : ParsableUuid("0000FFF3$UUID_DEFAULT".lowercase()) {
         val onOffByte = bytes[2]
         val onOffParam = bytes[5]
 
+        Timber.d(bytes.toHex())
+
         return !(onOffByte.toInt() == 4 && onOffParam.toInt() == 0)
     }
 

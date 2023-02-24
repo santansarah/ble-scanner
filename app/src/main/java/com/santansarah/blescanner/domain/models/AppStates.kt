@@ -5,7 +5,8 @@ import com.santansarah.blescanner.data.local.entities.ScannedDevice
 data class ScanState(
     val scanUI: ScanUI,
     val bleConnectEvents: BleConnectEvents,
-    val bleReadWriteCommands: BleReadWriteCommands
+    val bleReadWriteCommands: BleReadWriteCommands,
+    val deviceEvents: DeviceEvents
 )
 
 data class ScanUI(
@@ -29,6 +30,12 @@ data class BleReadWriteCommands(
     val onWriteDescriptor: (String, String, String) -> Unit
 )
 
+data class DeviceEvents(
+    val onIsEditing: (Boolean) -> Unit,
+    val onFavorite: (ScannedDevice) -> Unit,
+    val onForget: (ScannedDevice) -> Unit
+)
+
 data class ControlState(
     //val isScanning: Boolean,
     val device: ScannedDevice?,
@@ -43,6 +50,8 @@ enum class ConnectionState {
     DISCONNECTING,
     DISCONNECTED,
     UNKNOWN;
+
+    fun isActive() = (this == CONNECTING || this == CONNECTED)
 
     fun toTitle() = this.name.lowercase().replaceFirstChar { it.uppercase() }
 }

@@ -20,24 +20,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.R
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.domain.models.BleConnectEvents
+import com.santansarah.blescanner.domain.models.DeviceDetail
+import com.santansarah.blescanner.domain.models.DeviceEvents
+import com.santansarah.blescanner.domain.models.ScanUI
+import com.santansarah.blescanner.presentation.previewparams.FeatureParams
+import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
+import com.santansarah.blescanner.presentation.previewparams.LandscapeThemePreviews
+import com.santansarah.blescanner.presentation.previewparams.PortraitPreviewParams
+import com.santansarah.blescanner.presentation.previewparams.ThemePreviews
+import com.santansarah.blescanner.presentation.scan.device.DeviceButtons
 import com.santansarah.blescanner.presentation.scan.device.DeviceMenu
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun AppBarWithBackButton(
+    appLayoutInfo: AppLayoutInfo,
     onBackClicked: () -> Unit,
-    device: ScannedDevice,
-    onEdit: (Boolean) -> Unit,
-    onFavorite: (ScannedDevice) -> Unit,
-    onForget: (ScannedDevice) -> Unit
+    scanUi: ScanUI,
+    deviceDetail: DeviceDetail,
+    deviceEvents: DeviceEvents,
+    bleConnectEvents: BleConnectEvents,
+    onControlClick: (String) -> Unit
 ) {
 
     var deviceMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    val connectEnabled = !scanUi.bleMessage.isActive()
+    val disconnectEnabled = scanUi.bleMessage.isActive()
 
     CenterAlignedTopAppBar(
         //modifier = Modifier.border(2.dp, Color.Blue),
@@ -52,11 +68,23 @@ fun AppBarWithBackButton(
                 .onPrimary.copy(.7f)
         ),
         title = {
-            Text(
-                text = device.displayName(),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (appLayoutInfo.appLayoutMode.isLandscape()) {
+                DeviceButtons(
+                    connectEnabled = connectEnabled,
+                    onConnect = bleConnectEvents.onConnect,
+                    device = deviceDetail.scannedDevice,
+                    disconnectEnabled = disconnectEnabled,
+                    onDisconnect = bleConnectEvents.onDisconnect,
+                    services = deviceDetail.services,
+                    onControlClick = onControlClick
+                )
+            } else {
+                Text(
+                    text = deviceDetail.scannedDevice.displayName(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = onBackClicked) {
@@ -65,12 +93,12 @@ fun AppBarWithBackButton(
         },
         actions = {
             DeviceMenu(
-                device = device,
+                device = deviceDetail.scannedDevice,
                 expanded = deviceMenuExpanded,
                 onExpanded = {deviceMenuExpanded = it},
-                onEdit = onEdit,
-                onFavorite = onFavorite,
-                onForget = onForget
+                onEdit = deviceEvents.onIsEditing,
+                onFavorite = deviceEvents.onFavorite,
+                onForget = deviceEvents.onForget
             )
         }
     )
@@ -137,10 +165,42 @@ fun HomeAppBar(
 }
 
 
-
-@Preview
 @Composable
-fun PreviewAppBar() {
+@OptIn(ExperimentalMaterial3Api::class)
+fun ControlAppBar(
+    appLayoutInfo: AppLayoutInfo,
+    onBackClicked: () -> Unit,
+    actionButtons: @Composable () -> Unit
+) {
+
+    CenterAlignedTopAppBar(
+        //modifier = Modifier.border(2.dp, Color.Blue),
+        windowInsets = WindowInsets(
+            top = 0.dp,
+            bottom = 0.dp
+        ),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = Color(0xFF00005d),
+            titleContentColor = Color(0xFFcaccd9),
+            navigationIconContentColor = MaterialTheme.colorScheme
+                .onPrimary.copy(.7f)
+        ),
+        title = { actionButtons() },
+        navigationIcon = {
+            IconButton(onClick = onBackClicked) {
+                BackIcon(contentDesc = "Go Back")
+            }
+        },
+    )
+}
+
+
+
+@ThemePreviews
+@Composable
+fun PreviewAppBar(
+    @PreviewParameter(PortraitPreviewParams::class) featureParams: FeatureParams
+) {
     val device = ScannedDevice(
         0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
         "Microsoft", listOf("Human Readable Device"),
@@ -149,8 +209,40 @@ fun PreviewAppBar() {
         baseRssi = 0,favorite = false, forget = false
     )
     BLEScannerTheme() {
-        AppBarWithBackButton({},device,
-            {}, {}, {})
+        AppBarWithBackButton(
+            appLayoutInfo = featureParams.appLayoutInfo,
+            onBackClicked = { /*TODO*/ },
+            scanUi = featureParams.scanState.scanUI,
+            deviceDetail = featureParams.detail,
+            deviceEvents = featureParams.scanState.deviceEvents,
+            bleConnectEvents = featureParams.scanState.bleConnectEvents,
+            onControlClick = {}
+        )
+    }
+}
+
+@LandscapeThemePreviews
+@Composable
+fun PreviewLandscapeAppBar(
+    @PreviewParameter(LandscapePreviewParams::class) featureParams: FeatureParams
+) {
+    val device = ScannedDevice(
+        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
+        "Microsoft", listOf("Human Readable Device"),
+        listOf("Windows 10 Desktop"), 0L,
+        customName = null,
+        baseRssi = 0,favorite = false, forget = false
+    )
+    BLEScannerTheme() {
+        AppBarWithBackButton(
+            appLayoutInfo = featureParams.appLayoutInfo,
+            onBackClicked = { /*TODO*/ },
+            scanUi = featureParams.scanState.scanUI,
+            deviceDetail = featureParams.detail,
+            deviceEvents = featureParams.scanState.deviceEvents,
+            bleConnectEvents = featureParams.scanState.bleConnectEvents,
+            onControlClick = {}
+        )
     }
 }
 

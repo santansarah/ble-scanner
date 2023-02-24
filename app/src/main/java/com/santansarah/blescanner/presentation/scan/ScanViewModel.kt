@@ -11,6 +11,7 @@ import com.santansarah.blescanner.domain.models.BleConnectEvents
 import com.santansarah.blescanner.domain.models.BleReadWriteCommands
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
+import com.santansarah.blescanner.domain.models.DeviceEvents
 import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.domain.models.ScanUI
@@ -28,7 +29,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.Exception
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -43,38 +43,30 @@ class ScanViewModel(
     val scannerMessage = bleManager.userMessage
 
     private val _scanFilterOption = MutableStateFlow<ScanFilterOption?>(null)
-    private val _devices = _scanFilterOption
-        .flatMapLatest { scanFilterOption ->
-            bleRepository.getScannedDevices(scanFilterOption).map {
-                Pair(scanFilterOption, it)
-            }
+    private val _devices = _scanFilterOption.flatMapLatest { scanFilterOption ->
+        bleRepository.getScannedDevices(scanFilterOption).map {
+            Pair(scanFilterOption, it)
         }
-    private val _selectedDevice = MutableStateFlow<DeviceDetail?>(null)
+    }
+    private val _selectedDevice = MutableStateFlow<ScannedDevice?>(null)
     private val _bleMessage = bleGatt.connectMessage
     private val _userMessage = MutableStateFlow<String?>(null)
-    private val _deviceDetails = bleGatt.deviceDetails
+    private val _deviceDetails =
+        combine(_selectedDevice, bleGatt.deviceDetails) { selectedDevice, deviceDetails ->
+            selectedDevice?.let {
+                DeviceDetail(it, deviceDetails)
+            }
+        }
+    val isEditing = MutableStateFlow(false)
 
     val scanState = combine(
-        _devices, _selectedDevice,
-        _bleMessage, _userMessage, _deviceDetails
-    ) { devices, selectedDevice, bleMessage, userMessage, deviceDetails ->
-
-        val scannedDeviceList = devices.second
-        val refreshSelectedDevice = scannedDeviceList.find {
-            it.address == selectedDevice?.scannedDevice?.address
-        }
-
-        val currentDevice = refreshSelectedDevice?.let { scannedDevice ->
-            DeviceDetail(
-                scannedDevice = scannedDevice,
-                services = deviceDetails
-            )
-        }
+        _devices, _bleMessage, _userMessage, _deviceDetails
+    ) { devices, bleMessage, userMessage, deviceDetails ->
 
         ScanState(
             ScanUI(
-                scannedDeviceList,
-                currentDevice,
+                devices.second,
+                deviceDetails,
                 bleMessage,
                 userMessage,
                 devices.first,
@@ -96,6 +88,17 @@ class ScanViewModel(
                 onWriteDescriptor = { charUuid, descUuid, hexString ->
                     writeDescriptor(charUuid, descUuid, hexString)
                 }
+            ),
+            DeviceEvents(
+                onIsEditing = {
+                    onIsEditing(it)
+                },
+                onFavorite = {
+                    onFavorite(it)
+                },
+                onForget = {
+                    onForget(it)
+                }
             )
         )
     }.flowOn(dispatcher)
@@ -105,11 +108,11 @@ class ScanViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = ScanState(
                 ScanUI(
-                devices = emptyList(),
-                selectedDevice = null,
-                bleMessage = ConnectionState.DISCONNECTED,
-                userMessage = null,
-                scanFilterOption = null,
+                    devices = emptyList(),
+                    selectedDevice = null,
+                    bleMessage = ConnectionState.DISCONNECTED,
+                    userMessage = null,
+                    scanFilterOption = null,
                 ),
                 bleConnectEvents = BleConnectEvents({}, {}),
                 bleReadWriteCommands = BleReadWriteCommands(
@@ -117,7 +120,8 @@ class ScanViewModel(
                     { _: String, _: String -> },
                     { _: String, _: String -> },
                     { _: String, _: String, _: String -> },
-                )
+                ),
+                deviceEvents = DeviceEvents({}, {}, {})
             )
         )
 
@@ -153,8 +157,12 @@ class ScanViewModel(
         }
     }
 
+    fun onIsEditing(value: Boolean) {
+        isEditing.value = value
+    }
+
     fun onNameChange(newName: String) {
-        _selectedDevice.value?.scannedDevice?.let {
+        _selectedDevice.value?.let {
             viewModelScope.launch(dispatcher) {
                 bleRepository.updateDevice(it.copy(customName = newName))
                 showUserMessage("$newName updated.")
@@ -169,10 +177,7 @@ class ScanViewModel(
         }
 
         scannedDevice?.let {
-            _selectedDevice.value = DeviceDetail(
-                scannedDevice,
-                emptyList()
-            )
+            _selectedDevice.value = scannedDevice
             stopScan()
             bleGatt.connect(address)
         }

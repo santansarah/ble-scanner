@@ -13,6 +13,7 @@ import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
 import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceDetail
+import com.santansarah.blescanner.domain.models.DeviceEvents
 import com.santansarah.blescanner.domain.models.DeviceService
 import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.domain.models.ScanUI
@@ -201,7 +202,8 @@ class PortraitPreviewParams : PreviewParameterProvider<FeatureParams> {
                     { _: String, _: String -> },
                     { _: String, _: String -> },
                     { _: String, _: String, _: String -> },
-                )
+                ),
+                DeviceEvents({}, {}, {})
             ),
             devices,
             deviceDetail,
@@ -389,7 +391,8 @@ class LandscapePreviewParams : PreviewParameterProvider<FeatureParams> {
                     { _: String, _: String -> },
                     { _: String, _: String -> },
                     { _: String, _: String, _: String -> },
-                )
+                ),
+                DeviceEvents({}, {}, {})
             ),
             devices,
             deviceDetail,
@@ -413,7 +416,8 @@ class LandscapePreviewParams : PreviewParameterProvider<FeatureParams> {
                     { _: String, _: String -> },
                     { _: String, _: String -> },
                     { _: String, _: String, _: String -> },
-                )
+                ),
+                DeviceEvents({}, {}, {})
             ),
             devices,
             deviceDetail,

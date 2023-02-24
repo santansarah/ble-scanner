@@ -12,14 +12,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -46,6 +43,7 @@ fun HomeRoute(
     val devices = scanState.scanUI.devices
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionsList)
     val isScanning = vm.isScanning.collectAsStateWithLifecycle().value
+    val isEditing = vm.isEditing.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = multiplePermissionsState.allPermissionsGranted) {
         if (multiplePermissionsState.allPermissionsGranted) {
@@ -69,7 +67,6 @@ fun HomeRoute(
         }
     }
 
-    var isEditing by rememberSaveable { mutableStateOf(false) }
     val selectedDevice = scanState.scanUI.selectedDevice
 
     Scaffold(
@@ -84,13 +81,16 @@ fun HomeRoute(
                     onStopScan = vm::stopScan
                 )
             else
-                AppBarWithBackButton(
-                    onBackClicked = vm::onBackFromDevice,
-                    device = selectedDevice.scannedDevice,
-                    onEdit = { isEditing = it },
-                    onFavorite = vm::onFavorite,
-                    onForget = vm::onForget
-                )
+                if (!appLayoutInfo.appLayoutMode.isLandscape())
+                    AppBarWithBackButton(
+                        appLayoutInfo = appLayoutInfo,
+                        onBackClicked = vm::onBackFromDevice,
+                        scanUi = scanState.scanUI,
+                        deviceDetail = selectedDevice,
+                        deviceEvents = scanState.deviceEvents,
+                        bleConnectEvents = scanState.bleConnectEvents,
+                        onControlClick = onControlClick
+                    )
         }
     ) { padding ->
 
@@ -109,9 +109,14 @@ fun HomeRoute(
                     appLayoutInfo = appLayoutInfo
                 )
             } else {
+
+                val homePadding = if (appLayoutInfo.appLayoutMode.isLandscape()) 0.dp
+                else
+                    padding.calculateTopPadding()
+
                 Column(
                     modifier = Modifier
-                        .padding(top = padding.calculateTopPadding())
+                        .padding(top = homePadding)
                         .fillMaxSize()
                     //.padding(horizontal = 8.dp)
                 ) {
@@ -120,9 +125,10 @@ fun HomeRoute(
                         scanState = scanState,
                         onControlClick = onControlClick,
                         onShowUserMessage = vm::showUserMessage,
-                        onSave = vm::onNameChange,
-                        isEditing = isEditing,
-                        onEdit = { isEditing = it }
+                        deviceEvents = scanState.deviceEvents,
+                        isEditing = isEditing.value,
+                        onBackClicked = vm::onBackFromDevice,
+                        onSave = vm::onNameChange
                     )
 
                 }

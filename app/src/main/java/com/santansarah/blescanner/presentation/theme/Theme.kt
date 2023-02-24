@@ -101,8 +101,8 @@ fun BLEScannerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Color.Transparent.toArgb() // colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            window.statusBarColor = Color(0xFF000000).toArgb() // colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
             WindowCompat.setDecorFitsSystemWindows(window, false)
             //window.navigationBarColor = Color.Black.copy(.3f).toArgb()
         }

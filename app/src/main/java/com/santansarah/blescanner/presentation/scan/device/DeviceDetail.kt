@@ -21,9 +21,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
-import com.santansarah.blescanner.domain.models.BleConnectEvents
-import com.santansarah.blescanner.domain.models.ConnectionState
-import com.santansarah.blescanner.domain.models.ScanUI
+import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.domain.models.ScanState
+import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.previewparams.FeatureParams
 import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
 import com.santansarah.blescanner.presentation.previewparams.LandscapeThemePreviews
@@ -35,20 +35,18 @@ import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
 
 @Composable
 fun ShowDeviceDetail(
-    scanUi: ScanUI,
-    bleConnectEvents: BleConnectEvents,
+    scanState: ScanState,
     onControlClick: (String) -> Unit,
-    appLayoutInfo: AppLayoutInfo
+    appLayoutInfo: AppLayoutInfo,
+    onBackClicked: () -> Unit,
 ) {
 
+    val scanUi = scanState.scanUI
     val scannedDevice = scanUi.selectedDevice!!.scannedDevice
     val services = scanUi.selectedDevice!!.services
 
-    val connectEnabled = !(scanUi.bleMessage == ConnectionState.CONNECTING ||
-            scanUi.bleMessage == ConnectionState.CONNECTED)
-    val disconnectEnabled =
-        !(scanUi.bleMessage == ConnectionState.DISCONNECTING ||
-                scanUi.bleMessage == ConnectionState.DISCONNECTED)
+    val connectEnabled = !scanUi.bleMessage.isActive()
+    val disconnectEnabled = scanUi.bleMessage.isActive()
 
     val statusText = buildAnnotatedString {
         append("Status: ")
@@ -60,29 +58,40 @@ fun ShowDeviceDetail(
     var modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
     if (appLayoutInfo.appLayoutMode.isLandscape()) {
         modifier = modifier.fillMaxHeight()
-            //.fillMaxWidth(.3f)
+        //.fillMaxWidth(.3f)
     }
 
     Column(
         modifier = modifier
     ) {
+
+        if (appLayoutInfo.appLayoutMode.isLandscape()) {
+
+            AppBarWithBackButton(
+                appLayoutInfo = appLayoutInfo,
+                onBackClicked = onBackClicked,
+                scanUi = scanState.scanUI,
+                deviceDetail = scanState.scanUI.selectedDevice!!,
+                deviceEvents = scanState.deviceEvents,
+                bleConnectEvents = scanState.bleConnectEvents,
+                onControlClick = onControlClick
+            )
+        }
+
         Column(modifier = Modifier.padding(6.dp)) {
 
             if (appLayoutInfo.appLayoutMode.isLandscape()) {
-                    Text(
-                        text = statusText,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
 
-                    DeviceButtons(
-                        connectEnabled = connectEnabled,
-                        onConnect = bleConnectEvents.onConnect,
-                        device = scannedDevice,
-                        disconnectEnabled = disconnectEnabled,
-                        onDisconnect = bleConnectEvents.onDisconnect,
-                        services = services,
-                        onControlClick = onControlClick,
-                    )
+                Text(
+                    text = scannedDevice.displayName(),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+
+                Text(
+                    text = statusText,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -101,10 +110,10 @@ fun ShowDeviceDetail(
 
                     DeviceButtons(
                         connectEnabled = connectEnabled,
-                        onConnect = bleConnectEvents.onConnect,
+                        onConnect = scanState.bleConnectEvents.onConnect,
                         device = scannedDevice,
                         disconnectEnabled = disconnectEnabled,
-                        onDisconnect = bleConnectEvents.onDisconnect,
+                        onDisconnect = scanState.bleConnectEvents.onDisconnect,
                         services = services,
                         onControlClick = onControlClick,
                     )
@@ -156,10 +165,10 @@ fun PreviewDeviceDetailScreen(
     BLEScannerTheme() {
         Column {
             ShowDeviceDetail(
-                scanUi = featureParams.scanState.scanUI,
-                bleConnectEvents = BleConnectEvents({}, {}),
+                scanState = featureParams.scanState,
                 onControlClick = {},
-                appLayoutInfo = featureParams.appLayoutInfo
+                appLayoutInfo = featureParams.appLayoutInfo,
+                onBackClicked = {}
             )
         }
     }
@@ -173,10 +182,10 @@ fun PreviewLandscapeDeviceDetailScreen(
     BLEScannerTheme() {
         Column {
             ShowDeviceDetail(
-                scanUi = featureParams.scanState.scanUI,
-                bleConnectEvents = BleConnectEvents({}, {}),
+                scanState = featureParams.scanState,
                 onControlClick = {},
-                appLayoutInfo = featureParams.appLayoutInfo
+                appLayoutInfo = featureParams.appLayoutInfo,
+                onBackClicked = {}
             )
         }
     }

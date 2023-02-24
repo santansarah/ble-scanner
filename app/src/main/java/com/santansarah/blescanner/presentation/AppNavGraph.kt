@@ -33,6 +33,7 @@ fun AppNavGraph(
         }
         composable(CONTROL) {
             ControlScreen(
+                appLayoutInfo = appLayoutInfo,
                 onBackClicked = {navController.popBackStack()}
             )
         }
