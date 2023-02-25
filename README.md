@@ -38,3 +38,10 @@ Learn how I use Bluetooth Gatt to connect to my BLE devices. In this video, I'll
 Gatt Callback, custom Characteristic parsers including Appearance, Preferred Connection Parameters,
 and Client Characteristic Configuration, and my BLE Scanner ViewModel. I'll also go over my
 Jetpack Compose BLE Service pager and Compose UI to interact with BLE devices.
+
+## Video 4: Android App Compose Demo: Scan, Debug, and Control BLE Devices
+
+https://youtu.be/ZCs6SXIiObU
+
+In this demo, I go through my Light theme, Dark theme, Portrait and Landscape layouts, and my new 
+Control screen, which allows me to control my BLE LED light strip.

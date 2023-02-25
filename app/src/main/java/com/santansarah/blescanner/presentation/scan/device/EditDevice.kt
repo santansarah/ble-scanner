@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,12 +58,14 @@ fun EditDevice(
 
         Text(
             text = "Edit Device Name",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
-        Text(text = "Current Name: $currentName")
+        Text(text = "Current Name: $currentName",
+            color = MaterialTheme.colorScheme.onSurface)
 
 
-        var newName by rememberSaveable { mutableStateOf("") }
+        var newName by rememberSaveable { mutableStateOf(currentName) }
 
         OutlinedTextField(
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -83,7 +86,15 @@ fun EditDevice(
             },
         )
 
+        val buttonTextColor = if (isSystemInDarkTheme())
+            MaterialTheme.colorScheme.surface
+        else
+            MaterialTheme.colorScheme.onPrimary
+
         Button(
+            colors = ButtonDefaults.buttonColors(
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
             modifier = Modifier.fillMaxWidth(),
             enabled = newName.isNotEmpty(),
             onClick = {
@@ -96,6 +107,9 @@ fun EditDevice(
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
             modifier = Modifier.fillMaxWidth(),
             onClick = {
                 updateEdit(false)

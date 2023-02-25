@@ -162,9 +162,11 @@ class ScanViewModel(
     }
 
     fun onNameChange(newName: String) {
-        _selectedDevice.value?.let {
+        val currentDevice = _selectedDevice.value
+        currentDevice?.let {
             viewModelScope.launch(dispatcher) {
                 bleRepository.updateDevice(it.copy(customName = newName))
+                _selectedDevice.value = bleRepository.getDeviceByAddress(it.address)
                 showUserMessage("$newName updated.")
             }
         }
@@ -208,6 +210,7 @@ class ScanViewModel(
     fun onBackFromDevice() {
         bleGatt.close()
         _selectedDevice.value = null
+        isEditing.value = false
         startScan()
     }
 
