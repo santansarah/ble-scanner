@@ -60,6 +60,7 @@ fun ServicePager(
     val mainBodyModifier = when(appLayoutInfo.appLayoutMode) {
         AppLayoutMode.LANDSCAPE_NORMAL -> Modifier.padding(horizontal = 20.dp)
         AppLayoutMode.LANDSCAPE_BIG -> Modifier.padding(horizontal = 40.dp)
+        AppLayoutMode.PORTRAIT_NARROW -> Modifier.padding(horizontal = 16.dp)
         else -> Modifier
     }
 

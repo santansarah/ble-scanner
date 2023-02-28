@@ -18,13 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.domain.models.SCAN_FILTERS
 import com.santansarah.blescanner.domain.models.ScanFilterOption
-import com.santansarah.blescanner.presentation.previewparams.LayoutPreviews
+import com.santansarah.blescanner.presentation.previewparams.landscapeNormal
+import com.santansarah.blescanner.presentation.previewparams.portrait
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,15 +44,22 @@ fun ScanFilters(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(4.dp),
+                    .padding(start = 16.dp, end = 16.dp,
+                        top = 10.dp),
             ) {
                 ScanFilterButtons(scanFilterOption, onFilter)
             }
         } else {
+
+            val sidePadding = if (appLayoutInfo.appLayoutMode == AppLayoutMode.PORTRAIT_NARROW)
+                16.dp
+            else
+                4.dp
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp),
+                    .padding(top =4.dp, bottom = 4.dp, start = sidePadding, end = sidePadding),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 ScanFilterButtons(scanFilterOption, onFilter)
@@ -119,12 +127,20 @@ private fun ScanFilterButtons(
 
 @Preview
 @Composable
-fun PreviewScanFilters(
-    @PreviewParameter(LayoutPreviews::class) appLayoutInfo: AppLayoutInfo
-) {
+fun PreviewScanFilters() {
     BLEScannerTheme() {
         Surface {
-            ScanFilters({}, ScanFilterOption.FAVORITES, appLayoutInfo)
+            ScanFilters({}, ScanFilterOption.FAVORITES, portrait)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewScanFiltersLandscape() {
+    BLEScannerTheme() {
+        Surface {
+            ScanFilters({}, ScanFilterOption.FAVORITES, landscapeNormal)
         }
     }
 }

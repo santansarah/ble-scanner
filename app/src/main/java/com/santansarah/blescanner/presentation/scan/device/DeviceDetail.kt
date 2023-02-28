@@ -24,14 +24,15 @@ import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.displayName
 import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
+import com.santansarah.blescanner.presentation.previewparams.DeviceLandscapeParams
+import com.santansarah.blescanner.presentation.previewparams.DevicePortraitParams
 import com.santansarah.blescanner.presentation.previewparams.FeatureParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapeThemePreviews
-import com.santansarah.blescanner.presentation.previewparams.PortraitPreviewParams
-import com.santansarah.blescanner.presentation.previewparams.ThemePreviews
+import com.santansarah.blescanner.presentation.previewparams.LandscapeLayouts
+import com.santansarah.blescanner.presentation.previewparams.PortraitLayouts
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.toDate
 import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutMode
 
 @Composable
 fun ShowDeviceDetail(
@@ -78,7 +79,13 @@ fun ShowDeviceDetail(
             )
         }
 
-        Column(modifier = Modifier.padding(6.dp)) {
+        val sidePadding = if (appLayoutInfo.appLayoutMode == AppLayoutMode.PORTRAIT_NARROW)
+            16.dp
+        else
+            6.dp
+
+        Column(modifier = Modifier.padding(top = 6.dp, bottom = 6.dp,
+            start = sidePadding, end = sidePadding)) {
 
             if (appLayoutInfo.appLayoutMode.isLandscape()) {
 
@@ -157,10 +164,10 @@ fun DeviceDetails(device: ScannedDevice) {
     Spacer(modifier = Modifier.height(4.dp))
 }
 
-@ThemePreviews
+@PortraitLayouts
 @Composable
 fun PreviewDeviceDetailScreen(
-    @PreviewParameter(PortraitPreviewParams::class) featureParams: FeatureParams
+    @PreviewParameter(DevicePortraitParams::class) featureParams: FeatureParams
 ) {
     BLEScannerTheme() {
         Column {
@@ -174,10 +181,10 @@ fun PreviewDeviceDetailScreen(
     }
 }
 
-@LandscapeThemePreviews
+@LandscapeLayouts
 @Composable
 fun PreviewLandscapeDeviceDetailScreen(
-    @PreviewParameter(LandscapePreviewParams::class) featureParams: FeatureParams
+    @PreviewParameter(DeviceLandscapeParams::class) featureParams: FeatureParams
 ) {
     BLEScannerTheme() {
         Column {

@@ -31,9 +31,9 @@ import com.santansarah.blescanner.domain.models.DeviceEvents
 import com.santansarah.blescanner.domain.models.ScanUI
 import com.santansarah.blescanner.presentation.previewparams.FeatureParams
 import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapeThemePreviews
+import com.santansarah.blescanner.presentation.previewparams.LandscapePreviews
 import com.santansarah.blescanner.presentation.previewparams.PortraitPreviewParams
-import com.santansarah.blescanner.presentation.previewparams.ThemePreviews
+import com.santansarah.blescanner.presentation.previewparams.PortraitPreviews
 import com.santansarah.blescanner.presentation.scan.device.DeviceButtons
 import com.santansarah.blescanner.presentation.scan.device.DeviceMenu
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
@@ -196,7 +196,7 @@ fun ControlAppBar(
 
 
 
-@ThemePreviews
+@PortraitPreviews
 @Composable
 fun PreviewAppBar(
     @PreviewParameter(PortraitPreviewParams::class) featureParams: FeatureParams
@@ -221,7 +221,7 @@ fun PreviewAppBar(
     }
 }
 
-@LandscapeThemePreviews
+@LandscapePreviews
 @Composable
 fun PreviewLandscapeAppBar(
     @PreviewParameter(LandscapePreviewParams::class) featureParams: FeatureParams

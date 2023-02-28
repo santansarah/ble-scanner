@@ -1,7 +1,6 @@
 package com.santansarah.blescanner.presentation.scan
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,22 +8,21 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.blescanner.domain.models.ScanFilterOption
+import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.presentation.components.AppBarWithBackButton
 import com.santansarah.blescanner.presentation.components.HomeAppBar
 import com.santansarah.blescanner.presentation.components.ShowPermissions
-import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.permissionsList
 import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
 import org.koin.androidx.compose.koinViewModel
@@ -40,10 +38,9 @@ fun HomeRoute(
 
     val scanState = vm.scanState.collectAsStateWithLifecycle().value
     val scannerMessage = vm.scannerMessage.collectAsStateWithLifecycle().value
-    val devices = scanState.scanUI.devices
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionsList)
     val isScanning = vm.isScanning.collectAsStateWithLifecycle().value
-    val isEditing = vm.isEditing.collectAsStateWithLifecycle()
+    val isEditing = vm.isEditing.collectAsStateWithLifecycle().value
 
     LaunchedEffect(key1 = multiplePermissionsState.allPermissionsGranted) {
         if (multiplePermissionsState.allPermissionsGranted) {
@@ -67,7 +64,40 @@ fun HomeRoute(
         }
     }
 
+    HomeLayout(
+        appLayoutInfo = appLayoutInfo,
+        scanState = scanState,
+        multiplePermissionsState = multiplePermissionsState,
+        appSnackBarHostState = appSnackBarHostState,
+        isScanning = isScanning,
+        isEditing = isEditing,
+        startScan = vm::startScan,
+        stopScan = vm::stopScan,
+        onControlClick = onControlClick,
+        onFilter = vm::onFilter,
+        onShowUserMessage = vm::showUserMessage
+    )
+
+}
+
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun HomeLayout(
+    appLayoutInfo: AppLayoutInfo,
+    scanState: ScanState,
+    multiplePermissionsState: MultiplePermissionsState,
+    appSnackBarHostState: SnackbarHostState,
+    isScanning:Boolean,
+    isEditing: Boolean,
+    startScan: () -> Unit,
+    stopScan: () -> Unit,
+    onControlClick: (String) -> Unit,
+    onFilter: (ScanFilterOption?) -> Unit,
+    onShowUserMessage: (String) -> Unit
+) {
+
     val selectedDevice = scanState.scanUI.selectedDevice
+
 
     Scaffold(
         // modifier = Modifier.border(2.dp, Color.Magenta),
@@ -77,14 +107,14 @@ fun HomeRoute(
             if (selectedDevice == null)
                 HomeAppBar(
                     scanning = isScanning,
-                    onStartScan = vm::startScan,
-                    onStopScan = vm::stopScan
+                    onStartScan = startScan,
+                    onStopScan = stopScan
                 )
             else
                 if (!appLayoutInfo.appLayoutMode.isLandscape())
                     AppBarWithBackButton(
                         appLayoutInfo = appLayoutInfo,
-                        onBackClicked = vm::onBackFromDevice,
+                        onBackClicked = scanState.deviceEvents.onBack,
                         scanUi = scanState.scanUI,
                         deviceDetail = selectedDevice,
                         deviceEvents = scanState.deviceEvents,
@@ -99,13 +129,13 @@ fun HomeRoute(
         } else {
             if (scanState.scanUI.selectedDevice == null) {
                 DeviceListScreen(
-                    devices = devices,
-                    onClick = vm::onConnect,
+                    devices = scanState.scanUI.devices,
+                    onClick = scanState.bleConnectEvents.onConnect,
                     paddingValues = padding,
-                    onFilter = vm::onFilter,
+                    onFilter = onFilter,
                     scanFilterOption = scanState.scanUI.scanFilterOption,
-                    onFavorite = vm::onFavorite,
-                    onForget = vm::onForget,
+                    onFavorite = scanState.deviceEvents.onFavorite,
+                    onForget = scanState.deviceEvents.onForget,
                     appLayoutInfo = appLayoutInfo
                 )
             } else {
@@ -124,11 +154,11 @@ fun HomeRoute(
                         appLayoutInfo = appLayoutInfo,
                         scanState = scanState,
                         onControlClick = onControlClick,
-                        onShowUserMessage = vm::showUserMessage,
+                        onShowUserMessage = onShowUserMessage,
                         deviceEvents = scanState.deviceEvents,
-                        isEditing = isEditing.value,
-                        onBackClicked = vm::onBackFromDevice,
-                        onSave = vm::onNameChange
+                        isEditing = isEditing,
+                        onBackClicked = scanState.deviceEvents.onBack,
+                        onSave = scanState.deviceEvents.onSave
                     )
 
                 }
@@ -138,50 +168,3 @@ fun HomeRoute(
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
-@Composable
-fun ListPreview() {
-
-    val deviceList = listOf(
-        ScannedDevice(
-            deviceId = 0,
-            deviceName = "ELK-BLEDOM",
-            address = "BE:00:FA:00:XX:00",
-            rssi = -77,
-            manufacturer = null,
-            services = listOf("[Human Interface Device"),
-            extra = null,
-            lastSeen = 1674510398719,
-            customName = null,
-            baseRssi = 0,
-            favorite = false,
-            forget = false
-        ),
-        ScannedDevice(
-            deviceId = 0,
-            deviceName = "EASYWAY-BLE",
-            address = "93:00:44:00:XX:AC",
-            rssi = -81,
-            manufacturer = "Ericsson Technology Licensing",
-            services = null,
-            extra = null,
-            lastSeen = 1674510397416,
-            customName = null,
-            baseRssi = 0,
-            favorite = false,
-            forget = false
-        )
-    )
-
-    BLEScannerTheme {
-        Surface() {
-            ScannedDeviceList(devices = deviceList, onClick = {}, {}, {})
-        }
-    }
-
-}

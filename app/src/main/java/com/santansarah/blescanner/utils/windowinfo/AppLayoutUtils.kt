@@ -4,13 +4,15 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.window.layout.FoldingFeature
 import timber.log.Timber
 
 enum class AppLayoutMode {
     LANDSCAPE_NORMAL,
     LANDSCAPE_BIG,
-    PORTRAIT;
+    PORTRAIT,
+    PORTRAIT_NARROW;
 
     fun isLandscape(): Boolean = (this == LANDSCAPE_BIG || this ==LANDSCAPE_NORMAL)
 
@@ -64,8 +66,30 @@ fun getPortraitLayout(windowWidth: WindowWidthSizeClass, size: DpSize): AppLayou
     // So let's check the width.
     when (windowWidth) {
         WindowWidthSizeClass.Compact -> AppLayoutInfo(AppLayoutMode.PORTRAIT, size)
-        WindowWidthSizeClass.Medium -> AppLayoutInfo(AppLayoutMode.LANDSCAPE_NORMAL, size)
-        else -> AppLayoutInfo(AppLayoutMode.LANDSCAPE_BIG, size)
+        WindowWidthSizeClass.Medium -> {
+            // some tablets measure 600.93896; just over 600;
+            // let's give this some padding, and make a new cut-off.
+            if (size.width <= 650.dp)
+                AppLayoutInfo(
+                    AppLayoutMode.PORTRAIT_NARROW,
+                    size
+                )
+            else
+                AppLayoutInfo(
+                    AppLayoutMode.LANDSCAPE_NORMAL,
+                    size
+                )
+        }
+        else -> {
+            // override the expanded threshold. 800 vs 1000+ is big diff.
+            if (size.width < 950.dp)
+                AppLayoutInfo(
+                    AppLayoutMode.LANDSCAPE_NORMAL,
+                    size
+                )
+            else
+                AppLayoutInfo(AppLayoutMode.LANDSCAPE_BIG, size)
+        }
     }
 
 

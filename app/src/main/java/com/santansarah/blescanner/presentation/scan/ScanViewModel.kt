@@ -98,6 +98,12 @@ class ScanViewModel(
                 },
                 onForget = {
                     onForget(it)
+                },
+                onSave = {
+                    onNameChange(it)
+                },
+                onBack = {
+                    onBackFromDevice()
                 }
             )
         )
@@ -121,7 +127,7 @@ class ScanViewModel(
                     { _: String, _: String -> },
                     { _: String, _: String, _: String -> },
                 ),
-                deviceEvents = DeviceEvents({}, {}, {})
+                deviceEvents = DeviceEvents({}, {}, {}, {}, {})
             )
         )
 

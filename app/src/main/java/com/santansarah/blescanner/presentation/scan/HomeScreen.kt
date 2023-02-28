@@ -11,11 +11,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.domain.models.DeviceEvents
 import com.santansarah.blescanner.domain.models.ScanState
+import com.santansarah.blescanner.presentation.previewparams.DeviceBigParams
+import com.santansarah.blescanner.presentation.previewparams.DeviceLandscapeParams
+import com.santansarah.blescanner.presentation.previewparams.DevicePortraitParams
 import com.santansarah.blescanner.presentation.previewparams.FeatureParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapeThemePreviews
-import com.santansarah.blescanner.presentation.previewparams.PortraitPreviewParams
-import com.santansarah.blescanner.presentation.previewparams.ThemePreviews
+import com.santansarah.blescanner.presentation.previewparams.LandscapeBig
+import com.santansarah.blescanner.presentation.previewparams.LandscapeLayouts
+import com.santansarah.blescanner.presentation.previewparams.PortraitLayouts
 import com.santansarah.blescanner.presentation.scan.device.ShowDeviceBody
 import com.santansarah.blescanner.presentation.scan.device.ShowDeviceDetail
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
@@ -26,11 +28,11 @@ fun HomeScreen(
     appLayoutInfo: AppLayoutInfo,
     scanState: ScanState,
     onControlClick: (String) -> Unit,
-    onShowUserMessage: (String) -> Unit,
     deviceEvents: DeviceEvents,
     isEditing: Boolean,
     onBackClicked: () -> Unit,
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
+    onShowUserMessage: (String) -> Unit
 ) {
 
     if (appLayoutInfo.appLayoutMode.isLandscape()) {
@@ -85,10 +87,11 @@ fun HomeScreen(
     }
 }
 
-@ThemePreviews
+
+@PortraitLayouts
 @Composable
 fun PreviewHomeScreen(
-    @PreviewParameter(PortraitPreviewParams::class) featureParams: FeatureParams
+    @PreviewParameter(DevicePortraitParams::class) featureParams: FeatureParams
 ) {
     BLEScannerTheme() {
         Column {
@@ -100,16 +103,18 @@ fun PreviewHomeScreen(
                 onSave = {},
                 isEditing = false,
                 onBackClicked = {},
-                deviceEvents = DeviceEvents({},{},{})
+                deviceEvents = DeviceEvents({},{},{},{},{})
             )
         }
     }
 }
 
-@LandscapeThemePreviews
+
+
+@LandscapeLayouts
 @Composable
 fun PreviewLandscapeDeviceDetailScreen(
-    @PreviewParameter(LandscapePreviewParams::class) featureParams: FeatureParams
+    @PreviewParameter(DeviceLandscapeParams::class) featureParams: FeatureParams
 ) {
     BLEScannerTheme() {
         Column {
@@ -121,9 +126,29 @@ fun PreviewLandscapeDeviceDetailScreen(
                 onSave = {},
                 isEditing = false,
                 onBackClicked = {},
-                deviceEvents = DeviceEvents({},{},{})
+                deviceEvents = DeviceEvents({},{},{},{},{})
             )
         }
     }
 }
 
+@LandscapeBig
+@Composable
+fun PreviewLandscapeBigDeviceDetailScreen(
+    @PreviewParameter(DeviceBigParams::class) featureParams: FeatureParams
+) {
+    BLEScannerTheme() {
+        Column {
+            HomeScreen(
+                appLayoutInfo = featureParams.appLayoutInfo,
+                scanState = featureParams.scanState,
+                onControlClick = {},
+                onShowUserMessage = {},
+                onSave = {},
+                isEditing = false,
+                onBackClicked = {},
+                deviceEvents = DeviceEvents({},{},{},{},{})
+            )
+        }
+    }
+}

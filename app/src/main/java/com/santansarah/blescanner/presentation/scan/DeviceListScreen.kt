@@ -15,12 +15,15 @@ import androidx.compose.ui.unit.dp
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.presentation.previewparams.FeatureParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapePreviewParams
-import com.santansarah.blescanner.presentation.previewparams.LandscapeThemePreviews
-import com.santansarah.blescanner.presentation.previewparams.PortraitPreviewParams
-import com.santansarah.blescanner.presentation.previewparams.ThemePreviews
+import com.santansarah.blescanner.presentation.previewparams.LandscapeBig
+import com.santansarah.blescanner.presentation.previewparams.LandscapeBigListParams
+import com.santansarah.blescanner.presentation.previewparams.LandscapeLayouts
+import com.santansarah.blescanner.presentation.previewparams.LandscapeListParams
+import com.santansarah.blescanner.presentation.previewparams.PortraitLayouts
+import com.santansarah.blescanner.presentation.previewparams.PortraitListParams
 import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.windowinfo.AppLayoutInfo
+import com.santansarah.blescanner.utils.windowinfo.AppLayoutMode
 
 @Composable
 fun DeviceListScreen(
@@ -46,7 +49,7 @@ fun DeviceListScreen(
                         scanFilterOption = scanFilterOption,
                         appLayoutInfo = appLayoutInfo
                     )
-                ScannedDeviceList(devices, onClick, onFavorite, onForget)
+                ScannedDeviceList(appLayoutInfo, devices, onClick, onFavorite, onForget)
             }
         } else {
 
@@ -55,7 +58,7 @@ fun DeviceListScreen(
                 scanFilterOption = scanFilterOption,
                 appLayoutInfo = appLayoutInfo
             )
-            ScannedDeviceList(devices, onClick, onFavorite, onForget)
+            ScannedDeviceList(appLayoutInfo, devices, onClick, onFavorite, onForget)
         }
 
     }
@@ -63,14 +66,20 @@ fun DeviceListScreen(
 
 @Composable
 fun ScannedDeviceList(
+    appLayoutInfo: AppLayoutInfo,
     devices: List<ScannedDevice>,
     onClick: (String) -> Unit,
     onFavorite: (ScannedDevice) -> Unit,
     onForget: (ScannedDevice) -> Unit
 ) {
 
+    val sidePadding = if (appLayoutInfo.appLayoutMode == AppLayoutMode.PORTRAIT_NARROW)
+        16.dp
+    else
+        8.dp
+
     LazyColumn(
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(sidePadding)
     ) {
         items(devices) { device ->
 
@@ -85,10 +94,10 @@ fun ScannedDeviceList(
 }
 
 
-@ThemePreviews
+@PortraitLayouts
 @Composable
 fun PreviewDeviceListScreen(
-    @PreviewParameter(PortraitPreviewParams::class) featureParams: FeatureParams
+    @PreviewParameter(PortraitListParams::class) featureParams: FeatureParams
 ) {
     BLEScannerTheme() {
         Column {
@@ -106,10 +115,31 @@ fun PreviewDeviceListScreen(
     }
 }
 
-@LandscapeThemePreviews
+@LandscapeLayouts
 @Composable
 fun PreviewLandscapeDeviceListScreen(
-    @PreviewParameter(LandscapePreviewParams::class) featureParams: FeatureParams
+    @PreviewParameter(LandscapeListParams::class) featureParams: FeatureParams
+) {
+    BLEScannerTheme() {
+        Column {
+            DeviceListScreen(
+                paddingValues = PaddingValues(),
+                devices = featureParams.scannedDevice,
+                onClick = {},
+                onFilter = {},
+                scanFilterOption = ScanFilterOption.FAVORITES,
+                onFavorite = {},
+                onForget = {},
+                appLayoutInfo = featureParams.appLayoutInfo
+            )
+        }
+    }
+}
+
+@LandscapeBig
+@Composable
+fun PreviewLandscapeBigListScreen(
+    @PreviewParameter(LandscapeBigListParams::class) featureParams: FeatureParams
 ) {
     BLEScannerTheme() {
         Column {

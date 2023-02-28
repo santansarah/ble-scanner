@@ -33,7 +33,9 @@ data class BleReadWriteCommands(
 data class DeviceEvents(
     val onIsEditing: (Boolean) -> Unit,
     val onFavorite: (ScannedDevice) -> Unit,
-    val onForget: (ScannedDevice) -> Unit
+    val onForget: (ScannedDevice) -> Unit,
+    val onSave: (String) -> Unit,
+    val onBack: () -> Unit
 )
 
 data class ControlState(

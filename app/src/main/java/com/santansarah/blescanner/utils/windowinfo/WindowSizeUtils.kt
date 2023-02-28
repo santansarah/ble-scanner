@@ -1,7 +1,10 @@
 package com.santansarah.blescanner.utils.windowinfo
 
+import android.content.Context
 import android.graphics.Rect
 import android.graphics.RectF
+import android.view.Surface
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -27,11 +30,26 @@ fun getWindowSizeClasses(activity: ComponentActivity): WindowClassWithSize {
         windowWidth = windowSizeClass.widthSizeClass,
         windowHeight = windowSizeClass.heightSizeClass,
         size = size,
-        rotation = CurrentRotation.values()[activity.display?.rotation ?: 0],
+        rotation = getRotation(activity)
+        // API 30+ CurrentRotation.values()[activity.display?.rotation ?: 0],
         //bounds = bounds
     )
 
+
+
 }
+
+fun getRotation(context: ComponentActivity): CurrentRotation {
+    return when ((context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+        .defaultDisplay.orientation) {
+        Surface.ROTATION_0 -> CurrentRotation.ROTATION_0
+        Surface.ROTATION_90 -> CurrentRotation.ROTATION_90
+        Surface.ROTATION_180 -> CurrentRotation.ROTATION_180
+        Surface.ROTATION_270 -> CurrentRotation.ROTATION_270
+        else -> CurrentRotation.ROTATION_0
+    }
+}
+
 
 @Composable
 fun getWindowDpSizeFromRect(rect: Rect): DpSize {
