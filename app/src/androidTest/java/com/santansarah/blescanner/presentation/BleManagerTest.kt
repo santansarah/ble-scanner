@@ -80,10 +80,10 @@ internal class BleManagerTest : KoinTest {
         )
 
         parseScanResult(scanResult)
-        val dbResult = bleRepository.getScannedDevices().first().find {
+        val dbResult = bleRepository.getScannedDevices(null).first().find {
             it.address == "BE:FF:FA:00:11:22"
         }
-        println("db count: ${bleRepository.getScannedDevices().first().count()}")
+        println("db count: ${bleRepository.getScannedDevices(null).first().count()}")
 
         assertNotNull(dbResult)
 
@@ -132,7 +132,7 @@ internal class BleManagerTest : KoinTest {
         )
 
         parseScanResult(scanResult)
-        val dbResult = bleRepository.getScannedDevices().first().find {
+        val dbResult = bleRepository.getScannedDevices(null).first().find {
             it.address == "BE:FF:FA:00:22:33"
         }
 

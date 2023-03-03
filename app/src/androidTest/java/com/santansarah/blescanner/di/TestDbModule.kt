@@ -3,10 +3,8 @@ package com.santansarah.blescanner.di
 import android.app.Application
 import androidx.room.Room
 import com.santansarah.blescanner.data.local.BleDao
-import com.santansarah.blescanner.data.local.BleDatabase
 import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.room.TestBleDatabase
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import timber.log.Timber
 

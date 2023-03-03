@@ -82,7 +82,7 @@ fun ShowDeviceDetail(
         val sidePadding = if (appLayoutInfo.appLayoutMode == AppLayoutMode.PORTRAIT_NARROW)
             16.dp
         else
-            6.dp
+            8.dp
 
         Column(modifier = Modifier.padding(top = 6.dp, bottom = 6.dp,
             start = sidePadding, end = sidePadding)) {

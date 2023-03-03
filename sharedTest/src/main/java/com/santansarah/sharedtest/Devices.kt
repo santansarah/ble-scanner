@@ -45,5 +45,19 @@ val deviceList = listOf(
         baseRssi = -88,
         favorite = false,
         forget = false
-    )
+    ),
+    ScannedDevice(
+        deviceId = 0,
+        deviceName = "GOOD-RSSI",
+        address = "BE:22:FA:00:XX:ZZ",
+        rssi = -25,
+        manufacturer = null,
+        services = listOf("[Human Interface Device"),
+        extra = null,
+        lastSeen = 1674510398719,
+        customName = null,
+        baseRssi = -30,
+        favorite = false,
+        forget = false
+    ),
 )

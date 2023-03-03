@@ -3,7 +3,7 @@ package com.santansarah.blescanner.domain
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.santansarah.blescanner.data.local.BleRepository
+import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -12,7 +12,7 @@ import timber.log.Timber
 
 class DeleteNotSeenWorker(
     appContext: Context, workerParams: WorkerParameters,
-    private val bleRepository: BleRepository,
+    private val bleRepository: IBleRepository,
     private val dispatcher: CoroutineDispatcher
 ) :
     CoroutineWorker(appContext, workerParams), KoinComponent {

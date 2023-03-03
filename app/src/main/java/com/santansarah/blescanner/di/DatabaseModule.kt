@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.santansarah.blescanner.data.local.BleDao
 import com.santansarah.blescanner.data.local.BleDatabase
 import com.santansarah.blescanner.data.local.BleRepository
+import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -23,6 +24,6 @@ val databaseModule = module {
 
     single { provideDataBase(androidApplication()) }
     single { provideDao(get()) }
-    single { BleRepository(get()) }
+    single<IBleRepository> { BleRepository(get()) }
 
 }

@@ -2,8 +2,8 @@ package com.santansarah.blescanner.domain.usecases
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.Service
+import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import com.santansarah.blescanner.domain.models.BlePermissions
 import com.santansarah.blescanner.domain.models.BleProperties
 import com.santansarah.blescanner.domain.models.BleWriteTypes
@@ -17,7 +17,7 @@ import timber.log.Timber
 
 class ParseService
     (
-    private val bleRepository: BleRepository
+    private val bleRepository: IBleRepository
 ) {
 
     @SuppressLint("MissingPermission")

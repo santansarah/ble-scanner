@@ -7,32 +7,30 @@ import com.santansarah.blescanner.data.local.entities.Descriptor
 import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.Service
-import com.santansarah.blescanner.domain.models.ScanFilter
+import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.utils.toGss
 import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 class BleRepository(
     private val dao: BleDao
-) {
+): IBleRepository {
 
-    suspend fun getCompanyById(id: Int): Company? = dao.getCompanyById(id)
+    override suspend fun getCompanyById(id: Int): Company? = dao.getCompanyById(id)
 
-    suspend fun getServiceById(uuid: String): Service? = dao.getServiceByUuid(uuid)
+    override suspend fun getServiceById(uuid: String): Service? = dao.getServiceByUuid(uuid)
 
-    suspend fun getCharacteristicById(uuid: String): BleCharacteristic? {
+    override suspend fun getCharacteristicById(uuid: String): BleCharacteristic? {
         Timber.d(uuid)
         return dao.getCharacteristicsByUuid(uuid)
     }
 
-    suspend fun getMicrosoftDeviceById(id: Int): MicrosoftDevice? = dao.getMicrosoftDevice(id)
+    override suspend fun getMicrosoftDeviceById(id: Int): MicrosoftDevice? = dao.getMicrosoftDevice(id)
 
-    suspend fun insertDevice(device: ScannedDevice): Long {
+    override suspend fun insertDevice(device: ScannedDevice): Long {
         val existingDevice = dao.getDeviceByAddress(device.address)
 
         val deviceToUpsert = ScannedDevice(
@@ -60,11 +58,11 @@ class BleRepository(
         return dao.insertDevice(deviceToUpsert)
     }
 
-    suspend fun getDeviceByAddress(address: String) = dao.getDeviceByAddress(address)
+    override suspend fun getDeviceByAddress(address: String) = dao.getDeviceByAddress(address)
 
-    suspend fun deleteScans() = dao.deleteScans()
+    override suspend fun deleteScans() = dao.deleteScans()
 
-    fun getScannedDevices(scanFilter: ScanFilterOption?): Flow<List<ScannedDevice>> {
+    override fun getScannedDevices(scanFilter: ScanFilterOption?): Flow<List<ScannedDevice>> {
 
         val devices = dao.getScannedDevices()
         Timber.d("got devices..")
@@ -93,14 +91,14 @@ class BleRepository(
 
     }
 
-    suspend fun getMsDevice(
+    override suspend fun getMsDevice(
         byteArray: ByteArray
     ): String? {
         val msDeviceType = byteArray[1].toHex().toInt()
         return getMicrosoftDeviceById(msDeviceType)?.name
     }
 
-    suspend fun getServices(
+    override suspend fun getServices(
         serviceIdRecord: List<ParcelUuid>
     ): List<String>? {
         var serviceNames: MutableList<String>? = null
@@ -118,10 +116,10 @@ class BleRepository(
 
     }
 
-    suspend fun getDescriptorById(uuid: String): Descriptor? = dao.getDescriptorByUuid(uuid)
+    override suspend fun getDescriptorById(uuid: String): Descriptor? = dao.getDescriptorByUuid(uuid)
 
-    suspend fun updateDevice(scannedDevice: ScannedDevice) = dao.updateDevice(scannedDevice)
+    override suspend fun updateDevice(scannedDevice: ScannedDevice) = dao.updateDevice(scannedDevice)
 
-    suspend fun deleteNotSeen() = dao.deleteNotSeen()
+    override suspend fun deleteNotSeen() = dao.deleteNotSeen()
 
 }

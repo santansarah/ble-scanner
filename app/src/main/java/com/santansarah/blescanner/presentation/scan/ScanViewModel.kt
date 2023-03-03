@@ -4,9 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import com.santansarah.blescanner.domain.models.BleConnectEvents
 import com.santansarah.blescanner.domain.models.BleReadWriteCommands
 import com.santansarah.blescanner.domain.models.ConnectionState
@@ -35,7 +35,7 @@ import timber.log.Timber
 class ScanViewModel(
     private val bleManager: BleManager,
     private val bleGatt: BleGatt,
-    private val bleRepository: BleRepository,
+    private val bleRepository: IBleRepository,
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -45,6 +45,7 @@ class ScanViewModel(
     private val _scanFilterOption = MutableStateFlow<ScanFilterOption?>(null)
     private val _devices = _scanFilterOption.flatMapLatest { scanFilterOption ->
         bleRepository.getScannedDevices(scanFilterOption).map {
+            Timber.tag("unittest").d("running device flow")
             Pair(scanFilterOption, it)
         }
     }

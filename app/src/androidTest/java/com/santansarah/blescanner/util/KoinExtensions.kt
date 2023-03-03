@@ -2,17 +2,14 @@ package com.santansarah.blescanner.util
 
 import android.util.Log
 import com.santansarah.blescanner.data.local.room.TestBleDatabase
+import com.santansarah.sharedtest.characteristics
 import com.santansarah.sharedtest.companies
+import com.santansarah.sharedtest.descriptors
 import com.santansarah.sharedtest.msDevices
 import com.santansarah.sharedtest.services
-import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.AfterEachCallback
-import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
-import org.koin.test.inject
 
 class KoinTestPerMethod(
     private val bleDatabase: TestBleDatabase
@@ -23,6 +20,8 @@ class KoinTestPerMethod(
             insertServices(services)
             insertCompanies(companies)
             insertMicrosoftDevices(msDevices)
+            insertCharacteristics(characteristics)
+            insertDescriptors(descriptors)
         }
     }
 
