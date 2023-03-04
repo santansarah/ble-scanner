@@ -17,21 +17,23 @@ val newDevice = ScannedDevice(
     forget = false
 )
 
+val existingDevice = ScannedDevice(
+    deviceId = 0,
+    deviceName = "ELK-BLEDOM",
+    address = "BE:00:FA:00:XX:00",
+    rssi = -77,
+    manufacturer = null,
+    services = listOf("[Human Interface Device"),
+    extra = null,
+    lastSeen = 1674510398719,
+    customName = null,
+    baseRssi = -88,
+    favorite = false,
+    forget = false
+)
+
 val deviceList = listOf(
-    ScannedDevice(
-        deviceId = 0,
-        deviceName = "ELK-BLEDOM",
-        address = "BE:00:FA:00:XX:00",
-        rssi = -77,
-        manufacturer = null,
-        services = listOf("[Human Interface Device"),
-        extra = null,
-        lastSeen = 1674510398719,
-        customName = null,
-        baseRssi = -88,
-        favorite = false,
-        forget = false
-    ),
+    existingDevice,
     ScannedDevice(
         deviceId = 0,
         deviceName = "EASYWAY-BLE",
@@ -57,7 +59,7 @@ val deviceList = listOf(
         lastSeen = 1674510398719,
         customName = null,
         baseRssi = -30,
-        favorite = false,
+        favorite = true,
         forget = false
     ),
 )

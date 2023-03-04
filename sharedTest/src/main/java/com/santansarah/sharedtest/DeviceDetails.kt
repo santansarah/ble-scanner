@@ -4,6 +4,7 @@ import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.models.BleProperties
 import com.santansarah.blescanner.domain.models.BleWriteTypes
 import com.santansarah.blescanner.domain.models.DeviceCharacteristics
+import com.santansarah.blescanner.domain.models.DeviceDescriptor
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceService
 
@@ -14,7 +15,16 @@ val deviceNameCharacteristic = DeviceCharacteristics(
     permissions = 0,
     properties = listOf(BleProperties.PROPERTY_READ),
     writeTypes = listOf(BleWriteTypes.WRITE_TYPE_DEFAULT),
-    descriptors = emptyList(),
+    descriptors = listOf(
+        DeviceDescriptor(
+            uuid = "2902-0000-1000-8000-00805f9b34fb",
+            name = "Client Characteristic Configuration",
+            charUuid = "00002a00-0000-1000-8000-00805f9b34fb",
+            permissions = emptyList(),
+            notificationProperty = BleProperties.PROPERTY_NOTIFY,
+            readBytes = null
+        )
+    ),
     canRead = true,
     canWrite = false,
     readBytes = null,

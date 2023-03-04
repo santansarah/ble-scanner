@@ -27,7 +27,7 @@ val testAppModule = module {
 */
 
     single {
-        mockk<BluetoothAdapter>()
+        mockk<BluetoothAdapter>(relaxed = true)
     }
 
     single {
