@@ -45,6 +45,11 @@ class BleObserver(
 
     }
 
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+        activity.unregisterReceiver(broadcastReceiver)
+    }
+
     private fun createBroadcastReceiver() {
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
