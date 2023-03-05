@@ -268,17 +268,21 @@ class ScanViewModelTest : KoinTest {
 
     @Test
     fun onDisconnect() {
+        scanViewModel.onDisconnect()
+        verify { bleGatt.close() }
     }
 
     @Test
-    fun showUserMessage() {
+    fun userMessageShown() = runTest {
+        scanViewModel.scanState.test {
+            awaitItem()
+            scanViewModel.showUserMessage("Unit Test.")
+            val userMessage = awaitItem()
+            assertNotNull(userMessage.scanUI.userMessage)
+            scanViewModel.userMessageShown()
+            val shown = awaitItem()
+            assertNull(shown.scanUI.userMessage)
+        }
     }
 
-    @Test
-    fun userMessageShown() {
-    }
-
-    @Test
-    fun scannerMessageShown() {
-    }
 }

@@ -38,6 +38,24 @@ data class DeviceEvents(
     val onBack: () -> Unit
 )
 
+val emptyScanState = ScanState(
+    ScanUI(
+        devices = emptyList(),
+        selectedDevice = null,
+        bleMessage = ConnectionState.DISCONNECTED,
+        userMessage = null,
+        scanFilterOption = null,
+    ),
+    bleConnectEvents = BleConnectEvents({}, {}),
+    bleReadWriteCommands = BleReadWriteCommands(
+        {},
+        { _: String, _: String -> },
+        { _: String, _: String -> },
+        { _: String, _: String, _: String -> },
+    ),
+    deviceEvents = DeviceEvents({}, {}, {}, {}, {})
+)
+
 data class ControlState(
     //val isScanning: Boolean,
     val device: ScannedDevice?,

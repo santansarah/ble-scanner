@@ -9,12 +9,12 @@ import com.santansarah.blescanner.data.local.entities.displayName
 import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import com.santansarah.blescanner.domain.models.BleConnectEvents
 import com.santansarah.blescanner.domain.models.BleReadWriteCommands
-import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceDetail
 import com.santansarah.blescanner.domain.models.DeviceEvents
 import com.santansarah.blescanner.domain.models.ScanFilterOption
 import com.santansarah.blescanner.domain.models.ScanState
 import com.santansarah.blescanner.domain.models.ScanUI
+import com.santansarah.blescanner.domain.models.emptyScanState
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.presentation.BleManager
 import com.santansarah.blescanner.utils.decodeHex
@@ -72,65 +72,55 @@ class ScanViewModel(
                 userMessage,
                 devices.first,
             ),
-            BleConnectEvents(
-                onConnect = {
-                    onConnect(it)
-                },
-                onDisconnect = { onDisconnect() }
-            ),
-            BleReadWriteCommands(
-                onRead = { readCharacteristic(it) },
-                onWrite = { uuid, bytes ->
-                    onWriteCharacteristic(uuid, bytes)
-                },
-                onReadDescriptor = { charUuid, uuid ->
-                    readDescriptor(charUuid, uuid)
-                },
-                onWriteDescriptor = { charUuid, descUuid, hexString ->
-                    writeDescriptor(charUuid, descUuid, hexString)
-                }
-            ),
-            DeviceEvents(
-                onIsEditing = {
-                    onIsEditing(it)
-                },
-                onFavorite = {
-                    onFavorite(it)
-                },
-                onForget = {
-                    onForget(it)
-                },
-                onSave = {
-                    onNameChange(it)
-                },
-                onBack = {
-                    onBackFromDevice()
-                }
-            )
+            bleConnectEvents(),
+            bleReadWriteCommands(),
+            deviceEvents()
         )
     }.flowOn(dispatcher)
         //.onStart { emit("Loading...") }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ScanState(
-                ScanUI(
-                    devices = emptyList(),
-                    selectedDevice = null,
-                    bleMessage = ConnectionState.DISCONNECTED,
-                    userMessage = null,
-                    scanFilterOption = null,
-                ),
-                bleConnectEvents = BleConnectEvents({}, {}),
-                bleReadWriteCommands = BleReadWriteCommands(
-                    {},
-                    { _: String, _: String -> },
-                    { _: String, _: String -> },
-                    { _: String, _: String, _: String -> },
-                ),
-                deviceEvents = DeviceEvents({}, {}, {}, {}, {})
-            )
+            initialValue = emptyScanState
         )
+
+    private fun deviceEvents() = DeviceEvents(
+        onIsEditing = {
+            onIsEditing(it)
+        },
+        onFavorite = {
+            onFavorite(it)
+        },
+        onForget = {
+            onForget(it)
+        },
+        onSave = {
+            onNameChange(it)
+        },
+        onBack = {
+            onBackFromDevice()
+        }
+    )
+
+    private fun bleReadWriteCommands() = BleReadWriteCommands(
+        onRead = { readCharacteristic(it) },
+        onWrite = { uuid, bytes ->
+            onWriteCharacteristic(uuid, bytes)
+        },
+        onReadDescriptor = { charUuid, uuid ->
+            readDescriptor(charUuid, uuid)
+        },
+        onWriteDescriptor = { charUuid, descUuid, hexString ->
+            writeDescriptor(charUuid, descUuid, hexString)
+        }
+    )
+
+    private fun bleConnectEvents() = BleConnectEvents(
+        onConnect = {
+            onConnect(it)
+        },
+        onDisconnect = { onDisconnect() }
+    )
 
     fun startScan() {
         bleManager.scan()
