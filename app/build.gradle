@@ -36,11 +36,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildFeatures {
         compose true
@@ -142,6 +142,13 @@ dependencies {
     androidTestImplementation 'io.mockk:mockk-android:1.13.3'
     androidTestImplementation 'app.cash.turbine:turbine:0.12.1'
     androidTestImplementation("androidx.work:work-testing:2.8.0")
+
+    // Compose testing dependencies
+    androidTestImplementation "androidx.compose.ui:ui-test"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.4.0-beta02"
+    debugImplementation "androidx.compose.ui:ui-test-manifest"
+
+    androidTestImplementation 'de.mannodermaus.junit5:android-test-compose:0.1.0-SNAPSHOT'
 
 
 }

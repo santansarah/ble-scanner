@@ -3,9 +3,9 @@ package com.santansarah.blescanner.presentation.control
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.santansarah.blescanner.data.local.BleRepository
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.bleparsables.ELKBLEDOM
+import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import com.santansarah.blescanner.domain.models.AppRouteArgs.ADDRESS
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.ControlState
@@ -23,7 +23,7 @@ import timber.log.Timber
 
 class ControlViewModel(
     private val bleGatt: BleGatt,
-    private val bleRepository: BleRepository,
+    private val bleRepository: IBleRepository,
     private val dispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
