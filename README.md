@@ -45,3 +45,11 @@ https://youtu.be/ZCs6SXIiObU
 
 In this demo, I go through my Light theme, Dark theme, Portrait and Landscape layouts, and my new 
 Control screen, which allows me to control my BLE LED light strip.
+
+## Video 5: Filter and Sort Room Flows, Compose Preview Parameters, JVM 11 JUnit 5 Compose Testing
+
+https://youtu.be/TJ2AlSdMGL4
+
+I'm getting close to the finish line for my BLE Scanner app. In this video, I go over my recent
+updates, including Adaptive Layouts, filter and sort features, Compose Preview Parameters, and 
+Android tests.

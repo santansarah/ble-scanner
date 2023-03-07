@@ -34,9 +34,9 @@ fun getWindowLayoutType(
     } else {
         // Check for a typical phone size, landscape mode.
         if (windowHeight == WindowHeightSizeClass.Compact)
-            getLandscapeLayout(windowWidth, windowInfo.size)
+            getPhoneLandscape(windowWidth, windowInfo.size)
         else {
-            getPortraitLayout(windowWidth, windowInfo.size)
+            getLayoutType(windowWidth, windowInfo.size)
         }
     }
 }
@@ -57,11 +57,11 @@ fun getFoldableAppLayout(foldableInfo: FoldableInfo, size: DpSize): AppLayoutInf
         )
 }
 
-fun getLandscapeLayout(windowWidth: WindowWidthSizeClass, size: DpSize): AppLayoutInfo =
+fun getPhoneLandscape(windowWidth: WindowWidthSizeClass, size: DpSize): AppLayoutInfo =
     AppLayoutInfo(AppLayoutMode.LANDSCAPE_NORMAL, size)
 
 
-fun getPortraitLayout(windowWidth: WindowWidthSizeClass, size: DpSize): AppLayoutInfo =
+fun getLayoutType(windowWidth: WindowWidthSizeClass, size: DpSize): AppLayoutInfo =
 // At this point, I know it's not a landscape/rotated phone size.
     // So let's check the width.
     when (windowWidth) {

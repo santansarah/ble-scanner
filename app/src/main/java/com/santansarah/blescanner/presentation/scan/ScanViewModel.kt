@@ -45,7 +45,6 @@ class ScanViewModel(
     private val _scanFilterOption = MutableStateFlow<ScanFilterOption?>(null)
     private val _devices = _scanFilterOption.flatMapLatest { scanFilterOption ->
         bleRepository.getScannedDevices(scanFilterOption).map {
-            Timber.tag("unittest").d("running device flow")
             Pair(scanFilterOption, it)
         }
     }
@@ -63,6 +62,9 @@ class ScanViewModel(
     val scanState = combine(
         _devices, _bleMessage, _userMessage, _deviceDetails
     ) { devices, bleMessage, userMessage, deviceDetails ->
+
+        if (deviceDetails == null)
+            bleManager.scanEnabled = false
 
         ScanState(
             ScanUI(
@@ -123,10 +125,12 @@ class ScanViewModel(
     )
 
     fun startScan() {
+        bleManager.scanEnabled = true
         bleManager.scan()
     }
 
     fun stopScan() {
+        bleManager.scanEnabled = false
         bleManager.stopScan()
     }
 
@@ -208,6 +212,7 @@ class ScanViewModel(
         bleGatt.close()
         _selectedDevice.value = null
         isEditing.value = false
+        bleManager.scanEnabled = true
         startScan()
     }
 

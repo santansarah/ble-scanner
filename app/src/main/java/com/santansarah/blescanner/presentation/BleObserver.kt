@@ -47,7 +47,19 @@ class BleObserver(
 
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
-        activity.unregisterReceiver(broadcastReceiver)
+        Timber.d("onPause")
+        try {
+            activity.unregisterReceiver(broadcastReceiver)
+        } catch (_: Exception) {
+
+        }
+        //bleManager.stopScan()
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        Timber.d("onResume")
+       // bleManager.scan()
     }
 
     private fun createBroadcastReceiver() {

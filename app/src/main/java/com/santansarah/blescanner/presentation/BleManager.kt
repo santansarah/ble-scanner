@@ -26,6 +26,8 @@ class BleManager(
     val userMessage = MutableStateFlow<String?>(null)
     val isScanning = MutableStateFlow(true)
 
+    var scanEnabled = false
+
     private var lastCleanupTimestamp: Long? = null
     private val CLEANUP_DURATION = 60000L
 
@@ -70,13 +72,15 @@ class BleManager(
 
     @SuppressLint("MissingPermission")
     fun scan() {
-        if (btAdapter.isEnabled) {
-            isScanning.value = true
-            btScanner?.startScan(null, scanSettings, scanCallback)
-            lastCleanupTimestamp = System.currentTimeMillis()
-            Timber.d("started scan")
-        } else {
-            userMessage.value = "You must enable Bluetooth to start scanning."
+        if (scanEnabled) {
+            if (btAdapter.isEnabled) {
+                isScanning.value = true
+                btScanner?.startScan(null, scanSettings, scanCallback)
+                lastCleanupTimestamp = System.currentTimeMillis()
+                Timber.d("started scan")
+            } else {
+                userMessage.value = "You must enable Bluetooth to start scanning."
+            }
         }
     }
 
