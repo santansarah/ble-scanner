@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.os.Build
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.domain.bleparsables.CCCD
 import com.santansarah.blescanner.domain.models.ConnectionState
 import com.santansarah.blescanner.domain.models.DeviceService
@@ -18,7 +17,6 @@ import com.santansarah.blescanner.domain.usecases.ParseNotification
 import com.santansarah.blescanner.domain.usecases.ParseRead
 import com.santansarah.blescanner.domain.usecases.ParseService
 import com.santansarah.blescanner.utils.print
-import com.santansarah.blescanner.utils.toHex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +24,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
-import java.util.UUID
 
 @SuppressLint("MissingPermission")
 class BleGatt(
@@ -109,7 +106,17 @@ class BleGatt(
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
             Timber.d("characteristic changed: ${characteristic.value.print()}")
-            deviceDetails.value = parseNotification(deviceDetails.value, characteristic)
+            deviceDetails.value = parseNotification(deviceDetails.value, characteristic, characteristic.value)
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic, value)
+            Timber.d("characteristic changed: ${value.print()}")
+            deviceDetails.value = parseNotification(deviceDetails.value, characteristic, value)
         }
 
         @Deprecated("Deprecated in Java")
@@ -125,7 +132,23 @@ class BleGatt(
                         "${descriptor.characteristic.uuid}, $status, ${descriptor.value.print()}"
             )
 
-            deviceDetails.value = parseDescriptor(deviceDetails.value, descriptor, status)
+            deviceDetails.value = parseDescriptor(deviceDetails.value, descriptor, status, descriptor.value)
+        }
+
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int,
+            value: ByteArray
+        ) {
+            super.onDescriptorRead(gatt, descriptor, status, value)
+
+            Timber.d(
+                "descriptor read: ${descriptor.uuid}, " +
+                        "${descriptor.characteristic.uuid}, $status, ${value.print()}"
+            )
+
+            deviceDetails.value = parseDescriptor(deviceDetails.value, descriptor, status, value)
         }
 
         override fun onCharacteristicWrite(
@@ -237,8 +260,13 @@ class BleGatt(
         btGatt?.services?.flatMap { it.characteristics }?.flatMap { it.descriptors }
             ?.find { it.characteristic.uuid.toString() == charUuid && it.uuid.toString() == uuid }
             ?.also { foundDescriptor ->
-                foundDescriptor.setValue(bytes)
-                btGatt?.writeDescriptor(foundDescriptor)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    btGatt?.writeDescriptor(foundDescriptor, bytes)
+                } else
+                {
+                    foundDescriptor.setValue(bytes)
+                    btGatt?.writeDescriptor(foundDescriptor)
+                }
             }
     }
 

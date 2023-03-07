@@ -11,12 +11,13 @@ class ParseDescriptor() {
     operator fun invoke(
         deviceDetails: List<DeviceService>,
         descriptor: BluetoothGattDescriptor,
-        status: Int
+        status: Int,
+        value: ByteArray
     ): List<DeviceService> {
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
 
-            Timber.d(descriptor.value.toString())
+            Timber.d(value.toString())
 
             val newList = deviceDetails.map { dd ->
                 dd.copy(characteristics =
@@ -24,7 +25,7 @@ class ParseDescriptor() {
                     if (descriptor.characteristic.uuid.toString() == char.uuid) {
                         char.copy(
                             descriptors =
-                            char.updateDescriptors(descriptor.uuid.toString(), descriptor.value)
+                            char.updateDescriptors(descriptor.uuid.toString(), value)
                         )
                     }
                     else
