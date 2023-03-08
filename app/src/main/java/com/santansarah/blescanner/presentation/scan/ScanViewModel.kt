@@ -63,7 +63,7 @@ class ScanViewModel(
         _devices, _bleMessage, _userMessage, _deviceDetails
     ) { devices, bleMessage, userMessage, deviceDetails ->
 
-        if (deviceDetails == null)
+        if (deviceDetails != null)
             bleManager.scanEnabled = false
 
         ScanState(

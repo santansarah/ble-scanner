@@ -14,12 +14,16 @@ import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.windowinfo.getFoldableInfoFlow
 import com.santansarah.blescanner.utils.windowinfo.getWindowLayoutType
 import com.santansarah.blescanner.utils.windowinfo.getWindowSizeClasses
+import timber.log.Timber
 
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
+
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Timber.d("activity created...")
 
         val bleObserver = BleObserver(this)
         this.lifecycle.addObserver(bleObserver)

@@ -41,9 +41,12 @@ class BleManager(
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
 
+            Timber.d("scanEnabled: $scanEnabled")
+
             scope.launch {
                 parseScanResult(result)
-                launch { deleteNotSeen() }
+                if (isScanning.value)
+                    launch { deleteNotSeen() }
             }
 
         }

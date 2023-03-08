@@ -42,7 +42,7 @@ fun HomeRoute(
     val isScanning = vm.isScanning.collectAsStateWithLifecycle().value
     val isEditing = vm.isEditing.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(key1 = multiplePermissionsState.allPermissionsGranted) {
+    LaunchedEffect(multiplePermissionsState.allPermissionsGranted) {
         if (multiplePermissionsState.allPermissionsGranted) {
             vm.startScan()
         } else

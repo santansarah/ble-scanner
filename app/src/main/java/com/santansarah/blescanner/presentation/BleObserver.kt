@@ -33,6 +33,23 @@ class BleObserver(
         createBroadcastReceiver()
         btEnableResultLauncher = registerHandler(owner, "EnableBLE")
 
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+
+        try {
+            activity.unregisterReceiver(broadcastReceiver)
+        } catch (_: Exception) {
+
+        } finally {
+            bleManager.stopScan()
+        }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+
         ContextCompat.registerReceiver(
             activity, broadcastReceiver,
             IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED),
@@ -43,23 +60,7 @@ class BleObserver(
             launchEnableBtAdapter()
         }
 
-    }
-
-    override fun onPause(owner: LifecycleOwner) {
-        super.onPause(owner)
-        Timber.d("onPause")
-        try {
-            activity.unregisterReceiver(broadcastReceiver)
-        } catch (_: Exception) {
-
-        }
-        //bleManager.stopScan()
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        Timber.d("onResume")
-       // bleManager.scan()
+        bleManager.scan()
     }
 
     private fun createBroadcastReceiver() {
@@ -76,10 +77,10 @@ class BleObserver(
                         bleManager.stopScan()
                         launchEnableBtAdapter()
                     }
-                    /*if (btAdapter.state == BluetoothAdapter.STATE_ON) {
+                    if (btAdapter.state == BluetoothAdapter.STATE_ON) {
                         //delay(300L)
                         bleManager.scan()
-                    }*/
+                    }
                 }
                 // }
             }
@@ -101,7 +102,6 @@ class BleObserver(
         if (result.resultCode == Activity.RESULT_OK) {
             // There are no request codes
             val data: Intent? = result.data
-            bleManager.scan()
             //bleManager.scan()
         }
     }
