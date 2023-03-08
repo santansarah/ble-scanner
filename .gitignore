@@ -98,3 +98,4 @@ lint/tmp/
 /sharedTest/src/main/java/com/santansarah/sharedtest/BLEMfrIds.kt
 /sharedTest/src/main/java/com/santansarah/sharedtest/Companies.kt
 /sharedTest/src/main/java/com/santansarah/sharedtest/ServiceIds.kt
+/app/google-services.json

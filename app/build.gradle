@@ -4,6 +4,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'de.mannodermaus.android-junit5'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -114,7 +116,10 @@ dependencies {
     implementation "androidx.window:window:1.1.0-alpha04"
     implementation "androidx.compose.material3:material3-window-size-class:1.1.0-alpha06"
 
-
+    // firebase
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     //testing
     testImplementation "io.insert-koin:koin-test:$koin_android_version"
