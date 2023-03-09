@@ -13,6 +13,6 @@ dependencyResolutionManagement {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 }
-rootProject.name = "BLE Scanner"
+rootProject.name = "BLE Bytes"
 include ':app'
 include ':sharedTest'

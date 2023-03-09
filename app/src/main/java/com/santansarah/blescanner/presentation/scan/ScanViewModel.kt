@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santansarah.blescanner.data.local.entities.ScannedDevice
 import com.santansarah.blescanner.data.local.entities.displayName
+import com.santansarah.blescanner.domain.interfaces.IAnalytics
 import com.santansarah.blescanner.domain.interfaces.IBleRepository
 import com.santansarah.blescanner.domain.models.BleConnectEvents
 import com.santansarah.blescanner.domain.models.BleReadWriteCommands
@@ -18,6 +19,8 @@ import com.santansarah.blescanner.domain.models.emptyScanState
 import com.santansarah.blescanner.presentation.BleGatt
 import com.santansarah.blescanner.presentation.BleManager
 import com.santansarah.blescanner.utils.decodeHex
+import com.santansarah.blescanner.utils.logging.AnalyticsEventType
+import com.santansarah.blescanner.utils.logging.CharacteristicEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +39,8 @@ class ScanViewModel(
     private val bleManager: BleManager,
     private val bleGatt: BleGatt,
     private val bleRepository: IBleRepository,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val analytics: IAnalytics
 ) : ViewModel() {
 
     val isScanning by mutableStateOf(bleManager.isScanning)
@@ -188,6 +192,10 @@ class ScanViewModel(
 
     fun readCharacteristic(uuid: String) {
         bleGatt.readCharacteristic(uuid)
+        analytics.logCharacteristicEvent(CharacteristicEvent(
+            eventName = AnalyticsEventType.READ_CHARACTERISTIC.name,
+            uuid = uuid
+        ))
         //showUserMessage("Request sent.")
     }
 
@@ -225,7 +233,10 @@ class ScanViewModel(
         try {
             if (bytes.isNotEmpty()) {
                 bleGatt.writeBytes(uuid, bytes.decodeHex())
-                //showUserMessage("Data sent.")
+                analytics.logCharacteristicEvent(CharacteristicEvent(
+                    eventName = AnalyticsEventType.WRITE_CHARACTERISTIC.name,
+                    uuid = uuid
+                ))
             } else
                 showUserMessage("Hex can't be null.")
         } catch (badHex: Exception) {

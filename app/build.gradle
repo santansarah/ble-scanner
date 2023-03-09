@@ -121,6 +121,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
+
     //testing
     testImplementation "io.insert-koin:koin-test:$koin_android_version"
     testImplementation "io.insert-koin:koin-test-junit5:$koin_android_version"

@@ -28,6 +28,12 @@ class MainActivity : ComponentActivity() {
         val bleObserver = BleObserver(this)
         this.lifecycle.addObserver(bleObserver)
 
+        try {
+            throw RuntimeException("test prod")
+        } catch (e: Exception) {
+            Timber.e(e, "Prod Test.")
+        }
+
         //val deleteNotSeenRequest: WorkRequest = get(named("DeleteNotSeenWorker"))
 
 /*
