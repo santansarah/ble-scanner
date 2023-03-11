@@ -1,8 +1,8 @@
 package com.santansarah.sharedtest
 
-import com.santansarah.blescanner.data.local.entities.Company
-import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
-import com.santansarah.blescanner.data.local.entities.Service
+import com.santansarah.scan.local.entities.Company
+import com.santansarah.scan.local.entities.MicrosoftDevice
+import com.santansarah.scan.local.entities.Service
 
 val companies = listOf(
     Company(0, "Ericsson Technology Licensing"),

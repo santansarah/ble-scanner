@@ -1,7 +1,7 @@
 package com.santansarah.sharedtest
 
-import com.santansarah.blescanner.data.local.entities.BleCharacteristic
-import com.santansarah.blescanner.data.local.entities.Descriptor
+import com.santansarah.scan.local.entities.BleCharacteristic
+import com.santansarah.scan.local.entities.Descriptor
 
 val characteristics = listOf(
     BleCharacteristic(

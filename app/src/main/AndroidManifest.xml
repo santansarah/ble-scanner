@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:name=".BLEScannerApp"
+        android:name="com.santansarah.scan.SanTanScanApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,7 +28,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BLEScanner"
+        android:theme="@style/Theme.SanTanScanner"
         tools:targetApi="31">
         <!-- If you want to disable android.startup completely. -->
         <provider
@@ -37,10 +37,10 @@
             tools:node="remove">
         </provider>
         <activity
-            android:name=".presentation.MainActivity"
+            android:name="com.santansarah.scan.presentation.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.BLEScanner">
+            android:theme="@style/Theme.SanTanScanner">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

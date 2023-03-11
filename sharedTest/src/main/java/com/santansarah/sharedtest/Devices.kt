@@ -1,6 +1,6 @@
 package com.santansarah.sharedtest
 
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
+import com.santansarah.scan.local.entities.ScannedDevice
 
 val newDevice = ScannedDevice(
     deviceId = null,

@@ -1,16 +1,17 @@
 package com.santansarah.sharedtest
 
-import com.santansarah.blescanner.domain.models.BleConnectEvents
-import com.santansarah.blescanner.domain.models.BleReadWriteCommands
-import com.santansarah.blescanner.domain.models.ConnectionState
-import com.santansarah.blescanner.domain.models.DeviceEvents
-import com.santansarah.blescanner.domain.models.ScanState
-import com.santansarah.blescanner.domain.models.ScanUI
-import com.santansarah.blescanner.presentation.previewparams.FeatureParams
-import com.santansarah.blescanner.presentation.previewparams.devices
-import com.santansarah.blescanner.presentation.previewparams.portrait
+import com.santansarah.scan.domain.models.BleConnectEvents
+import com.santansarah.scan.domain.models.BleReadWriteCommands
+import com.santansarah.scan.domain.models.ConnectionState
+import com.santansarah.scan.domain.models.DeviceEvents
+import com.santansarah.scan.domain.models.ScanState
+import com.santansarah.scan.domain.models.ScanUI
+import com.santansarah.scan.presentation.previewparams.FeatureParams
+import com.santansarah.scan.presentation.previewparams.devices
+import com.santansarah.scan.presentation.previewparams.portrait
 
-val scanStatePortrait = FeatureParams(ScanState(
+val scanStatePortrait = FeatureParams(
+    ScanState(
     ScanUI(
         devices,
         null,

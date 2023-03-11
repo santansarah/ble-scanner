@@ -9,18 +9,18 @@ plugins {
 }
 
 android {
-    namespace 'com.santansarah.blescanner'
+    namespace 'com.santansarah.scan'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.santansarah.blescanner"
+        applicationId "com.santansarah.scan"
         minSdk 28
         targetSdk 33
         versionCode 1
         versionName "1.0"
 
         // add the AndroidJUnitRunner, then connect JUnit 5 to the runner
-        testInstrumentationRunner "com.santansarah.blescanner.InstrumentationTestRunner"
+        testInstrumentationRunner "com.santansarah.scan.InstrumentationTestRunner"
         testInstrumentationRunnerArgument "runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder"
 
         vectorDrawables {

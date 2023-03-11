@@ -1,12 +1,12 @@
 package com.santansarah.sharedtest
 
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
-import com.santansarah.blescanner.domain.models.BleProperties
-import com.santansarah.blescanner.domain.models.BleWriteTypes
-import com.santansarah.blescanner.domain.models.DeviceCharacteristics
-import com.santansarah.blescanner.domain.models.DeviceDescriptor
-import com.santansarah.blescanner.domain.models.DeviceDetail
-import com.santansarah.blescanner.domain.models.DeviceService
+import com.santansarah.scan.local.entities.ScannedDevice
+import com.santansarah.scan.domain.models.BleProperties
+import com.santansarah.scan.domain.models.BleWriteTypes
+import com.santansarah.scan.domain.models.DeviceCharacteristics
+import com.santansarah.scan.domain.models.DeviceDescriptor
+import com.santansarah.scan.domain.models.DeviceDetail
+import com.santansarah.scan.domain.models.DeviceService
 
 val deviceNameCharacteristic = DeviceCharacteristics(
     uuid = "00002a00-0000-1000-8000-00805f9b34fb",

@@ -1,14 +1,14 @@
 package com.santansarah.sharedtest.mocks
 
 import android.os.ParcelUuid
-import com.santansarah.blescanner.data.local.entities.BleCharacteristic
-import com.santansarah.blescanner.data.local.entities.Company
-import com.santansarah.blescanner.data.local.entities.Descriptor
-import com.santansarah.blescanner.data.local.entities.MicrosoftDevice
-import com.santansarah.blescanner.data.local.entities.ScannedDevice
-import com.santansarah.blescanner.data.local.entities.Service
-import com.santansarah.blescanner.domain.interfaces.IBleRepository
-import com.santansarah.blescanner.domain.models.ScanFilterOption
+import com.santansarah.scan.local.entities.BleCharacteristic
+import com.santansarah.scan.local.entities.Company
+import com.santansarah.scan.local.entities.Descriptor
+import com.santansarah.scan.local.entities.MicrosoftDevice
+import com.santansarah.scan.local.entities.ScannedDevice
+import com.santansarah.scan.local.entities.Service
+import com.santansarah.scan.domain.interfaces.IBleRepository
+import com.santansarah.scan.domain.models.ScanFilterOption
 import com.santansarah.sharedtest.deviceList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
