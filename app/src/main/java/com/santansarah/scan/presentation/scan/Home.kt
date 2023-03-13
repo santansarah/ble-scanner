@@ -33,7 +33,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeRoute(
     vm: ScanViewModel = koinViewModel(),
     onControlClick: (String) -> Unit,
-    appLayoutInfo: AppLayoutInfo
+    appLayoutInfo: AppLayoutInfo,
+    onHelpClicked: () -> Unit
 ) {
 
     val scanState = vm.scanState.collectAsStateWithLifecycle().value
@@ -75,7 +76,8 @@ fun HomeRoute(
         stopScan = vm::stopScan,
         onControlClick = onControlClick,
         onFilter = vm::onFilter,
-        onShowUserMessage = vm::showUserMessage
+        onShowUserMessage = vm::showUserMessage,
+        onHelpClicked = onHelpClicked
     )
 
 }
@@ -93,7 +95,8 @@ fun HomeLayout(
     stopScan: () -> Unit,
     onControlClick: (String) -> Unit,
     onFilter: (ScanFilterOption?) -> Unit,
-    onShowUserMessage: (String) -> Unit
+    onShowUserMessage: (String) -> Unit,
+    onHelpClicked: () -> Unit
 ) {
 
     val selectedDevice = scanState.scanUI.selectedDevice
@@ -108,7 +111,8 @@ fun HomeLayout(
                 HomeAppBar(
                     scanning = isScanning,
                     onStartScan = startScan,
-                    onStopScan = stopScan
+                    onStopScan = stopScan,
+                    onHelp = onHelpClicked
                 )
             else
                 if (!appLayoutInfo.appLayoutMode.isLandscape())

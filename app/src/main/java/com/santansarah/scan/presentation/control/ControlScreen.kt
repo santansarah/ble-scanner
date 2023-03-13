@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.santansarah.scan.local.entities.displayName
-import com.santansarah.scan.presentation.components.ControlAppBar
+import com.santansarah.scan.presentation.components.BasicBackTopAppBar
 import com.santansarah.scan.presentation.scan.device.ConnectButtons
 import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
 import org.koin.androidx.compose.koinViewModel
@@ -59,7 +59,7 @@ fun ControlScreen(
             snackbarHost = { SnackbarHost(hostState = appSnackBarHostState) },
             topBar = {
                 if (!appLayoutInfo.appLayoutMode.isLandscape()) {
-                    ControlAppBar(appLayoutInfo = appLayoutInfo, onBackClicked = onBackClicked) {
+                    BasicBackTopAppBar(appLayoutInfo = appLayoutInfo, onBackClicked = onBackClicked) {
                         Text(text = controlState.device.displayName())
                     }
                 }
@@ -92,10 +92,10 @@ fun ControlScreen(
                                 .background(MaterialTheme.colorScheme.secondaryContainer)
                         ) {
 
-                            ControlAppBar(
+                            BasicBackTopAppBar(
                                 appLayoutInfo = appLayoutInfo,
                                 onBackClicked = onBackClicked,
-                                actionButtons = {
+                                titleContent = {
                                     Row() {
                                         ConnectButtons(
                                             connectEnabled, vm::onConnect,

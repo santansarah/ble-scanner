@@ -13,7 +13,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
-class BLEScannerAppTest : Application() {
+class SanTanScanAppTest : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(DebugTree())
@@ -43,7 +43,7 @@ class InstrumentationTestRunner : AndroidJUnitRunner() {
     ): Application {
         return super.newApplication(
             classLoader,
-            BLEScannerAppTest::class.java.name, context
+            SanTanScanAppTest::class.java.name, context
         )
     }
 }

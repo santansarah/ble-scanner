@@ -19,21 +19,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.santansarah.scan.R
-import com.santansarah.scan.local.entities.ScannedDevice
-import com.santansarah.scan.local.entities.displayName
 import com.santansarah.scan.domain.models.BleConnectEvents
 import com.santansarah.scan.domain.models.DeviceDetail
 import com.santansarah.scan.domain.models.DeviceEvents
 import com.santansarah.scan.domain.models.ScanUI
+import com.santansarah.scan.local.entities.ScannedDevice
+import com.santansarah.scan.local.entities.displayName
 import com.santansarah.scan.presentation.previewparams.FeatureParams
-import com.santansarah.scan.presentation.previewparams.LandscapePreviewParams
-import com.santansarah.scan.presentation.previewparams.LandscapePreviews
-import com.santansarah.scan.presentation.previewparams.PortraitPreviewParams
-import com.santansarah.scan.presentation.previewparams.PortraitPreviews
+import com.santansarah.scan.presentation.previewparams.LandscapeLayoutParams
+import com.santansarah.scan.presentation.previewparams.LandscapeLayouts
+import com.santansarah.scan.presentation.previewparams.PortraitLayoutParams
+import com.santansarah.scan.presentation.previewparams.PortraitLayouts
 import com.santansarah.scan.presentation.scan.device.DeviceButtons
 import com.santansarah.scan.presentation.scan.device.DeviceMenu
 import com.santansarah.scan.presentation.theme.SanTanScanTheme
@@ -95,7 +94,7 @@ fun AppBarWithBackButton(
             DeviceMenu(
                 device = deviceDetail.scannedDevice,
                 expanded = deviceMenuExpanded,
-                onExpanded = {deviceMenuExpanded = it},
+                onExpanded = { deviceMenuExpanded = it },
                 onEdit = deviceEvents.onIsEditing,
                 onFavorite = deviceEvents.onFavorite,
                 onForget = deviceEvents.onForget
@@ -110,8 +109,11 @@ fun AppBarWithBackButton(
 fun HomeAppBar(
     scanning: Boolean,
     onStartScan: () -> Unit,
-    onStopScan: () -> Unit
+    onStopScan: () -> Unit,
+    onHelp: () -> Unit
 ) {
+
+    var homeMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     TopAppBar(
         //modifier = Modifier.border(2.dp, Color.Blue),
@@ -125,6 +127,13 @@ fun HomeAppBar(
             navigationIconContentColor = MaterialTheme.colorScheme
                 .onPrimary.copy(.7f)
         ),
+        navigationIcon = {
+            MainMenu(
+                expanded = homeMenuExpanded,
+                onExpanded = { homeMenuExpanded = it },
+                onHelp = onHelp
+            )
+        },
         title = {
             Text(
                 text = if (scanning) "Your Devices" else "Scan Stopped",
@@ -153,7 +162,7 @@ fun HomeAppBar(
                     disabledContentColor = MaterialTheme.colorScheme.outline
                 ),
                 enabled = scanning,
-                onClick = { onStopScan()  },
+                onClick = { onStopScan() },
                 content = {
                     Icon(
                         painter = painterResource(id = R.drawable.disconnect),
@@ -167,10 +176,10 @@ fun HomeAppBar(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ControlAppBar(
+fun BasicBackTopAppBar(
     appLayoutInfo: AppLayoutInfo,
     onBackClicked: () -> Unit,
-    actionButtons: @Composable () -> Unit
+    titleContent: @Composable () -> Unit
 ) {
 
     CenterAlignedTopAppBar(
@@ -185,7 +194,7 @@ fun ControlAppBar(
             navigationIconContentColor = MaterialTheme.colorScheme
                 .onPrimary.copy(.7f)
         ),
-        title = { actionButtons() },
+        title = { titleContent() },
         navigationIcon = {
             IconButton(onClick = onBackClicked) {
                 BackIcon(contentDesc = "Go Back")
@@ -194,63 +203,63 @@ fun ControlAppBar(
     )
 }
 
-
-
-@PortraitPreviews
-@Composable
-fun PreviewAppBar(
-    @PreviewParameter(PortraitPreviewParams::class) featureParams: FeatureParams
-) {
-    val device = ScannedDevice(
-        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
-        "Microsoft", listOf("Human Readable Device"),
-        listOf("Windows 10 Desktop"), 0L,
-        customName = null,
-        baseRssi = 0,favorite = false, forget = false
-    )
-    SanTanScanTheme() {
-        AppBarWithBackButton(
-            appLayoutInfo = featureParams.appLayoutInfo,
-            onBackClicked = { /*TODO*/ },
-            scanUi = featureParams.scanState.scanUI,
-            deviceDetail = featureParams.detail,
-            deviceEvents = featureParams.scanState.deviceEvents,
-            bleConnectEvents = featureParams.scanState.bleConnectEvents,
-            onControlClick = {}
-        )
-    }
-}
-
-@LandscapePreviews
-@Composable
-fun PreviewLandscapeAppBar(
-    @PreviewParameter(LandscapePreviewParams::class) featureParams: FeatureParams
-) {
-    val device = ScannedDevice(
-        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
-        "Microsoft", listOf("Human Readable Device"),
-        listOf("Windows 10 Desktop"), 0L,
-        customName = null,
-        baseRssi = 0,favorite = false, forget = false
-    )
-    SanTanScanTheme() {
-        AppBarWithBackButton(
-            appLayoutInfo = featureParams.appLayoutInfo,
-            onBackClicked = { /*TODO*/ },
-            scanUi = featureParams.scanState.scanUI,
-            deviceDetail = featureParams.detail,
-            deviceEvents = featureParams.scanState.deviceEvents,
-            bleConnectEvents = featureParams.scanState.bleConnectEvents,
-            onControlClick = {}
-        )
-    }
-}
-
-@Preview
+@PortraitLayouts
 @Composable
 fun PreviewHomeBar() {
     SanTanScanTheme() {
-        HomeAppBar(scanning = true, {}, {})
+        HomeAppBar(scanning = true, {}, {}, {})
     }
 }
+
+
+@PortraitLayouts
+@Composable
+fun PreviewAppBar(
+    @PreviewParameter(PortraitLayoutParams::class) featureParams: FeatureParams
+) {
+    val device = ScannedDevice(
+        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
+        "Microsoft", listOf("Human Readable Device"),
+        listOf("Windows 10 Desktop"), 0L,
+        customName = null,
+        baseRssi = 0, favorite = false, forget = false
+    )
+    SanTanScanTheme() {
+        AppBarWithBackButton(
+            appLayoutInfo = featureParams.appLayoutInfo,
+            onBackClicked = { /*TODO*/ },
+            scanUi = featureParams.scanState.scanUI,
+            deviceDetail = featureParams.detail,
+            deviceEvents = featureParams.scanState.deviceEvents,
+            bleConnectEvents = featureParams.scanState.bleConnectEvents,
+            onControlClick = {}
+        )
+    }
+}
+
+@LandscapeLayouts
+@Composable
+fun PreviewLandscapeAppBar(
+    @PreviewParameter(LandscapeLayoutParams::class) featureParams: FeatureParams
+) {
+    val device = ScannedDevice(
+        0, "ELK-BLEDOM", "24:A9:30:53:5A:97", -45,
+        "Microsoft", listOf("Human Readable Device"),
+        listOf("Windows 10 Desktop"), 0L,
+        customName = null,
+        baseRssi = 0, favorite = false, forget = false
+    )
+    SanTanScanTheme() {
+        AppBarWithBackButton(
+            appLayoutInfo = featureParams.appLayoutInfo,
+            onBackClicked = { /*TODO*/ },
+            scanUi = featureParams.scanState.scanUI,
+            deviceDetail = featureParams.detail,
+            deviceEvents = featureParams.scanState.deviceEvents,
+            bleConnectEvents = featureParams.scanState.bleConnectEvents,
+            onControlClick = {}
+        )
+    }
+}
+
 
