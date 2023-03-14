@@ -40,13 +40,14 @@ Own an LED light strip? SanTanScan might be able to control it! If your device s
 ELK-BLEDOM, our app supports turning your light strip on and off, and changing the color and
 brightness.
 
-## Screenshots and Demo
+## BLE YouTube Playlist
+> A lot's changed in the app since I first started :) If you'd like to following along on my journey, check out the playlist below.
 
-To check out my development progress along with a complete end-to-end demo, check out my [YouTube BLE Scanner App Playlist](https://youtu.be/CpBWF52IOk4).
+<a href="https://www.youtube.com/watch?v=CpBWF52IOk4" target="_blank"><img src="https://img.youtube.com/vi/CpBWF52IOk4/0.jpg"></a>
 
-<button style="margin:6px;padding:14px;background:#0087ff;border-radius:25px;width:250px"><a href="https://youtu.be/CpBWF52IOk4" target="_blank" style="color:#e2e2e9">
-YouTube BLE Scanner App Playlist</a></button>
+## BLE Scanner App Demo
 
+<a href="https://www.youtube.com/watch?v=ZCs6SXIiObU" target="_blank"><img src="https://img.youtube.com/vi/ZCs6SXIiObU/0.jpg"></a>
 
 <table cellspacing="1" cellpadding="1" width="100%">
 <tr><td><img src="ble-screenshots/home.png" style="width:400px"></td>
@@ -56,14 +57,6 @@ YouTube BLE Scanner App Playlist</a></button>
 <tr><td><img src="ble-screenshots/edit.png" style="width:400px"></td>
 <td><img src="ble-screenshots/control.png" style="width:400px"></td>
 </tr></table>
-
-## Privacy Policy
-
-Your privacy is important! To see what we collect, check out our Privacy Policy.
-
-<button style="margin:6px;padding:14px;background:#0087ff;border-radius:25px;width:250px"><a href="PrivacyPolicy.md" target="_blank" style="color:#e2e2e9">
-Privacy Policy</a></button>
-
 
 # For Developers - Jetpack Compose BLE Scanner with Room, Koin, and JUnit 5
 
@@ -120,3 +113,8 @@ https://youtu.be/TJ2AlSdMGL4
 I'm getting close to the finish line for my BLE Scanner app. In this video, I go over my recent
 updates, including Adaptive Layouts, filter and sort features, Compose Preview Parameters, and 
 Android tests.
+
+## Privacy Policy
+
+Your privacy is important! To learn about what we collect, check out our <a href="PrivacyPolicy.md" target="_blank" style="color:#e2e2e9">
+Privacy Policy</a>.
