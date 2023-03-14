@@ -1,10 +1,4 @@
-<table width="100%" style="background:#00005f">
-<tr><td width="20%" style="padding:4px"><img src="santanscan-logo-print.png"
-style="width:120px"></td>
-<td><h1>SanTanScan Android App</h1>
-<h3>Bluetooth Low Energy (BLE) Scanner and Debugger</h3></td>
-</tr>
-</table>
+![SanTanScan Banner](github-banner-animated.gif)
 
 SanTanScan is a Bluetooth Low Energy (BLE) scanner and debugger available for Android 9+. It scans your
 home or office for any nearby BLE devices, allowing you to sort by signal strength (RSSI), device name, 

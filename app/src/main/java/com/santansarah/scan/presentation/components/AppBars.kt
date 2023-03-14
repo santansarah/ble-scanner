@@ -36,6 +36,7 @@ import com.santansarah.scan.presentation.previewparams.PortraitLayouts
 import com.santansarah.scan.presentation.scan.device.DeviceButtons
 import com.santansarah.scan.presentation.scan.device.DeviceMenu
 import com.santansarah.scan.presentation.theme.SanTanScanTheme
+import com.santansarah.scan.presentation.theme.appBarTitle
 import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
 
 @Composable
@@ -82,6 +83,7 @@ fun AppBarWithBackButton(
                     text = deviceDetail.scannedDevice.displayName(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    style = appBarTitle
                 )
             }
         },
@@ -139,7 +141,7 @@ fun HomeAppBar(
                 text = if (scanning) "Your Devices" else "Scan Stopped",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                //style = MaterialTheme.typography.titleMedium
+                style = appBarTitle
             )
         },
         actions = {

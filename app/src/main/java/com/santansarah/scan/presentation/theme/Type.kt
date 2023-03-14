@@ -13,6 +13,16 @@ val monoFamily = FontFamily(
     Font(resId = R.font.space_mono)
 )
 
+val titleFamily = FontFamily(
+    Font(resId = R.font.anton)
+)
+
+val appBarTitle = TextStyle(
+    fontFamily = titleFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 24.sp
+)
+
 val codeFont = TextStyle(
     fontFamily = monoFamily,
     fontWeight = FontWeight.Normal,

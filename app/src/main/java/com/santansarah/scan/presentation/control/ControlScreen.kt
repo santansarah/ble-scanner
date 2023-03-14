@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.santansarah.scan.local.entities.displayName
 import com.santansarah.scan.presentation.components.BasicBackTopAppBar
 import com.santansarah.scan.presentation.scan.device.ConnectButtons
+import com.santansarah.scan.presentation.theme.appBarTitle
 import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
 import org.koin.androidx.compose.koinViewModel
 
@@ -60,7 +61,7 @@ fun ControlScreen(
             topBar = {
                 if (!appLayoutInfo.appLayoutMode.isLandscape()) {
                     BasicBackTopAppBar(appLayoutInfo = appLayoutInfo, onBackClicked = onBackClicked) {
-                        Text(text = controlState.device.displayName())
+                        Text(text = controlState.device.displayName(), style = appBarTitle)
                     }
                 }
             }
