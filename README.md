@@ -43,7 +43,7 @@ brightness.
 ## BLE YouTube Playlist
 > A lot's changed in the app since I first started :) If you'd like to following along on my journey, check out the playlist below.
 
-<a href="https://www.youtube.com/watch?v=CpBWF52IOk4" target="_blank"><img src="https://img.youtube.com/vi/CpBWF52IOk4/0.jpg"></a>
+<a href="https://www.youtube.com/playlist?list=PLzxawGXQRFsyAEuKdGBHj6Rhh2R_vYkFK" target="_blank"><img src="https://img.youtube.com/vi/CpBWF52IOk4/0.jpg"></a>
 
 ## BLE Scanner App Demo
 
