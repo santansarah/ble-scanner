@@ -1,4 +1,77 @@
-# Jetpack Compose BLE Scanner with Room, Koin, and JUnit 5
+<table width="100%" style="background:#00005f">
+<tr><td width="20%" style="padding:4px"><img src="santanscan-logo-print.png"
+style="width:120px"></td>
+<td><h1>SanTanScan Android App</h1>
+<h3>Bluetooth Low Energy (BLE) Scanner and Debugger</h3></td>
+</tr>
+</table>
+
+SanTanScan is a Bluetooth Low Energy (BLE) scanner and debugger available for Android 9+. It scans your
+home or office for any nearby BLE devices, allowing you to sort by signal strength (RSSI), device name, 
+and your favorite devices. From the home screen, you can also selected devices to 'forget'.
+
+Our BLE scan displays the following information:
+
+* Device Name, or 'Unknown'
+* Advertised Services
+* Manufacturer Name
+* Device Address
+* RSSI Strength
+* Last Seen Date
+
+Once you click on a device, you can easily update its name. If you're a developer or an IoT
+enthusiast, we've got you covered too! Once a device is connected with BLE Gatt, all of its
+services are displayed, allowing you to easily page through each of them. You can read from each 
+characteristic and descriptor, which returns BLE device data in the following formats:
+
+* Text/String, when possible
+* Hex String
+* Byte Array
+* Binary Data
+
+SanTanScan also parses the following services based on Bluetooth specifications:
+
+* Device Name
+* Appearance
+* Peripheral Preferred Connection
+
+If notifications are enabled, each service will also display notification data, if it's available.
+Once the data is read, you can copy it with one simple click. If the device allows it, you can also
+write to characteristics and descriptors. This allows you to control and communicate with your BLE
+devices to debug and validate all of your services.
+
+**ELK-BLEDOM Devices**
+
+Own an LED light strip? SanTanScan might be able to control it! If your device shows up as 
+ELK-BLEDOM, our app supports turning your light strip on and off, and changing the color and
+brightness.
+
+## Screenshots and Demo
+
+To check out my development progress along with a complete end-to-end demo, check out my [YouTube BLE Scanner App Playlist](https://youtu.be/CpBWF52IOk4).
+
+<button style="margin:6px;padding:14px;background:#0087ff;border-radius:25px;width:250px"><a href="https://youtu.be/CpBWF52IOk4" target="_blank" style="color:#e2e2e9">
+YouTube BLE Scanner App Playlist</a></button>
+
+
+<table cellspacing="1" cellpadding="1" width="100%">
+<tr><td><img src="ble-screenshots/home.png" style="width:400px"></td>
+<td><img src="ble-screenshots/favorites.png" style="width:400px"></td></tr>
+<tr><td><img src="ble-screenshots/read.png" style="width:400px"></td>
+<td><img src="ble-screenshots/write.png" style="width:400px"></td></tr>
+<tr><td><img src="ble-screenshots/edit.png" style="width:400px"></td>
+<td><img src="ble-screenshots/control.png" style="width:400px"></td>
+</tr></table>
+
+## Privacy Policy
+
+Your privacy is important! To see what we collect, check out our Privacy Policy.
+
+<button style="margin:6px;padding:14px;background:#0087ff;border-radius:25px;width:250px"><a href="PrivacyPolicy.md" target="_blank" style="color:#e2e2e9">
+Privacy Policy</a></button>
+
+
+# For Developers - Jetpack Compose BLE Scanner with Room, Koin, and JUnit 5
 
 Scan your BLE devices with my new Jetpack Compose app. BLE scans include:
 
