@@ -28,13 +28,32 @@ android {
         }
     }
 
+    def appPropertiesFile = rootProject.file("app.properties")
+    def appProperties = new Properties()
+    appProperties.load(new FileInputStream(appPropertiesFile))
+
+    signingConfigs {
+
+        release {
+            storeFile file(appProperties.getProperty("RELEASE_STORE_FILE"))
+            storePassword appProperties.getProperty("RELEASE_STORE_PASSWORD")
+            keyAlias appProperties.getProperty("RELEASE_KEY_ALIAS")
+            keyPassword appProperties.getProperty("RELEASE_KEY_PASSWORD")
+
+            // Optional, specify signing versions used
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
     buildTypes {
         debug {
             debuggable true
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

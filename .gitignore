@@ -100,3 +100,4 @@ lint/tmp/
 /sharedTest/src/main/java/com/santansarah/sharedtest/ServiceIds.kt
 /app/google-services.json
 /app/src/main/res/font/kanit_regular.ttf
+/app/santanscan.jks
