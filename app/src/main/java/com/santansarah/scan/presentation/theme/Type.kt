@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.unit.sp
 import com.santansarah.scan.R
 
@@ -20,7 +21,17 @@ val titleFamily = FontFamily(
 val appBarTitle = TextStyle(
     fontFamily = titleFamily,
     fontWeight = FontWeight.Normal,
-    fontSize = 24.sp
+    fontSize = 24.sp,
+    baselineShift = BaselineShift(.23f),
+    letterSpacing = .3.sp
+)
+
+val pagerHeaders = TextStyle(
+    fontFamily = titleFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 20.sp,
+    baselineShift = BaselineShift(.23f),
+    letterSpacing = .3.sp
 )
 
 val codeFont = TextStyle(

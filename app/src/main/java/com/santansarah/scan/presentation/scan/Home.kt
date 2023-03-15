@@ -89,7 +89,7 @@ fun HomeLayout(
     scanState: ScanState,
     multiplePermissionsState: MultiplePermissionsState,
     appSnackBarHostState: SnackbarHostState,
-    isScanning:Boolean,
+    isScanning: Boolean,
     isEditing: Boolean,
     startScan: () -> Unit,
     stopScan: () -> Unit,
@@ -129,7 +129,11 @@ fun HomeLayout(
     ) { padding ->
 
         if (!multiplePermissionsState.allPermissionsGranted) {
-            ShowPermissions(multiplePermissionsState)
+            ShowPermissions(
+                paddingValues = padding,
+                multiplePermissionsState,
+                onHelpClicked
+            )
         } else {
             if (scanState.scanUI.selectedDevice == null) {
                 DeviceListScreen(

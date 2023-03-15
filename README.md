@@ -71,6 +71,19 @@ Scan your BLE devices with my new Jetpack Compose app. BLE scans include:
 
 Includes partial support for [Microsoft Beacon](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cdp/77b446d0-8cea-4821-ad21-fabdf4d9a569).
 
+## Project Setup
+
+I use Google Analytics & Crashlytics to track app usage information. Because of this, I've 
+excluded my `google-services.json` file, so you'll have issues running the main branch as-is. 
+There are a few ways to get up and running:
+
+* Switch to the [`filters-previews-test`](https://github.com/santansarah/ble-scanner/tree/filters-previews-tests)
+  branch. It doesn't use [Firebase](https://firebase.google.com/).
+* Comment out the [Firebase](https://firebase.google.com/) dependencies. Analytics is an Interface,
+  so you could update the Koin DI folder to use an empty implementation.
+* Create your own [Firebase](https://firebase.google.com/) project and include your unique
+  `google-services.json`
+
 ## Video 1: Prepopulated Room Database, Data Layer Setup, and Room JUnit 5 Tests
 
 https://youtu.be/CpBWF52IOk4

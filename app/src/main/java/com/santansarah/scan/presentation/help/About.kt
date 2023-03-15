@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
@@ -56,6 +57,8 @@ import com.santansarah.scan.presentation.previewparams.LandscapeListParams
 import com.santansarah.scan.presentation.previewparams.PortraitLayouts
 import com.santansarah.scan.presentation.previewparams.PortraitListParams
 import com.santansarah.scan.presentation.theme.SanTanScanTheme
+import com.santansarah.scan.presentation.theme.appBarTitle
+import com.santansarah.scan.presentation.theme.pagerHeaders
 import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,8 +76,10 @@ fun AboutScreen(
     val gitHubLink = "https://www.github.com/santansarah"
     val discussionsLink = "https://github.com/santansarah/ble-scanner/discussions"
     val bugLink = "https://github.com/santansarah/ble-scanner/issues"
+    val aboutLink = "https://github.com/santansarah/ble-scanner"
+    val privacyPolicy = "https://github.com/santansarah/ble-scanner/blob/main/PrivacyPolicy.md"
 
-    val pagingItems = listOf("Questions & Help", "Report a Bug")
+    val pagingItems = listOf("About & Privacy", "Questions & Help", "Report a Bug")
     val pagingItemCount by rememberSaveable { mutableStateOf(pagingItems.count()) }
     var currentPagingIndex by rememberSaveable { mutableStateOf(0) }
 
@@ -85,7 +90,8 @@ fun AboutScreen(
         topBar = {
             if (!appLayoutInfo.appLayoutMode.isLandscape()) {
                 BasicBackTopAppBar(appLayoutInfo = appLayoutInfo, onBackClicked = onBackClicked) {
-                    Text(text = "About/Help")
+                    Text(text = "About/Help",
+                        style = appBarTitle)
                 }
             }
         }
@@ -133,13 +139,21 @@ fun AboutScreen(
                             }
                         )
 
-                        if (currentPagingIndex == 0)
-                            HelpCard(
+                        when (currentPagingIndex) {
+                            0 -> AboutAndPrivacy(
+                                uriHandler = uriHandler,
+                                aboutLink = aboutLink,
+                                privacyPolicyLink = privacyPolicy
+                            )
+
+                            1 -> HelpCard(
                                 uriHandler = uriHandler,
                                 discussionsLink = discussionsLink,
                             )
-                        else
-                            BugCard(uriHandler = uriHandler, bugLink = bugLink)
+
+                            else ->
+                                BugCard(uriHandler = uriHandler, bugLink = bugLink)
+                        }
                     }
                 }
 
@@ -162,13 +176,26 @@ fun AboutScreen(
                     }
                 )
 
-                if (currentPagingIndex == 0)
-                    HelpCard(
-                        uriHandler = uriHandler,
-                        discussionsLink = discussionsLink,
-                    )
-                else
-                    BugCard(uriHandler = uriHandler, bugLink = bugLink)
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    when (currentPagingIndex) {
+                        0 -> AboutAndPrivacy(
+                            uriHandler = uriHandler,
+                            aboutLink = aboutLink,
+                            privacyPolicyLink = privacyPolicy
+                        )
+
+                        1 -> HelpCard(
+                            uriHandler = uriHandler,
+                            discussionsLink = discussionsLink,
+                        )
+
+                        else ->
+                            BugCard(uriHandler = uriHandler, bugLink = bugLink)
+                    }
+                }
+
             }
 
         }
@@ -237,6 +264,87 @@ fun AboutPager(
 }
 
 @Composable
+fun AboutAndPrivacy(
+    uriHandler: UriHandler,
+    aboutLink: String,
+    privacyPolicyLink: String
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+
+        OutlinedCard(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(12.dp),
+            ) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "About Icon",
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 6.dp),
+                        text = "Learn More",
+                        style = pagerHeaders,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
+                Divider(modifier = Modifier.padding(top = 8.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "SanTanScan is a Bluetooth Low Energy (BLE) scanner and debugger " +
+                            "available for Android 9+. Features include BLE scanning, sorting, " +
+                            "reading and writing to devices, and more.\n\nWe use Google Analytics to capture app usage " +
+                            "statistics. To learn more, check out our Privacy Policy."
+                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                val buttonTextColor = if (isSystemInDarkTheme())
+                    MaterialTheme.colorScheme.surface
+                else
+                    MaterialTheme.colorScheme.onPrimary
+
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        uriHandler.openUri(aboutLink)
+                    }) {
+                    Text(text = "About this App")
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        uriHandler.openUri(privacyPolicyLink)
+                    }) {
+                    Text(text = "Privacy Policy")
+                }
+
+            }
+        }
+    }
+}
+
+
+@Composable
 fun HelpCard(
     uriHandler: UriHandler,
     discussionsLink: String,
@@ -264,9 +372,9 @@ fun HelpCard(
                         tint = MaterialTheme.colorScheme.onSecondary
                     )
                     Text(
-                        modifier = Modifier.padding(start = 4.dp),
+                        modifier = Modifier.padding(start = 6.dp),
                         text = "GitHub Discussions",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = pagerHeaders,
                         color = MaterialTheme.colorScheme.onSecondary
                     )
                 }
@@ -329,9 +437,9 @@ fun BugCard(
                         tint = MaterialTheme.colorScheme.onSecondary
                     )
                     Text(
-                        modifier = Modifier.padding(start = 4.dp),
+                        modifier = Modifier.padding(start = 6.dp),
                         text = "GitHub Issues",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = pagerHeaders,
                         color = MaterialTheme.colorScheme.onSecondary
                     )
                 }
@@ -379,9 +487,9 @@ private fun AppInfo() {
     ) {
         Image(
             modifier = Modifier
-                .size(84.dp)
+                .size(76.dp)
                 .padding(4.dp)
-                .offset(y=3.dp),
+                .offset(y = 3.dp),
             painter = painterResource(id = R.drawable.santanscan_logo_print),
             contentDescription = "App Logo"
         )
