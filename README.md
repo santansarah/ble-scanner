@@ -41,11 +41,12 @@ ELK-BLEDOM, our app supports turning your light strip on and off, and changing t
 brightness.
 
 ## BLE YouTube Playlist
-> A lot's changed in the app since I first started :) If you'd like to following along on my journey, check out the playlist below.
+> A lot's changed in the app since I first started. If you'd like to follow along on my journey, check out the playlist below.
 
 <a href="https://www.youtube.com/playlist?list=PLzxawGXQRFsyAEuKdGBHj6Rhh2R_vYkFK" target="_blank"><img src="https://img.youtube.com/vi/CpBWF52IOk4/0.jpg"></a>
 
 ## BLE Scanner App Demo
+> Make sure the quality is set to HD in settings. 
 
 <a href="https://www.youtube.com/watch?v=ZCs6SXIiObU" target="_blank"><img src="https://img.youtube.com/vi/ZCs6SXIiObU/0.jpg"></a>
 
