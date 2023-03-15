@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -31,12 +32,16 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionState
 import com.santansarah.scan.R
+import com.santansarah.scan.presentation.previewparams.landscapeNormal
+import com.santansarah.scan.presentation.previewparams.portrait
 import com.santansarah.scan.presentation.theme.SanTanScanTheme
 import com.santansarah.scan.presentation.theme.pagerHeaders
+import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ShowPermissions(
+    appLayoutInfo: AppLayoutInfo,
     paddingValues: PaddingValues,
     multiplePermissionsState: MultiplePermissionsState,
     onAboutClick: () -> Unit
@@ -103,30 +108,60 @@ fun ShowPermissions(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    onClick = {
-                        multiplePermissionsState.launchMultiplePermissionRequest()
-                    }) {
-                    Text(text = "Allow Permissions")
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    onClick = {
-                        onAboutClick()
-                    }) {
-                    Text(text = "About & Help")
+                if (appLayoutInfo.appLayoutMode.isLandscape()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(.4f, false)
+                        ) {
+                            AllowButton { multiplePermissionsState.launchMultiplePermissionRequest() }
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            modifier = Modifier.weight(.4f, false)
+                        ) {
+                            AboutButton(onAboutClick)
+                        }
+                    }
+                } else {
+                    AllowButton { multiplePermissionsState.launchMultiplePermissionRequest() }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    AboutButton(onAboutClick)
                 }
             }
         }
     }
 
+}
+
+@Composable
+private fun AboutButton(onAboutClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        onClick = {
+            onAboutClick()
+        }) {
+        Text(text = "About & Help")
+    }
+}
+
+@Composable
+private fun AllowButton(
+    onAllowClick: () -> Unit
+) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        onClick = {
+            onAllowClick()
+        }) {
+        Text(text = "Allow Permissions")
+    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -136,6 +171,37 @@ fun PermissionsPreview() {
     SanTanScanTheme(dynamicColor = false) {
         Surface() {
             ShowPermissions(
+                portrait,
+                paddingValues = PaddingValues(0.dp),
+                multiplePermissionsState = object : MultiplePermissionsState {
+                    override val allPermissionsGranted: Boolean
+                        get() = TODO("Not yet implemented")
+                    override val permissions: List<PermissionState>
+                        get() = TODO("Not yet implemented")
+                    override val revokedPermissions: List<PermissionState>
+                        get() = TODO("Not yet implemented")
+                    override val shouldShowRationale: Boolean
+                        get() = TODO("Not yet implemented")
+
+                    override fun launchMultiplePermissionRequest() {
+                        TODO("Not yet implemented")
+                    }
+                },
+                {})
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
+@Composable
+fun PermissionsLandscapePreview() {
+    SanTanScanTheme(dynamicColor = false) {
+        Surface() {
+            ShowPermissions(
+                landscapeNormal,
                 paddingValues = PaddingValues(0.dp),
                 multiplePermissionsState = object : MultiplePermissionsState {
                     override val allPermissionsGranted: Boolean

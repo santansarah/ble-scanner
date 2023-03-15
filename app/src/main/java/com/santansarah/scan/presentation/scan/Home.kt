@@ -130,9 +130,10 @@ fun HomeLayout(
 
         if (!multiplePermissionsState.allPermissionsGranted) {
             ShowPermissions(
+                appLayoutInfo = appLayoutInfo,
                 paddingValues = padding,
-                multiplePermissionsState,
-                onHelpClicked
+                multiplePermissionsState = multiplePermissionsState,
+                onAboutClick = onHelpClicked
             )
         } else {
             if (scanState.scanUI.selectedDevice == null) {
