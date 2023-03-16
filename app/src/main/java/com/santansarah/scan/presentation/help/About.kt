@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -46,10 +47,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.santansarah.scan.BuildConfig
 import com.santansarah.scan.R
+import com.santansarah.scan.domain.aboutLink
+import com.santansarah.scan.domain.bugLink
+import com.santansarah.scan.domain.discussionsLink
+import com.santansarah.scan.domain.gitHubLink
+import com.santansarah.scan.domain.linkedInLink
+import com.santansarah.scan.domain.privacyPolicy
+import com.santansarah.scan.domain.termsLink
+import com.santansarah.scan.domain.youTubeLink
 import com.santansarah.scan.presentation.components.BasicBackTopAppBar
 import com.santansarah.scan.presentation.previewparams.FeatureParams
 import com.santansarah.scan.presentation.previewparams.LandscapeLayouts
@@ -71,15 +84,8 @@ fun AboutScreen(
     val appSnackBarHostState = remember { SnackbarHostState() }
 
     val uriHandler = LocalUriHandler.current
-    val youTubeLink = "https://www.youtube.com/@santansarah"
-    val linkedInLink = "https://www.linkedin.com/in/santansarah"
-    val gitHubLink = "https://www.github.com/santansarah"
-    val discussionsLink = "https://github.com/santansarah/ble-scanner/discussions"
-    val bugLink = "https://github.com/santansarah/ble-scanner/issues"
-    val aboutLink = "https://github.com/santansarah/ble-scanner"
-    val privacyPolicy = "https://github.com/santansarah/ble-scanner/blob/main/PrivacyPolicy.md"
 
-    val pagingItems = listOf("About & Privacy", "Questions & Help", "Report a Bug")
+    val pagingItems = listOf("About, Terms, Privacy", "Questions & Help", "Report a Bug")
     val pagingItemCount by rememberSaveable { mutableStateOf(pagingItems.count()) }
     var currentPagingIndex by rememberSaveable { mutableStateOf(0) }
 
@@ -90,8 +96,10 @@ fun AboutScreen(
         topBar = {
             if (!appLayoutInfo.appLayoutMode.isLandscape()) {
                 BasicBackTopAppBar(appLayoutInfo = appLayoutInfo, onBackClicked = onBackClicked) {
-                    Text(text = "SanTanScan",
-                        style = appBarTitle)
+                    Text(
+                        text = "SanTanScan",
+                        style = appBarTitle
+                    )
                 }
             }
         }
@@ -120,7 +128,10 @@ fun AboutScreen(
                             appLayoutInfo = appLayoutInfo,
                             onBackClicked = onBackClicked,
                             titleContent = {
-                                SocialIcons(uriHandler, youTubeLink, linkedInLink, gitHubLink)
+                                SocialIcons(
+                                    uriHandler, youTubeLink,
+                                    linkedInLink, gitHubLink
+                                )
                             }
                         )
                         Spacer(modifier = Modifier.height(12.dp))
@@ -143,7 +154,8 @@ fun AboutScreen(
                             0 -> AboutAndPrivacy(
                                 uriHandler = uriHandler,
                                 aboutLink = aboutLink,
-                                privacyPolicyLink = privacyPolicy
+                                privacyPolicyLink = privacyPolicy,
+                                termsLink = termsLink
                             )
 
                             1 -> HelpCard(
@@ -183,7 +195,8 @@ fun AboutScreen(
                         0 -> AboutAndPrivacy(
                             uriHandler = uriHandler,
                             aboutLink = aboutLink,
-                            privacyPolicyLink = privacyPolicy
+                            privacyPolicyLink = privacyPolicy,
+                            termsLink = termsLink
                         )
 
                         1 -> HelpCard(
@@ -267,7 +280,8 @@ fun AboutPager(
 fun AboutAndPrivacy(
     uriHandler: UriHandler,
     aboutLink: String,
-    privacyPolicyLink: String
+    privacyPolicyLink: String,
+    termsLink: String
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -300,13 +314,18 @@ fun AboutAndPrivacy(
                 }
                 Divider(modifier = Modifier.padding(top = 8.dp))
                 Spacer(modifier = Modifier.height(20.dp))
+
                 Text(
                     text = "SanTanScan is a Bluetooth Low Energy (BLE) scanner and debugger " +
                             "available for Android 9+. Features include BLE scanning, sorting, " +
-                            "reading and writing to devices, and more.\n\nWe use Google Analytics to capture app usage " +
-                            "statistics. To learn more, check out our Privacy Policy."
+                            "reading and writing to devices, and more. "
                 )
-
+                Spacer(modifier = Modifier.height(10.dp))
+                LegalStuff(
+                    privacyPolicyLink = privacyPolicyLink,
+                    termsLink = termsLink,
+                    uriHandler = uriHandler
+                )
                 Spacer(modifier = Modifier.height(30.dp))
 
                 val buttonTextColor = if (isSystemInDarkTheme())
@@ -323,19 +342,6 @@ fun AboutAndPrivacy(
                         uriHandler.openUri(aboutLink)
                     }) {
                     Text(text = "About this App")
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        uriHandler.openUri(privacyPolicyLink)
-                    }) {
-                    Text(text = "Privacy Policy")
                 }
 
             }
@@ -443,7 +449,7 @@ fun BugCard(
                         color = MaterialTheme.colorScheme.onSecondary
                     )
                 }
-                Divider(modifier = Modifier.padding(top=8.dp))
+                Divider(modifier = Modifier.padding(top = 8.dp))
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "To report a bug, create a GitHub issue. Be sure to include all " +
@@ -499,7 +505,7 @@ private fun AppInfo() {
         ) {
             Text(
                 text = "Sarah Brenner",
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
@@ -507,9 +513,11 @@ private fun AppInfo() {
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            Text(text = "Version: ${BuildConfig.VERSION_NAME}",
+            Text(
+                text = "Version: ${BuildConfig.VERSION_NAME}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer)
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }
@@ -563,6 +571,63 @@ private fun SocialIcons(
             })
 
     }
+}
+
+@Composable
+fun LegalStuff(
+    privacyPolicyLink: String,
+    termsLink: String,
+    uriHandler: UriHandler
+) {
+
+    val annotatedString = buildAnnotatedString {
+        withStyle(style = SpanStyle(
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface)
+        ) {
+            append("Note: By using SanTanScan, you agree to the ")
+        }
+
+        pushStringAnnotation(tag = "policy", annotation = privacyPolicyLink)
+        withStyle(style = SpanStyle(
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.primary)) {
+            append("Privacy Policy")
+        }
+        pop()
+
+        withStyle(style = SpanStyle(
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface)) {
+            append(" and ")
+        }
+        pushStringAnnotation(tag = "terms", annotation = termsLink)
+
+        withStyle(style = SpanStyle(
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.primary)) {
+            append("Terms of Service.")
+        }
+        pop()
+    }
+
+    ClickableText(text = annotatedString,
+        style = MaterialTheme.typography.bodyLarge,
+        onClick = { offset ->
+            annotatedString.getStringAnnotations(
+                tag = "policy", start = offset, end = offset
+            ).firstOrNull()?.let { stringAnnotation ->
+                uriHandler.openUri(stringAnnotation.item)
+            }
+
+            annotatedString.getStringAnnotations(
+                tag = "terms",
+                start = offset, end = offset
+            ).firstOrNull()?.let { stringAnnotation ->
+                uriHandler.openUri(stringAnnotation.item)
+            }
+        })
+
 }
 
 @PortraitLayouts

@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionState
 import com.santansarah.scan.R
+import com.santansarah.scan.domain.privacyPolicy
+import com.santansarah.scan.domain.termsLink
+import com.santansarah.scan.presentation.help.LegalStuff
 import com.santansarah.scan.presentation.previewparams.FeatureParams
 import com.santansarah.scan.presentation.previewparams.LandscapeBig
 import com.santansarah.scan.presentation.previewparams.LandscapeBigListParams
@@ -53,6 +57,8 @@ fun ShowPermissions(
     multiplePermissionsState: MultiplePermissionsState,
     onAboutClick: () -> Unit
 ) {
+
+    val uriHandler = LocalUriHandler.current
 
     Column(
         modifier = Modifier
@@ -78,7 +84,6 @@ fun ShowPermissions(
             Column(
                 modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 Row(
@@ -117,8 +122,13 @@ fun ShowPermissions(
                 Text(
                     text = "Before you can start scanning for BLE devices, first, " +
                             "you'll need to enable some Bluetooth and Location permissions.",
-
                     )
+                Spacer(modifier = Modifier.height(10.dp))
+                LegalStuff(
+                    privacyPolicyLink = privacyPolicy,
+                    termsLink = termsLink,
+                    uriHandler = uriHandler
+                )
 
                 Spacer(modifier = Modifier.height(30.dp))
 
@@ -159,7 +169,7 @@ private fun AboutButton(onAboutClick: () -> Unit) {
         onClick = {
             onAboutClick()
         }) {
-        Text(text = "Help & Privacy")
+        Text(text = "Learn More")
     }
 }
 
