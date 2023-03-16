@@ -55,7 +55,7 @@ brightness.
 <a href="https://www.youtube.com/watch?v=ZCs6SXIiObU" target="_blank"><img src="https://img.youtube.com/vi/ZCs6SXIiObU/0.jpg"></a>
 
 <table cellspacing="1" cellpadding="1" width="100%">
-<tr><td><img src="ble-screenshots/home.png" style="width:400px"></td>
+<tr><td><img src="ble-screenshots/rssi-home.gif" style="width:400px"></td>
 <td><img src="ble-screenshots/favorites.png" style="width:400px"></td></tr>
 <tr><td><img src="ble-screenshots/read.png" style="width:400px"></td>
 <td><img src="ble-screenshots/write.png" style="width:400px"></td></tr>
