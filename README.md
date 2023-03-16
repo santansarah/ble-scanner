@@ -82,7 +82,8 @@ There are a few ways to get up and running:
 * Comment out the [Firebase](https://firebase.google.com/) dependencies. Analytics is an Interface,
   so you could update the Koin DI folder to use an empty implementation.
 * Create your own [Firebase](https://firebase.google.com/) project and include your unique
-  `google-services.json`
+  `google-services.json`. You'll need to create your own unique `Package Name` if you choose this
+  option.
 
 ## Video 1: Prepopulated Room Database, Data Layer Setup, and Room JUnit 5 Tests
 
