@@ -33,6 +33,34 @@ class PortraitListParams : PreviewParameterProvider<FeatureParams> {
         ),
     )
 }
+
+class PortraitNarrowListParams : PreviewParameterProvider<FeatureParams> {
+
+    override val values = sequenceOf(
+        FeatureParams(
+            ScanState(
+                ScanUI(
+                    devices,
+                    null,
+                    ConnectionState.CONNECTING,
+                    null,
+                    null),
+                BleConnectEvents({}, {}),
+                BleReadWriteCommands(
+                    {},
+                    { _: String, _: String -> },
+                    { _: String, _: String -> },
+                    { _: String, _: String, _: String -> },
+                ),
+                DeviceEvents({}, {}, {},{},{})
+            ),
+            devices,
+            deviceDetail,
+            portraitNarrow
+        ),
+    )
+}
+
 class LandscapeListParams : PreviewParameterProvider<FeatureParams> {
 
     override val values = sequenceOf(

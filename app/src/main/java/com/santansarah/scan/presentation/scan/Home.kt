@@ -112,7 +112,8 @@ fun HomeLayout(
                     scanning = isScanning,
                     onStartScan = startScan,
                     onStopScan = stopScan,
-                    onHelp = onHelpClicked
+                    onHelp = onHelpClicked,
+                    permissionsGranted = multiplePermissionsState.allPermissionsGranted
                 )
             else
                 if (!appLayoutInfo.appLayoutMode.isLandscape())

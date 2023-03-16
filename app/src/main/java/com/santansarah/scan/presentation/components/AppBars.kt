@@ -112,7 +112,8 @@ fun HomeAppBar(
     scanning: Boolean,
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
-    onHelp: () -> Unit
+    onHelp: () -> Unit,
+    permissionsGranted: Boolean
 ) {
 
     var homeMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -150,7 +151,7 @@ fun HomeAppBar(
                     containerColor = MaterialTheme.colorScheme.primary,
                     disabledContentColor = MaterialTheme.colorScheme.outline
                 ),
-                enabled = !scanning,
+                enabled = (permissionsGranted && !scanning),
                 onClick = { onStartScan() },
                 content = {
                     Icon(
@@ -209,7 +210,7 @@ fun BasicBackTopAppBar(
 @Composable
 fun PreviewHomeBar() {
     SanTanScanTheme() {
-        HomeAppBar(scanning = true, {}, {}, {})
+        HomeAppBar(scanning = true, {}, {}, {}, true)
     }
 }
 

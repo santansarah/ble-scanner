@@ -90,7 +90,7 @@ fun AboutScreen(
         topBar = {
             if (!appLayoutInfo.appLayoutMode.isLandscape()) {
                 BasicBackTopAppBar(appLayoutInfo = appLayoutInfo, onBackClicked = onBackClicked) {
-                    Text(text = "About/Help",
+                    Text(text = "SanTanScan",
                         style = appBarTitle)
                 }
             }
@@ -498,13 +498,13 @@ private fun AppInfo() {
             modifier = Modifier.padding(start = 6.dp)
         ) {
             Text(
-                text = "SanTanScan",
-                style = MaterialTheme.typography.titleLarge,
+                text = "Sarah Brenner",
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(
-                text = "by Sarah Brenner",
-                style = MaterialTheme.typography.titleMedium,
+                text = "Phoenix, AZ",
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
             Text(text = "Version: ${BuildConfig.VERSION_NAME}",

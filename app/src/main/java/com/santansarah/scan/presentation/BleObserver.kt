@@ -30,13 +30,15 @@ class BleObserver(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
+
         createBroadcastReceiver()
         btEnableResultLauncher = registerHandler(owner, "EnableBLE")
-
     }
 
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
+
+        Timber.d("onPause called")
 
         try {
             activity.unregisterReceiver(broadcastReceiver)
@@ -50,15 +52,16 @@ class BleObserver(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
 
+        Timber.d("onResume called...")
+
         ContextCompat.registerReceiver(
             activity, broadcastReceiver,
             IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED),
             ContextCompat.RECEIVER_EXPORTED
         )
 
-        if (!btAdapter.isEnabled) {
+        if (!btAdapter.isEnabled)
             launchEnableBtAdapter()
-        }
 
         bleManager.scan()
     }
@@ -67,22 +70,25 @@ class BleObserver(
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
 
-                //activity.lifecycleScope.launch {
+                // activity.lifecycleScope.launch {
                 val action = intent.action
                 Timber.d("btadapter changed $action")
 
                 // It means the user has changed their bluetooth state.
                 if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    Timber.d("btadapter state: ${btAdapter.state} / ${btAdapter.isEnabled}")
                     if (btAdapter.state == BluetoothAdapter.STATE_OFF) {
-                        bleManager.stopScan()
+                        //bleManager.isScanning.value = false
+                        //bleManager.stopScan()
                         launchEnableBtAdapter()
                     }
                     if (btAdapter.state == BluetoothAdapter.STATE_ON) {
+                        //Timber.d("btadapter back on...")
                         //delay(300L)
-                        bleManager.scan()
+                        //bleManager.scan()
                     }
+                    //}
                 }
-                // }
             }
 
 

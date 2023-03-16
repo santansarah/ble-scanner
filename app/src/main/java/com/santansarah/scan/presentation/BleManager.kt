@@ -24,7 +24,7 @@ class BleManager(
     private val btScanner = btAdapter.bluetoothLeScanner
 
     val userMessage = MutableStateFlow<String?>(null)
-    val isScanning = MutableStateFlow(true)
+    val isScanning = MutableStateFlow(false)
 
     var scanEnabled = false
 
@@ -36,6 +36,15 @@ class BleManager(
         .build()
 
     private val scanCallback = object : ScanCallback() {
+
+        override fun onScanFailed(errorCode: Int) {
+            super.onScanFailed(errorCode)
+            Timber.e("Scan error $errorCode")
+            if (errorCode == 1) {
+                stopScan()
+                scan()
+            }
+        }
 
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -63,27 +72,21 @@ class BleManager(
         }
     }
 
-    init {
-        if (!btAdapter.isEnabled)
-            isScanning.value = false
-
-        /*scope.launch {
-            bleRepository.deleteScans()
-            //scan()
-        }*/
-    }
-
     @SuppressLint("MissingPermission")
     fun scan() {
-        if (scanEnabled) {
-            if (btAdapter.isEnabled) {
-                isScanning.value = true
-                btScanner?.startScan(null, scanSettings, scanCallback)
-                lastCleanupTimestamp = System.currentTimeMillis()
-                Timber.d("started scan")
-            } else {
-                userMessage.value = "You must enable Bluetooth to start scanning."
+        try {
+            if (scanEnabled) {
+                if (btAdapter.isEnabled) {
+                    isScanning.value = true
+                    btScanner?.startScan(null, scanSettings, scanCallback) ?: Timber.d("btScanner is null")
+                    lastCleanupTimestamp = System.currentTimeMillis()
+                    Timber.d("started scan")
+                } else {
+                    userMessage.value = "You must enable Bluetooth to start scanning."
+                }
             }
+        } catch (e: Exception) {
+            Timber.e(e, e.message, "START_SCAN")
         }
     }
 

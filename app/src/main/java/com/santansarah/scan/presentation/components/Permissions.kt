@@ -1,6 +1,5 @@
 package com.santansarah.scan.presentation.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,17 +25,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.PermissionState
 import com.santansarah.scan.R
-import com.santansarah.scan.presentation.previewparams.landscapeNormal
-import com.santansarah.scan.presentation.previewparams.portrait
+import com.santansarah.scan.presentation.previewparams.FeatureParams
+import com.santansarah.scan.presentation.previewparams.LandscapeBig
+import com.santansarah.scan.presentation.previewparams.LandscapeBigListParams
+import com.santansarah.scan.presentation.previewparams.LandscapeLayouts
+import com.santansarah.scan.presentation.previewparams.LandscapeListParams
+import com.santansarah.scan.presentation.previewparams.PortraitLayouts
+import com.santansarah.scan.presentation.previewparams.PortraitListParams
+import com.santansarah.scan.presentation.previewparams.PortraitNarrowLayouts
+import com.santansarah.scan.presentation.previewparams.PortraitNarrowListParams
 import com.santansarah.scan.presentation.theme.SanTanScanTheme
 import com.santansarah.scan.presentation.theme.pagerHeaders
 import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
+import com.santansarah.scan.utils.windowinfo.AppLayoutMode
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -58,8 +65,15 @@ fun ShowPermissions(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        val cardPadding = when(appLayoutInfo.appLayoutMode) {
+            AppLayoutMode.LANDSCAPE_BIG -> PaddingValues(150.dp)
+            AppLayoutMode.LANDSCAPE_NORMAL -> PaddingValues(horizontal = 60.dp)
+            AppLayoutMode.PORTRAIT -> PaddingValues(16.dp)
+            AppLayoutMode.PORTRAIT_NARROW -> PaddingValues(40.dp)
+        }
+
         OutlinedCard(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(cardPadding)
         ) {
             Column(
                 modifier = Modifier.padding(12.dp),
@@ -145,7 +159,7 @@ private fun AboutButton(onAboutClick: () -> Unit) {
         onClick = {
             onAboutClick()
         }) {
-        Text(text = "About & Help")
+        Text(text = "Help & Privacy")
     }
 }
 
@@ -165,13 +179,15 @@ private fun AllowButton(
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
+@PortraitLayouts
 @Composable
-fun PermissionsPreview() {
+fun PermissionsPreview(
+    @PreviewParameter(PortraitListParams::class) featureParams: FeatureParams
+) {
     SanTanScanTheme(dynamicColor = false) {
         Surface() {
             ShowPermissions(
-                portrait,
+                featureParams.appLayoutInfo,
                 paddingValues = PaddingValues(0.dp),
                 multiplePermissionsState = object : MultiplePermissionsState {
                     override val allPermissionsGranted: Boolean
@@ -193,15 +209,76 @@ fun PermissionsPreview() {
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES,
-    device = "spec:parent=pixel_5,orientation=landscape"
-)
+@PortraitNarrowLayouts
 @Composable
-fun PermissionsLandscapePreview() {
+fun PermissionsNarrowPreview(
+    @PreviewParameter(PortraitNarrowListParams::class) featureParams: FeatureParams
+) {
     SanTanScanTheme(dynamicColor = false) {
         Surface() {
             ShowPermissions(
-                landscapeNormal,
+                featureParams.appLayoutInfo,
+                paddingValues = PaddingValues(0.dp),
+                multiplePermissionsState = object : MultiplePermissionsState {
+                    override val allPermissionsGranted: Boolean
+                        get() = TODO("Not yet implemented")
+                    override val permissions: List<PermissionState>
+                        get() = TODO("Not yet implemented")
+                    override val revokedPermissions: List<PermissionState>
+                        get() = TODO("Not yet implemented")
+                    override val shouldShowRationale: Boolean
+                        get() = TODO("Not yet implemented")
+
+                    override fun launchMultiplePermissionRequest() {
+                        TODO("Not yet implemented")
+                    }
+                },
+                {})
+        }
+    }
+}
+
+
+@OptIn(ExperimentalPermissionsApi::class)
+@LandscapeLayouts
+@Composable
+fun PermissionsLandscapePreview(
+    @PreviewParameter(LandscapeListParams::class) featureParams: FeatureParams
+) {
+    SanTanScanTheme(dynamicColor = false) {
+        Surface() {
+            ShowPermissions(
+                featureParams.appLayoutInfo,
+                paddingValues = PaddingValues(0.dp),
+                multiplePermissionsState = object : MultiplePermissionsState {
+                    override val allPermissionsGranted: Boolean
+                        get() = TODO("Not yet implemented")
+                    override val permissions: List<PermissionState>
+                        get() = TODO("Not yet implemented")
+                    override val revokedPermissions: List<PermissionState>
+                        get() = TODO("Not yet implemented")
+                    override val shouldShowRationale: Boolean
+                        get() = TODO("Not yet implemented")
+
+                    override fun launchMultiplePermissionRequest() {
+                        TODO("Not yet implemented")
+                    }
+                },
+                {})
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@LandscapeBig
+@Composable
+fun PermissionsLandscapeBigPreview(
+    @PreviewParameter(LandscapeBigListParams::class) featureParams: FeatureParams
+) {
+    SanTanScanTheme(dynamicColor = false) {
+        Surface() {
+            ShowPermissions(
+                featureParams.appLayoutInfo,
                 paddingValues = PaddingValues(0.dp),
                 multiplePermissionsState = object : MultiplePermissionsState {
                     override val allPermissionsGranted: Boolean
