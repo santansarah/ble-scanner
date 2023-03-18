@@ -16,50 +16,49 @@ class ParseScanResult
     @SuppressLint("MissingPermission")
     suspend operator fun invoke(result: ScanResult) {
 
-        Timber.d("device: $result")
+        try {
 
-        var mfName: String? = null
-        var services: List<String>? = null
-        var extra: List<String>? = null
+            var mfName: String? = null
+            var services: List<String>? = null
+            var extra: List<String>? = null
 
-        result.scanRecord?.manufacturerSpecificData?.let { mfData ->
-            getMfId(mfData)?.let { mfId ->
-                mfName = bleRepository.getCompanyById(mfId)?.name
+            result.scanRecord?.manufacturerSpecificData?.let { mfData ->
+                getMfId(mfData)?.let { mfId ->
+                    mfName = bleRepository.getCompanyById(mfId)?.name
 
-                result.scanRecord?.getManufacturerSpecificData(mfId)?.let { mfBytes ->
-                    if (mfId == 6) {
-                        bleRepository.getMsDevice(mfBytes)?.let { msDevice ->
-                            extra = listOf(msDevice)
+                    result.scanRecord?.getManufacturerSpecificData(mfId)?.let { mfBytes ->
+                        if (mfId == 6) {
+                            bleRepository.getMsDevice(mfBytes)?.let { msDevice ->
+                                extra = listOf(msDevice)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        result.scanRecord?.serviceUuids?.let {
-            services = bleRepository.getServices(it)
-        }
+            result.scanRecord?.serviceUuids?.let {
+                services = bleRepository.getServices(it)
+            }
 
-        var device = ScannedDevice(
-            deviceId = 0,
-            deviceName = result.device.name,
-            address = result.device.address,
-            rssi = result.rssi,
-            manufacturer = mfName,
-            services = services,
-            extra = extra,
-            lastSeen = result.timestampNanos.toMillis(),
-            customName = null,
-            baseRssi = 0,
-            favorite = false,
-            forget = false
-        )
+            val device = ScannedDevice(
+                deviceId = 0,
+                deviceName = result.device.name,
+                address = result.device.address,
+                rssi = result.rssi,
+                manufacturer = mfName,
+                services = services,
+                extra = extra,
+                lastSeen = result.timestampNanos.toMillis(),
+                customName = null,
+                baseRssi = 0,
+                favorite = false,
+                forget = false
+            )
 
-        if (device.manufacturer != "Microsoft"
-            || device.deviceName?.endsWith("-PC") == false) {
             val recNum = bleRepository.insertDevice(device)
+        } catch (e: Exception) {
+            Timber.e(e, "Insert Device")
         }
-        Timber.d("$device")
 
     }
 

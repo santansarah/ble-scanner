@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import com.santansarah.scan.local.entities.ScannedDevice
 import com.santansarah.scan.domain.models.ScanFilterOption
+import com.santansarah.scan.local.entities.ScannedDevice
 import com.santansarah.scan.presentation.previewparams.FeatureParams
 import com.santansarah.scan.presentation.previewparams.LandscapeBig
 import com.santansarah.scan.presentation.previewparams.LandscapeBigListParams
@@ -73,10 +73,14 @@ fun ScannedDeviceList(
     onForget: (ScannedDevice) -> Unit
 ) {
 
-    val sidePadding = if (appLayoutInfo.appLayoutMode == AppLayoutMode.PORTRAIT_NARROW)
-        16.dp
-    else
-        8.dp
+    val sidePadding = when(appLayoutInfo.appLayoutMode) {
+        AppLayoutMode.PORTRAIT_NARROW -> 16.dp
+        AppLayoutMode.LANDSCAPE_BIG -> 30.dp
+        AppLayoutMode.LANDSCAPE_NORMAL -> 16.dp
+        else -> 8.dp
+    }
+
+
 
     LazyColumn(
         modifier = Modifier.padding(sidePadding)

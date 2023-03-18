@@ -54,7 +54,8 @@ class HomeScanListTest {
                         stopScan = { /*TODO*/ },
                         onControlClick = {},
                         onFilter ={},
-                        onShowUserMessage ={}
+                        onShowUserMessage ={},
+                        onHelpClicked = {}
                     )
                 }
             }

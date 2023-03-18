@@ -3,7 +3,6 @@ package com.santansarah.scan.presentation.previewparams
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.santansarah.scan.local.entities.ScannedDevice
 import com.santansarah.scan.domain.bleparsables.CCCD
 import com.santansarah.scan.domain.models.BleConnectEvents
 import com.santansarah.scan.domain.models.BleProperties
@@ -17,6 +16,7 @@ import com.santansarah.scan.domain.models.DeviceEvents
 import com.santansarah.scan.domain.models.DeviceService
 import com.santansarah.scan.domain.models.ScanState
 import com.santansarah.scan.domain.models.ScanUI
+import com.santansarah.scan.local.entities.ScannedDevice
 import com.santansarah.scan.utils.windowinfo.AppLayoutInfo
 import com.santansarah.scan.utils.windowinfo.AppLayoutMode
 
@@ -272,7 +272,7 @@ class LandscapePreviewParams : PreviewParameterProvider<FeatureParams> {
             address = "BE:00:FA:00:XX:00",
             rssi = -77,
             manufacturer = null,
-            services = listOf("[Human Interface Device"),
+            services = listOf("Human Interface Device"),
             extra = null,
             lastSeen = 1674510398719,
             customName = null,

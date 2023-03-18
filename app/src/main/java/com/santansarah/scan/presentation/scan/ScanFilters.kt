@@ -2,9 +2,12 @@ package com.santansarah.scan.presentation.scan
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -21,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.santansarah.scan.domain.models.SCAN_FILTERS
 import com.santansarah.scan.domain.models.ScanFilterOption
+import com.santansarah.scan.presentation.previewparams.landscapeBig
 import com.santansarah.scan.presentation.previewparams.landscapeNormal
 import com.santansarah.scan.presentation.previewparams.portrait
 import com.santansarah.scan.presentation.theme.SanTanScanTheme
@@ -41,13 +45,23 @@ fun ScanFilters(
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
     ) {
         if (appLayoutInfo.appLayoutMode.isLandscape()) {
+
+            val paddingValues = when (appLayoutInfo.appLayoutMode) {
+                AppLayoutMode.LANDSCAPE_BIG -> PaddingValues(
+                    30.dp
+                )
+                else -> PaddingValues(
+                    start = 16.dp, end = 16.dp,
+                    top = 10.dp
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .padding(start = 16.dp, end = 16.dp,
-                        top = 10.dp),
+                    .padding(paddingValues),
             ) {
-                ScanFilterButtons(scanFilterOption, onFilter)
+                ScanFilterButtons(scanFilterOption, onFilter, appLayoutInfo)
             }
         } else {
 
@@ -59,10 +73,10 @@ fun ScanFilters(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top =4.dp, bottom = 4.dp, start = sidePadding, end = sidePadding),
+                    .padding(top = 4.dp, bottom = 4.dp, start = sidePadding, end = sidePadding),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ScanFilterButtons(scanFilterOption, onFilter)
+                ScanFilterButtons(scanFilterOption, onFilter, appLayoutInfo)
             }
         }
     }
@@ -73,11 +87,18 @@ fun ScanFilters(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun ScanFilterButtons(
     scanFilterOption: ScanFilterOption?,
-    onFilter: (ScanFilterOption?) -> Unit
+    onFilter: (ScanFilterOption?) -> Unit,
+    appLayoutInfo: AppLayoutInfo
 ) {
+
+    val scanFilterWidth = when(appLayoutInfo.appLayoutMode) {
+        AppLayoutMode.LANDSCAPE_BIG -> 150.dp
+        else -> 84.dp
+    }
+
     SCAN_FILTERS.forEachIndexed { index, scanFilter ->
         FilterChip(
-            modifier = Modifier.width(84.dp),
+            modifier = Modifier.width(scanFilterWidth),
             border = FilterChipDefaults.filterChipBorder(
                 borderColor = MaterialTheme.colorScheme.secondary,
                 //selectedBorderColor = MaterialTheme.colorScheme.outline
@@ -104,24 +125,10 @@ private fun ScanFilterButtons(
                     textAlign = TextAlign.Center
                     //color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-            },
-            /*leadingIcon = {
-                if (scanFilterOption?.ordinal == index) {
-                    Icon(
-                        imageVector = Icons.Outlined.Check,
-                        contentDescription = "Selected",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }*/
-                /*Icon(
-                            painter = painterResource(id = scanFilter.icon),
-                            contentDescription = scanFilter.text,
-                            tint = MaterialTheme.colorScheme.primary
-                            //modifier = Modifier.requiredSize(ChipDefaults.LeadingIconSize)
-                        )
-            }*/
-
+            }
         )
+        if (appLayoutInfo.appLayoutMode == AppLayoutMode.LANDSCAPE_BIG)
+            Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
@@ -141,6 +148,16 @@ fun PreviewScanFiltersLandscape() {
     SanTanScanTheme() {
         Surface {
             ScanFilters({}, ScanFilterOption.FAVORITES, landscapeNormal)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewScanFiltersLandscapeBig() {
+    SanTanScanTheme() {
+        Surface {
+            ScanFilters({}, ScanFilterOption.FAVORITES, landscapeBig)
         }
     }
 }
