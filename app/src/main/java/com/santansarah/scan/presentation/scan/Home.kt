@@ -1,6 +1,7 @@
 package com.santansarah.scan.presentation.scan
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -42,6 +43,12 @@ fun HomeRoute(
     val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionsList)
     val isScanning = vm.isScanning.collectAsStateWithLifecycle().value
     val isEditing = vm.isEditing.collectAsStateWithLifecycle().value
+    
+    BackHandler {
+        if (scanState.scanUI.selectedDevice != null) run {
+            vm.onBackFromDevice()
+        }
+    }
 
     LaunchedEffect(multiplePermissionsState.allPermissionsGranted) {
         if (multiplePermissionsState.allPermissionsGranted) {

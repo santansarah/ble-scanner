@@ -4,8 +4,12 @@
 
 > [Terms of Service](Terms.md) | [Privacy Policy](PrivacyPolicy.md)
 
-SanTanScan is a Bluetooth Low Energy (BLE) scanner and debugger available for Android 9+. It scans your
-home or office for any nearby BLE devices, allowing you to sort by signal strength (RSSI), device name, 
+<a href='https://play.google.com/store/apps/details?id=com.santansarah.scan&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' style="width:300px"/></a>
+
+SanTanScan is a Bluetooth Low Energy (BLE) scanner and debugger available for Android 9+. It scans
+your
+home or office for any nearby BLE devices, allowing you to sort by signal strength (RSSI), device
+name,
 and your favorite devices. From the home screen, you can also selected devices to 'forget'.
 
 Our BLE scan displays the following information:
@@ -19,7 +23,7 @@ Our BLE scan displays the following information:
 
 Once you click on a device, you can easily update its name. If you're a developer or an IoT
 enthusiast, we've got you covered too! Once a device is connected with BLE Gatt, all of its
-services are displayed, allowing you to easily page through each of them. You can read from each 
+services are displayed, allowing you to easily page through each of them. You can read from each
 characteristic and descriptor, which returns BLE device data in the following formats:
 
 * Text/String, when possible
@@ -40,17 +44,20 @@ devices to debug and validate all of your services.
 
 **ELK-BLEDOM Devices**
 
-Own an LED light strip? SanTanScan might be able to control it! If your device shows up as 
+Own an LED light strip? SanTanScan might be able to control it! If your device shows up as
 ELK-BLEDOM, our app supports turning your light strip on and off, and changing the color and
 brightness.
 
 ## BLE YouTube Playlist
-> A lot's changed in the app since I first started. If you'd like to follow along on my journey, check out the playlist below.
+
+> A lot's changed in the app since I first started. If you'd like to follow along on my journey,
+> check out the playlist below.
 
 <a href="https://www.youtube.com/playlist?list=PLzxawGXQRFsyAEuKdGBHj6Rhh2R_vYkFK" target="_blank"><img src="https://img.youtube.com/vi/CpBWF52IOk4/0.jpg"></a>
 
 ## BLE Scanner App Demo
-> Make sure the quality is set to HD in settings. 
+
+> Make sure the quality is set to HD in settings.
 
 <a href="https://www.youtube.com/watch?v=ZCs6SXIiObU" target="_blank"><img src="https://img.youtube.com/vi/ZCs6SXIiObU/0.jpg"></a>
 
@@ -73,15 +80,17 @@ Scan your BLE devices with my new Jetpack Compose app. BLE scans include:
 * Manufacturer specific data, when possible
 * and a timestamp of when the device was last seen
 
-Includes partial support for [Microsoft Beacon](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cdp/77b446d0-8cea-4821-ad21-fabdf4d9a569).
+Includes partial support
+for [Microsoft Beacon](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cdp/77b446d0-8cea-4821-ad21-fabdf4d9a569).
 
 ## Project Setup
 
-I use Google Analytics & Crashlytics to track app usage information. Because of this, I've 
-excluded my `google-services.json` file, so you'll have issues running the main branch as-is. 
+I use Google Analytics & Crashlytics to track app usage information. Because of this, I've
+excluded my `google-services.json` file, so you'll have issues running the main branch as-is.
 There are a few ways to get up and running:
 
-* Switch to the [`filters-previews-test`](https://github.com/santansarah/ble-scanner/tree/filters-previews-tests)
+* Switch to
+  the [`filters-previews-test`](https://github.com/santansarah/ble-scanner/tree/filters-previews-tests)
   branch. It doesn't use [Firebase](https://firebase.google.com/).
 * Comment out the [Firebase](https://firebase.google.com/) dependencies. Analytics is an Interface,
   so you could update the Koin DI folder to use an empty implementation.
@@ -96,7 +105,8 @@ https://youtu.be/CpBWF52IOk4
 In this video, I go over my data layer, which includes a pre-populated Room database. I’ll also
 go over my corresponding JUnit 5 tests. This video features:
 
-* Nordic's [Bluetooth Numbers Database](https://github.com/NordicSemiconductor/bluetooth-numbers-database)
+*
+Nordic's [Bluetooth Numbers Database](https://github.com/NordicSemiconductor/bluetooth-numbers-database)
 * DB Browser for SQLite
 * Room Entities, Dao
 * Koin Dependency Injection
@@ -113,7 +123,8 @@ over my Koin setup, Bluetooth permissions, composables, ScanResult parser, and J
 
 https://youtu.be/mjDDJ3HaBGg
 
-Learn how I use Bluetooth Gatt to connect to my BLE devices. In this video, I'll go over my Bluetooth
+Learn how I use Bluetooth Gatt to connect to my BLE devices. In this video, I'll go over my
+Bluetooth
 Gatt Callback, custom Characteristic parsers including Appearance, Preferred Connection Parameters,
 and Client Characteristic Configuration, and my BLE Scanner ViewModel. I'll also go over my
 Jetpack Compose BLE Service pager and Compose UI to interact with BLE devices.
@@ -122,7 +133,7 @@ Jetpack Compose BLE Service pager and Compose UI to interact with BLE devices.
 
 https://youtu.be/ZCs6SXIiObU
 
-In this demo, I go through my Light theme, Dark theme, Portrait and Landscape layouts, and my new 
+In this demo, I go through my Light theme, Dark theme, Portrait and Landscape layouts, and my new
 Control screen, which allows me to control my BLE LED light strip.
 
 ## Video 5: Filter and Sort Room Flows, Compose Preview Parameters, JVM 11 JUnit 5 Compose Testing
@@ -130,5 +141,5 @@ Control screen, which allows me to control my BLE LED light strip.
 https://youtu.be/TJ2AlSdMGL4
 
 I'm getting close to the finish line for my BLE Scanner app. In this video, I go over my recent
-updates, including Adaptive Layouts, filter and sort features, Compose Preview Parameters, and 
+updates, including Adaptive Layouts, filter and sort features, Compose Preview Parameters, and
 Android tests.

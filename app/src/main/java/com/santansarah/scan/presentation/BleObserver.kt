@@ -96,8 +96,14 @@ class BleObserver(
     }
 
     private fun launchEnableBtAdapter() {
-        val btEnableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        btEnableResultLauncher.launch(btEnableIntent)
+        //if (bleManager.scanEnabled) {
+        try {
+            val btEnableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            btEnableResultLauncher.launch(btEnableIntent)
+        } catch (e: Exception) {
+            //Timber.tag("LAUNCH_BT_ENABLE").e(e)
+        }
+        //}
     }
 
     private fun registerHandler(owner: LifecycleOwner, key: String) = registry.register(

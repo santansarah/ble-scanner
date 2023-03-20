@@ -42,6 +42,7 @@ class BleGatt(
     val deviceDetails = MutableStateFlow<List<DeviceService>>(emptyList())
 
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
+
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
 
@@ -201,13 +202,16 @@ class BleGatt(
     }
 
     fun connect(address: String) {
-        btAdapter.let { adapter ->
-            try {
-                connectMessage.value = ConnectionState.CONNECTING
-                val device = adapter.getRemoteDevice(address)
-                device.connectGatt(app, false, bluetoothGattCallback)
-            } catch (exception: IllegalArgumentException) {
-                Timber.w("Device not found with provided address.")
+        if (btAdapter.isEnabled) {
+            btAdapter.let { adapter ->
+                try {
+                    connectMessage.value = ConnectionState.CONNECTING
+                    val device = adapter.getRemoteDevice(address)
+                    device.connectGatt(app, false, bluetoothGattCallback)
+                } catch (e: Exception) {
+                    connectMessage.value = ConnectionState.DISCONNECTED
+                    Timber.tag("BTGATT_CONNECT").e(e)
+                }
             }
         }
     }
@@ -273,12 +277,17 @@ class BleGatt(
     fun close() {
         connectMessage.value = ConnectionState.DISCONNECTED
         deviceDetails.value = emptyList()
-        btGatt?.let { gatt ->
-            gatt.disconnect()
-            gatt.close()
+        try {
+            btGatt?.let { gatt ->
+                gatt.disconnect()
+                gatt.close()
+                btGatt = null
+            }
+        } catch (e: Exception) {
+            Timber.tag("BTGATT_CLOSE").e(e)
+        } finally {
             btGatt = null
         }
     }
-
 
 }
