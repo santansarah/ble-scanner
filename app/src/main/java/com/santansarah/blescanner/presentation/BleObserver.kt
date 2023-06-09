@@ -1,4 +1,4 @@
-package com.santansarah.blescanner.presentation
+package com.santansarah.scan.presentation
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.santansarah.blescanner.presentation.BleManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
@@ -30,8 +31,29 @@ class BleObserver(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
+
         createBroadcastReceiver()
         btEnableResultLauncher = registerHandler(owner, "EnableBLE")
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+
+        Timber.d("onPause called")
+
+        try {
+            activity.unregisterReceiver(broadcastReceiver)
+        } catch (_: Exception) {
+
+        } finally {
+            bleManager.stopScan()
+        }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+
+        Timber.d("onResume called...")
 
         ContextCompat.registerReceiver(
             activity, broadcastReceiver,
@@ -39,49 +61,35 @@ class BleObserver(
             ContextCompat.RECEIVER_EXPORTED
         )
 
-        if (!btAdapter.isEnabled) {
+        if (!btAdapter.isEnabled)
             launchEnableBtAdapter()
-        }
 
-    }
-
-    override fun onPause(owner: LifecycleOwner) {
-        super.onPause(owner)
-        Timber.d("onPause")
-        try {
-            activity.unregisterReceiver(broadcastReceiver)
-        } catch (_: Exception) {
-
-        }
-        //bleManager.stopScan()
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        Timber.d("onResume")
-       // bleManager.scan()
+        bleManager.scan()
     }
 
     private fun createBroadcastReceiver() {
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
 
-                //activity.lifecycleScope.launch {
+                // activity.lifecycleScope.launch {
                 val action = intent.action
                 Timber.d("btadapter changed $action")
 
                 // It means the user has changed their bluetooth state.
                 if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    Timber.d("btadapter state: ${btAdapter.state} / ${btAdapter.isEnabled}")
                     if (btAdapter.state == BluetoothAdapter.STATE_OFF) {
-                        bleManager.stopScan()
+                        //bleManager.isScanning.value = false
+                        //bleManager.stopScan()
                         launchEnableBtAdapter()
                     }
-                    /*if (btAdapter.state == BluetoothAdapter.STATE_ON) {
+                    if (btAdapter.state == BluetoothAdapter.STATE_ON) {
+                        //Timber.d("btadapter back on...")
                         //delay(300L)
-                        bleManager.scan()
-                    }*/
+                        //bleManager.scan()
+                    }
+                    //}
                 }
-                // }
             }
 
 
@@ -89,8 +97,14 @@ class BleObserver(
     }
 
     private fun launchEnableBtAdapter() {
-        val btEnableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        btEnableResultLauncher.launch(btEnableIntent)
+        //if (bleManager.scanEnabled) {
+        try {
+            val btEnableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            btEnableResultLauncher.launch(btEnableIntent)
+        } catch (e: Exception) {
+            //Timber.tag("LAUNCH_BT_ENABLE").e(e)
+        }
+        //}
     }
 
     private fun registerHandler(owner: LifecycleOwner, key: String) = registry.register(
@@ -101,7 +115,6 @@ class BleObserver(
         if (result.resultCode == Activity.RESULT_OK) {
             // There are no request codes
             val data: Intent? = result.data
-            bleManager.scan()
             //bleManager.scan()
         }
     }

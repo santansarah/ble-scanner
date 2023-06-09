@@ -14,6 +14,7 @@ import com.santansarah.blescanner.presentation.theme.BLEScannerTheme
 import com.santansarah.blescanner.utils.windowinfo.getFoldableInfoFlow
 import com.santansarah.blescanner.utils.windowinfo.getWindowLayoutType
 import com.santansarah.blescanner.utils.windowinfo.getWindowSizeClasses
+import com.santansarah.scan.presentation.BleObserver
 
 
 class MainActivity : ComponentActivity() {
